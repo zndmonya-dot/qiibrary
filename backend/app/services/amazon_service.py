@@ -70,9 +70,9 @@ class AmazonService:
             'dummy' in self.secret_key.lower()
         )
     
-    async def get_book_info(self, asin: str, locale: str = 'ja') -> Optional[Dict[str, Any]]:
+    def get_book_info_sync(self, asin: str, locale: str = 'ja') -> Optional[Dict[str, Any]]:
         """
-        ASINから書籍情報を取得
+        ASINから書籍情報を取得（同期版）
         
         Args:
             asin: Amazon ASIN
@@ -85,20 +85,47 @@ class AmazonService:
         region = 'JP' if locale == 'ja' else 'US'
         domain = 'amazon.co.jp' if locale == 'ja' else 'amazon.com'
         
-        # Amazon API が有効な場合は実際のデータを取得
+        # 1. Amazon API が有効な場合は実際のデータを取得
         if self.enabled and self.client:
             try:
-                return await self._fetch_from_api(asin, region, domain)
+                return self._fetch_from_api_sync(asin, region, domain)
             except Exception as e:
                 logger.error(f"Amazon API error for ASIN {asin}: {e}")
-                # エラー時はフォールバック
-                return self._create_fallback_book_info(asin, domain, locale)
-        else:
-            # デモモード：最低限の情報を返す
-            return self._create_fallback_book_info(asin, domain, locale)
+        
+        # 2. Google Books APIにフォールバック（実データ）
+        try:
+            from app.services.google_books_service import get_google_books_service
+            google_books = get_google_books_service()
+            book_info = google_books.get_book_info(asin, locale)
+            
+            if book_info:
+                logger.info(f"✓ Google Books API: '{book_info['title']}' の情報を取得")
+                # アフィリエイトタグを追加
+                book_info['affiliate_url'] = f"https://www.{domain}/dp/{asin}?tag={self.associate_tag}"
+                return book_info
+        except Exception as e:
+            logger.error(f"Google Books API error for ASIN {asin}: {e}")
+        
+        # 3. 最終的にダミーデータ
+        logger.warning(f"⚠ ダミーデータを使用: {asin}")
+        return self._create_fallback_book_info(asin, domain, locale)
     
-    async def _fetch_from_api(self, asin: str, region: str, domain: str) -> Optional[Dict[str, Any]]:
-        """Amazon APIから実際のデータを取得"""
+    async def get_book_info(self, asin: str, locale: str = 'ja') -> Optional[Dict[str, Any]]:
+        """
+        ASINから書籍情報を取得（非同期版）
+        
+        Args:
+            asin: Amazon ASIN
+            locale: ロケール ('ja' または 'en')
+        
+        Returns:
+            書籍情報の辞書、エラー時はNone
+        """
+        # 同期版を呼び出す
+        return self.get_book_info_sync(asin, locale)
+    
+    def _fetch_from_api_sync(self, asin: str, region: str, domain: str) -> Optional[Dict[str, Any]]:
+        """Amazon APIから実際のデータを取得（同期版）"""
         try:
             # API呼び出し
             response = self.client.get_items(
@@ -145,21 +172,60 @@ class AmazonService:
             logger.error(f"Error fetching from Amazon API: {e}")
             raise
     
+    async def _fetch_from_api(self, asin: str, region: str, domain: str) -> Optional[Dict[str, Any]]:
+        """Amazon APIから実際のデータを取得（非同期版）"""
+        return self._fetch_from_api_sync(asin, region, domain)
+    
     def _create_fallback_book_info(self, asin: str, domain: str, locale: str) -> Dict[str, Any]:
-        """フォールバック用の書籍情報を生成"""
+        """フォールバック用の書籍情報を生成（開発用ダミーデータ）"""
+        import random
+        from datetime import datetime, timedelta
+        
+        # より見栄えの良いダミータイトルを生成
+        if locale == 'ja':
+            title_templates = [
+                f"IT技術書 - {asin}",
+                f"プログラミング入門 [{asin[:4]}]",
+                f"ソフトウェア設計の基礎 ({asin[-4:]})",
+                f"クラウド開発実践ガイド",
+                f"データベース設計入門",
+            ]
+            author = "技術評論社 編集部"
+            publisher = "技術評論社" if random.random() > 0.5 else "オライリー・ジャパン"
+        else:
+            title_templates = [
+                f"Programming Guide - {asin}",
+                f"Software Engineering [{asin[:4]}]",
+                f"Cloud Development ({asin[-4:]})",
+                f"Database Design Patterns",
+                f"System Architecture Guide",
+            ]
+            author = "Tech Publications"
+            publisher = "O'Reilly Media" if random.random() > 0.5 else "Manning Publications"
+        
+        title = random.choice(title_templates)
+        
+        # ダミーの日付・価格・評価を生成
+        days_ago = random.randint(30, 1095)  # 過去1ヶ月〜3年
+        pub_date = datetime.now() - timedelta(days=days_ago)
+        
+        price = random.choice([2980, 3280, 3680, 3980, 4280])
+        rating = round(random.uniform(3.5, 4.8), 1)
+        review_count = random.randint(50, 2000)
+        
         return {
             'asin': asin,
-            'title': f"Book {asin}",
-            'author': None,
-            'publisher': None,
-            'publication_date': None,
-            'price': None,
+            'title': title,
+            'author': author,
+            'publisher': publisher,
+            'publication_date': pub_date,
+            'price': price,
             'sale_price': None,
             'discount_rate': None,
-            'rating': None,
-            'review_count': None,
-            'image_url': f"https://m.media-amazon.com/images/I/{asin}.jpg",
-            'description': None,
+            'rating': rating,
+            'review_count': review_count,
+            'image_url': f"https://placehold.co/400x600/1a1a1a/white?text={asin[:8]}",
+            'description': f"（Amazon APIキー未設定のため、ダミーデータを表示しています。実際の書籍情報を取得するには、backend/.env にAmazon API認証情報を設定してください。ASIN: {asin}）",
             'amazon_url': f"https://www.{domain}/dp/{asin}",
             'affiliate_url': f"https://www.{domain}/dp/{asin}?tag={self.associate_tag}",
             'locale': locale,

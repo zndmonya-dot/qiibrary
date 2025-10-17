@@ -18,6 +18,22 @@ const nextConfig = {
         protocol: 'https',
         hostname: 'placehold.co',
       },
+      {
+        protocol: 'http',
+        hostname: 'books.google.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'books.google.com',
+      },
+      {
+        protocol: 'http',
+        hostname: 'books.google.co.jp',
+      },
+      {
+        protocol: 'https',
+        hostname: 'books.google.co.jp',
+      },
     ],
     dangerouslyAllowSVG: true,
     contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",

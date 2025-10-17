@@ -116,10 +116,21 @@ class BookTuberSetup:
         return asins
     
     def get_book_info_from_asin(self, asin: str, locale: str):
-        """ASINから書籍情報を取得（同期版 - デモモード用）"""
+        """ASINから書籍情報を取得"""
         amazon_service = get_amazon_service(locale)
-        # デモモードでは簡易的な書籍情報を返す
+        
+        try:
+            # Amazon APIから実際のデータを取得（同期版）
+            book_info = amazon_service.get_book_info_sync(asin, locale)
+            if book_info:
+                print(f"  ✓ Amazon API: '{book_info.get('title', asin)}' の情報を取得")
+                return book_info
+        except Exception as e:
+            print(f"  ⚠ Amazon API エラー (ASIN: {asin}): {e}")
+        
+        # APIが失敗した場合はダミーデータを返す
         domain = 'amazon.co.jp' if locale == 'ja' else 'amazon.com'
+        print(f"  ℹ ダミーデータを使用: {asin}")
         return {
             'asin': asin,
             'title': f"Book {asin}",
@@ -234,6 +245,14 @@ class BookTuberSetup:
                     
                     existing_video = db.query(YouTubeVideo).filter_by(video_id=video_id).first()
                     if not existing_video:
+                        # published_at が文字列の場合は datetime に変換
+                        published_at_raw = video_data.get('published_at', datetime.now())
+                        if isinstance(published_at_raw, str):
+                            # ISO形式の文字列をdatetimeに変換
+                            published_at = datetime.fromisoformat(published_at_raw.replace('Z', '+00:00'))
+                        else:
+                            published_at = published_at_raw
+                        
                         video = YouTubeVideo(
                             video_id=video_id,
                             title=video_data['title'],
@@ -244,7 +263,7 @@ class BookTuberSetup:
                             video_url=f"https://www.youtube.com/watch?v={video_id}",
                             view_count=video_data.get('view_count', 0),
                             like_count=video_data.get('like_count', 0),
-                            published_at=video_data.get('published_at', datetime.now()),
+                            published_at=published_at,
                             locale=locale,
                         )
                         db.add(video)
@@ -271,7 +290,12 @@ class BookTuberSetup:
                     # 書籍の統計を更新
                     book.total_views += video.view_count
                     book.total_mentions += 1
-                    if not book.latest_mention_at or video.published_at > book.latest_mention_at:
+                    
+                    # datetimeのタイムゾーンを統一して比較
+                    video_pub_naive = video.published_at.replace(tzinfo=None) if video.published_at.tzinfo else video.published_at
+                    book_mention_naive = book.latest_mention_at.replace(tzinfo=None) if (book.latest_mention_at and book.latest_mention_at.tzinfo) else book.latest_mention_at
+                    
+                    if not book_mention_naive or video_pub_naive > book_mention_naive:
                         book.latest_mention_at = video.published_at
             
             db.commit()

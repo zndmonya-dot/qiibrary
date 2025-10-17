@@ -72,7 +72,7 @@ class YouTubeService:
                 videoDefinition=self.config['video_definition'],
             ).execute()
             
-            videos = []
+            video_ids = []
             for item in search_response.get('items', []):
                 video_id = item['id']['videoId']
                 snippet = item['snippet']
@@ -82,18 +82,16 @@ class YouTubeService:
                     logger.info(f"除外: {snippet['title']}")
                     continue
                 
-                videos.append({
-                    'video_id': video_id,
-                    'title': snippet['title'],
-                    'description': snippet.get('description', ''),
-                    'channel_id': snippet['channelId'],
-                    'channel_name': snippet['channelTitle'],
-                    'published_at': snippet['publishedAt'],
-                    'thumbnail_url': snippet['thumbnails']['high']['url'],
-                })
+                video_ids.append(video_id)
             
-            logger.info(f"検索完了: '{query}' -> {len(videos)}件")
-            return videos
+            # 統計情報を含む詳細情報を取得
+            if video_ids:
+                videos = self.get_video_details(video_ids)
+                logger.info(f"検索完了: '{query}' -> {len(videos)}件")
+                return videos
+            else:
+                logger.info(f"検索完了: '{query}' -> 0件")
+                return []
         
         except HttpError as e:
             logger.error(f"YouTube API エラー: {e}")
