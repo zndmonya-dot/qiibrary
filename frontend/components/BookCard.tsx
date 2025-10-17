@@ -8,6 +8,7 @@ import { t, getLocale } from '@/lib/locale';
 import { useState, useEffect } from 'react';
 import StarRating from './StarRating';
 import PriceDisplay from './PriceDisplay';
+import { analytics } from '@/lib/analytics';
 
 interface BookCardProps {
   rank: number;
@@ -61,7 +62,12 @@ export default function BookCard({ rank, book, stats }: BookCardProps) {
       
       {/* 書籍画像（大きく・中央配置） */}
       <div className="flex-shrink-0 flex items-center justify-center">
-        <Link href={`/books/${book.asin}`} prefetch={true} className="block transition-opacity duration-200 hover:opacity-90">
+        <Link 
+          href={`/books/${book.asin}`} 
+          prefetch={true} 
+          className="block transition-opacity duration-200 hover:opacity-90"
+          onClick={() => analytics.clickBook(book.asin, book.title, rank)}
+        >
               {book.image_url ? (
                 <div className="relative w-[160px] h-[240px]">
                   <Image
@@ -91,7 +97,12 @@ export default function BookCard({ rank, book, stats }: BookCardProps) {
       
           {/* 書籍情報（左側） */}
           <div className="flex-1 min-w-0 max-w-md">
-            <Link href={`/books/${book.asin}`} prefetch={true} className="hover:text-youtube-red transition-colors duration-200 inline-block">
+            <Link 
+              href={`/books/${book.asin}`} 
+              prefetch={true} 
+              className="hover:text-youtube-red transition-colors duration-200 inline-block"
+              onClick={() => analytics.clickBook(book.asin, book.title, rank)}
+            >
               <h3 className="text-lg font-semibold mb-2 line-clamp-2">
                 {book.title}
               </h3>
@@ -176,6 +187,7 @@ export default function BookCard({ rank, book, stats }: BookCardProps) {
               href={`/books/${book.asin}`}
               prefetch={true}
               className="inline-flex items-center gap-1 border-2 border-youtube-red text-youtube-red hover:bg-youtube-red hover:text-white px-4 py-2 rounded text-sm font-medium transition-all duration-200"
+              onClick={() => analytics.clickBook(book.asin, book.title, rank)}
             >
               <i className="ri-play-circle-line text-lg"></i>
               {t('watchVideos')}
@@ -185,6 +197,7 @@ export default function BookCard({ rank, book, stats }: BookCardProps) {
               target="_blank"
               rel="noopener noreferrer"
               className="btn-youtube inline-flex items-center gap-1 text-sm"
+              onClick={() => analytics.clickAmazonLink(book.asin, book.title)}
             >
               <i className="ri-shopping-cart-line text-lg"></i>
               {t('buyOnAmazon')}

@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
 import { getLocale, setLocale, t, type Locale } from '@/lib/locale';
+import { analytics } from '@/lib/analytics';
 
 export default function Header() {
   const [locale, setLocaleState] = useState<Locale>('ja');
@@ -25,6 +26,7 @@ export default function Header() {
   const handleLocaleChange = (newLocale: Locale) => {
     setLocale(newLocale);
     setLocaleState(newLocale);
+    analytics.changeLocale(newLocale);
   };
 
   return (

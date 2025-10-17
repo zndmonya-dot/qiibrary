@@ -5,6 +5,7 @@ import Header from '@/components/Header';
 import BookCard from '@/components/BookCard';
 import { getRankings, RankingResponse } from '@/lib/api';
 import { getLocale, t } from '@/lib/locale';
+import { analytics, trackPageView } from '@/lib/analytics';
 
 type PeriodType = 'daily' | 'monthly' | 'yearly';
 
@@ -112,7 +113,10 @@ export default function Home() {
         {/* タブ */}
         <div className="flex gap-2 mb-6 border-b border-youtube-dark-surface">
           <button
-            onClick={() => setPeriod('daily')}
+            onClick={() => {
+              setPeriod('daily');
+              analytics.changeRankingPeriod('daily');
+            }}
             className={`tab-button ${
               period === 'daily'
                 ? 'text-white active'
@@ -123,7 +127,10 @@ export default function Home() {
             {t('today')}
           </button>
           <button
-            onClick={() => setPeriod('monthly')}
+            onClick={() => {
+              setPeriod('monthly');
+              analytics.changeRankingPeriod('monthly');
+            }}
             className={`tab-button ${
               period === 'monthly'
                 ? 'text-white active'
@@ -134,7 +141,10 @@ export default function Home() {
             {t('thisMonth')}
           </button>
           <button
-            onClick={() => setPeriod('yearly')}
+            onClick={() => {
+              setPeriod('yearly');
+              analytics.changeRankingPeriod('yearly');
+            }}
             className={`tab-button ${
               period === 'yearly'
                 ? 'text-white active'
