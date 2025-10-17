@@ -3,8 +3,8 @@ from typing import Optional
 
 
 class Settings(BaseSettings):
-    # Database（サンプルデモ用にオプショナル）
-    DATABASE_URL: str = "postgresql://user:password@localhost:5432/booktube"
+    # Database
+    DATABASE_URL: str = "postgresql://postgres:postgres@localhost:5432/booktuber?client_encoding=utf8"
     
     # Redis（サンプルデモ用にオプショナル）
     REDIS_URL: str = "redis://localhost:6379/0"
@@ -34,6 +34,7 @@ class Settings(BaseSettings):
     
     class Config:
         env_file = ".env"
+        env_file_encoding = 'utf-8'
         case_sensitive = True
 
 

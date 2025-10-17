@@ -58,7 +58,10 @@ async def get_today_rankings(
         }
     
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"ランキング取得エラー: {str(e)}")
+        import traceback
+        error_msg = f"Ranking error: {repr(e)}"
+        traceback.print_exc()
+        raise HTTPException(status_code=500, detail=error_msg)
 
 
 @router.get("/last30days", response_model=dict)
@@ -100,7 +103,10 @@ async def get_last30days_rankings(
         }
     
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"ランキング取得エラー: {str(e)}")
+        import traceback
+        error_msg = f"Ranking error: {repr(e)}"
+        traceback.print_exc()
+        raise HTTPException(status_code=500, detail=error_msg)
 
 
 @router.get("/last365days", response_model=dict)
@@ -142,7 +148,10 @@ async def get_last365days_rankings(
         }
     
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"ランキング取得エラー: {str(e)}")
+        import traceback
+        error_msg = f"Ranking error: {repr(e)}"
+        traceback.print_exc()
+        raise HTTPException(status_code=500, detail=error_msg)
 
 
 @router.get("/monthly/{year}/{month}", response_model=dict)
@@ -189,7 +198,10 @@ async def get_monthly_archive_rankings(
         }
     
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"ランキング取得エラー: {str(e)}")
+        import traceback
+        error_msg = f"Ranking error: {repr(e)}"
+        traceback.print_exc()
+        raise HTTPException(status_code=500, detail=error_msg)
 
 
 @router.get("/yearly/{year}", response_model=dict)
@@ -229,7 +241,10 @@ async def get_yearly_archive_rankings(
         }
     
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"ランキング取得エラー: {str(e)}")
+        import traceback
+        error_msg = f"Ranking error: {repr(e)}"
+        traceback.print_exc()
+        raise HTTPException(status_code=500, detail=error_msg)
 
 
 # レガシーエンドポイント（互換性のため残す）
