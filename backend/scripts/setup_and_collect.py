@@ -96,8 +96,24 @@ class BookTuberSetup:
     def extract_amazon_links_from_video(self, video: dict, locale: str):
         """動画からAmazonリンクを抽出"""
         description = video.get('description', '')
-        links = self.link_extractor.extract_amazon_links(description, locale)
-        return links
+        amazon_info = self.link_extractor.extract_amazon_info(description)
+        
+        # ロケールに合ったASINのみを抽出
+        asins = []
+        for info in amazon_info:
+            asin = info.get('asin')
+            marketplace = info.get('marketplace', 'jp')
+            
+            # ロケールに応じてフィルタリング
+            if locale == 'ja' and marketplace == 'jp':
+                asins.append(asin)
+            elif locale == 'en' and marketplace == 'com':
+                asins.append(asin)
+            elif marketplace == 'unknown':
+                # マーケットプレイスが不明な場合は現在のロケールと仮定
+                asins.append(asin)
+        
+        return asins
     
     def get_book_info_from_asin(self, asin: str, locale: str):
         """ASINから書籍情報を取得（同期版 - デモモード用）"""
