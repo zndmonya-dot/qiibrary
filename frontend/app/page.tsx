@@ -236,7 +236,7 @@ export default function Home() {
       {/* フッター */}
       <footer className="border-t border-youtube-dark-surface mt-20 py-8">
         <div className="container mx-auto px-4 text-center text-secondary text-sm">
-          <p>&copy; 2025 BookTube. All rights reserved.</p>
+          <p>&copy; 2025 BookTuber. All rights reserved.</p>
           <p className="mt-2">
             {t('description')}
           </p>

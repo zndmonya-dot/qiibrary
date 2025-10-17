@@ -4,7 +4,7 @@ from .config import settings
 from .api import rankings, books
 
 app = FastAPI(
-    title="BookTube API",
+    title="BookTuber API",
     description="YouTubeで紹介されたIT技術書ランキングAPI",
     version="0.1.0"
 )
@@ -26,7 +26,7 @@ app.include_router(books.router, prefix="/api/books", tags=["books"])
 @app.get("/")
 async def root():
     return {
-        "message": "BookTube API",
+        "message": "BookTuber API",
         "version": "0.1.0",
         "docs": "/docs"
     }

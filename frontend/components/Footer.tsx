@@ -31,7 +31,7 @@ export default function Footer() {
           <div className="md:col-span-2 lg:col-span-1">
             <h3 className="text-xl font-bold mb-4 flex items-center gap-2">
               <i className="ri-book-2-line text-youtube-red text-2xl"></i>
-              <span className="text-white">BookTube</span>
+              <span className="text-white">BookTuber</span>
             </h3>
             <p className="text-sm text-secondary leading-relaxed">
               {locale === 'ja' 
@@ -136,7 +136,7 @@ export default function Footer() {
           <div className="flex flex-col md:flex-row justify-between items-center gap-3 text-xs text-secondary">
             <div className="flex items-center gap-2">
               <i className="ri-copyright-line"></i>
-              <span>{currentYear} BookTube. All rights reserved.</span>
+              <span>{currentYear} BookTuber. All rights reserved.</span>
             </div>
             <div className="flex items-center gap-2">
               <i className="ri-amazon-line text-youtube-red"></i>

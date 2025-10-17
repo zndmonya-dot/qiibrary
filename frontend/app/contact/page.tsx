@@ -36,7 +36,7 @@ export default function ContactPage() {
 
               <div className="space-y-6 text-secondary leading-relaxed">
                 <p>
-                  BookTubeに関するご質問、ご要望、バグ報告などがございましたら、
+                  BookTuberに関するご質問、ご要望、バグ報告などがございましたら、
                   以下のいずれかの方法でお気軽にお問い合わせください。
                 </p>
 
@@ -148,7 +148,7 @@ export default function ContactPage() {
 
               <div className="space-y-6 text-secondary leading-relaxed">
                 <p>
-                  If you have questions, requests, or bug reports about BookTube,
+                  If you have questions, requests, or bug reports about BookTuber,
                   please feel free to contact us through any of the following methods.
                 </p>
 

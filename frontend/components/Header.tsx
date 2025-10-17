@@ -34,7 +34,7 @@ export default function Header() {
               <i className="ri-book-2-line text-2xl text-youtube-red"></i>
               <h1 className="text-xl font-bold">
                 <span className="text-youtube-red">Book</span>
-                <span className="text-white">Tube</span>
+                <span className="text-white">Tuber</span>
               </h1>
             </Link>
         

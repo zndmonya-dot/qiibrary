@@ -1,4 +1,4 @@
-# BookTube Frontend (Next.js)
+# BookTuber Frontend (Next.js)
 
 ## セットアップ
 

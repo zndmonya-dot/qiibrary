@@ -38,7 +38,7 @@ export default function TermsPage() {
                 <section>
                   <h2 className="text-xl font-semibold text-white mb-3">第1条（適用）</h2>
                   <p>
-                    本規約は、当サイト（BookTube）が提供するサービス（以下「本サービス」といいます）の利用条件を定めるものです。
+                    本規約は、当サイト（BookTuber）が提供するサービス（以下「本サービス」といいます）の利用条件を定めるものです。
                     利用者は、本サービスを利用することにより、本規約に同意したものとみなされます。
                   </p>
                 </section>
@@ -138,7 +138,7 @@ export default function TermsPage() {
                 <section>
                   <h2 className="text-xl font-semibold text-white mb-3">Article 1 (Application)</h2>
                   <p>
-                    These Terms of Service define the conditions for using the services provided by this site (BookTube) (hereinafter referred to as "the Service").
+                    These Terms of Service define the conditions for using the services provided by this site (BookTuber) (hereinafter referred to as "the Service").
                     By using the Service, users are deemed to have agreed to these Terms.
                   </p>
                 </section>

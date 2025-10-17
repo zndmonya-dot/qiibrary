@@ -31,7 +31,7 @@ export default function AboutPage() {
             <>
               <h1 className="text-3xl font-bold mb-6 flex items-center gap-2">
                 <i className="ri-information-line text-youtube-red"></i>
-                BookTubeについて
+                BookTuberについて
               </h1>
 
               <div className="space-y-8 text-secondary leading-relaxed">
@@ -42,11 +42,11 @@ export default function AboutPage() {
                     サイトの目的
                   </h2>
                   <p className="mb-3">
-                    BookTubeは、YouTubeで紹介されたIT技術書をランキング形式で表示するサービスです。
+                    BookTuberは、YouTubeで紹介されたIT技術書をランキング形式で表示するサービスです。
                   </p>
                   <p className="mb-3">
                     技術書選びに迷ったとき、「YouTubeで人気の本は何だろう？」と思ったことはありませんか？
-                    BookTubeは、そんな疑問を解決するために生まれました。
+                    BookTuberは、そんな疑問を解決するために生まれました。
                   </p>
                   <p>
                     YouTubeのエンジニア系チャンネルで紹介された技術書を集計し、
@@ -234,7 +234,7 @@ export default function AboutPage() {
             <>
               <h1 className="text-3xl font-bold mb-6 flex items-center gap-2">
                 <i className="ri-information-line text-youtube-red"></i>
-                About BookTube
+                About BookTuber
               </h1>
 
               <div className="space-y-8 text-secondary leading-relaxed">
@@ -245,11 +245,11 @@ export default function AboutPage() {
                     Our Purpose
                   </h2>
                   <p className="mb-3">
-                    BookTube is a service that displays IT technical books featured on YouTube in a ranking format.
+                    BookTuber is a service that displays IT technical books featured on YouTube in a ranking format.
                   </p>
                   <p className="mb-3">
                     Ever wondered "What books are popular on YouTube?" when choosing technical books?
-                    BookTube was created to answer that question.
+                    BookTuber was created to answer that question.
                   </p>
                   <p>
                     We aggregate technical books introduced on engineering YouTube channels

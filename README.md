@@ -1,4 +1,4 @@
-# BookTube - IT技術書ランキングWebサービス
+# BookTuber - IT技術書ランキングWebサービス
 
 YouTubeで紹介されたIT技術書をランキング形式で表示するWebサービス。
 YouTube動画の概要欄に記載されたAmazonリンクから書籍情報を自動収集し、日別・月別・年別のランキングを提供します。
@@ -410,7 +410,7 @@ def update_book_info():
 
 ```
 ┌────────────────────────────────────────────────┐
-│ 🎯 BookTube - IT技術書ランキング                │
+│ 🎯 BookTuber - IT技術書ランキング                │
 │                                                │
 │ [ 今日 ] [ 今月 ] [ 今年 ]  ← タブ            │
 │                                                │
@@ -539,7 +539,7 @@ export async function generateMetadata({ params }) {
   const book = await fetchBook(params.asin);
   
   return {
-    title: `${book.title} - IT技術書ランキング | BookTube`,
+    title: `${book.title} - IT技術書ランキング | BookTuber`,
     description: `${book.title}（${book.author}）のランキング情報。YouTubeで紹介された回数や再生数をチェック。`,
     openGraph: {
       title: book.title,

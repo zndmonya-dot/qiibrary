@@ -1,4 +1,4 @@
-# BookTube Backend (FastAPI)
+# BookTuber Backend (FastAPI)
 
 ## セットアップ
 
