@@ -4,6 +4,7 @@ IT技術書を効率的に発見するためのキーワード戦略
 """
 
 from typing import List, Dict
+from datetime import datetime
 
 # 日本語キーワード（ja）
 JAPANESE_KEYWORDS = {
