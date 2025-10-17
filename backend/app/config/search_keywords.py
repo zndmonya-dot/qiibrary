@@ -195,6 +195,7 @@ ENGLISH_KEYWORDS = {
 }
 
 # 高優先度キーワード（まず最初に試すべき）
+# 注: YouTube API クォータ節約のため、1日5-10個に制限
 HIGH_PRIORITY_KEYWORDS_JA = [
     "プログラミング 本 おすすめ 2024",
     "技術書 レビュー",
@@ -218,6 +219,27 @@ HIGH_PRIORITY_KEYWORDS_EN = [
     "Clean Code",
     "design patterns books",
 ]
+
+# ローテーション用キーワードグループ（曜日別に使用）
+KEYWORD_ROTATION_JA = {
+    0: ["プログラミング 本 おすすめ 2024", "Python 本", "JavaScript 本"],  # 月曜日
+    1: ["技術書 レビュー", "React 本", "AWS 本"],  # 火曜日
+    2: ["エンジニア 本 おすすめ", "設計 本", "Clean Code"],  # 水曜日
+    3: ["リーダブルコード", "Docker 本", "SQL 本"],  # 木曜日
+    4: ["Kubernetes 本", "TypeScript 本", "Go言語 本"],  # 金曜日
+    5: ["機械学習 本", "データサイエンス 本", "統計学 本"],  # 土曜日
+    6: ["アルゴリズム 本", "Web開発 本", "アーキテクチャ 本"],  # 日曜日
+}
+
+KEYWORD_ROTATION_EN = {
+    0: ["best programming books 2024", "Python books", "JavaScript books"],
+    1: ["software engineering books", "React books", "AWS books"],
+    2: ["Clean Code", "design patterns books", "refactoring books"],
+    3: ["Docker books", "Kubernetes books", "DevOps books"],
+    4: ["TypeScript books", "Go programming books", "Rust books"],
+    5: ["machine learning books", "data science books", "AI books"],
+    6: ["algorithms books", "web development books", "system design books"],
+}
 
 # 除外キーワード（これらを含む動画は除外）
 EXCLUDE_KEYWORDS = [
@@ -285,5 +307,12 @@ SEARCH_CONFIG = {
     # スケジュール設定
     "search_interval_hours": 24,   # 検索実行間隔（時間）
     "update_ranking_hours": 1,     # ランキング更新間隔（時間）
+    
+    # YouTube API クォータ管理
+    "daily_quota_limit": 10000,    # 1日の最大クォータ
+    "search_quota_cost": 100,      # 検索1回のコスト
+    "video_detail_quota_cost": 1,  # 動画詳細1件のコスト
+    "max_searches_per_day": 10,    # 1日の最大検索回数（クォータ節約）
+    "keywords_per_search": 3,      # 1回の検索で使用するキーワード数（曜日ローテーション）
 }
 
