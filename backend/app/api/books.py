@@ -1,74 +1,115 @@
-from fastapi import APIRouter, HTTPException
+"""
+書籍APIエンドポイント
+実データベースから書籍詳細を取得
+"""
+
+from fastapi import APIRouter, HTTPException, Depends
+from sqlalchemy.orm import Session
 from typing import List
-from ..schemas.book import BookDetail, YouTubeVideo
+
+from ..database import SessionLocal
+from ..models.book import Book
+from ..models.youtube_video import YouTubeVideo, BookMention
+from ..schemas.book import BookDetail, YouTubeVideo as YouTubeVideoSchema
 
 router = APIRouter()
 
 
-# サンプルデータ
-SAMPLE_BOOKS_DETAIL = {
-    "4873115655": {
-        "id": 1,
-        "asin": "4873115655",
-        "title": "リーダブルコード",
-        "author": "Dustin Boswell, Trevor Foucher",
-        "publisher": "オライリージャパン",
-        "publication_date": "2012-06-23",
-        "price": 2640,
-        "sale_price": 2376,  # 10%オフ
-        "discount_rate": 10,
-        "rating": 4.5,
-        "review_count": 1523,
-        "image_url": "https://m.media-amazon.com/images/P/4873115655.jpg",
-        "amazon_url": "https://www.amazon.co.jp/dp/4873115655",
-        "affiliate_url": "https://www.amazon.co.jp/dp/4873115655?tag=yourtag-22",
-        "description": "コードは理解しやすくなければならない。本書はこの原則を日々のコーディングの様々な場面に当てはめる方法を紹介します。名前の付け方、コメントの書き方、ループや条件分岐の書き方など、エンジニアが本当に知りたかった基本原則とテクニックを解説。すべてのプログラマーが読むべき一冊です。",
-        "total_views": 1234567,
-        "total_mentions": 8,
-        "latest_mention_at": "2025-10-15T10:00:00+09:00",
-        "created_at": "2025-01-01T00:00:00+09:00",
-        "updated_at": "2025-10-17T00:00:00+09:00",
-        "youtube_videos": [
-            {
-                "video_id": "dQw4w9WgXcQ",
-                "title": "エンジニアなら絶対読むべき技術書10選【2025年版】",
-                "channel_name": "テック解説チャンネル",
-                "thumbnail_url": "https://i.ytimg.com/vi/dQw4w9WgXcQ/mqdefault.jpg",
-                "video_url": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
-                "view_count": 123456,
-                "like_count": 5678,
-                "published_at": "2025-09-15T10:00:00+09:00"
-            },
-            {
-                "video_id": "abc123xyz",
-                "title": "新人エンジニアにおすすめの本5選",
-                "channel_name": "プログラミング講座",
-                "thumbnail_url": "https://i.ytimg.com/vi/abc123xyz/mqdefault.jpg",
-                "video_url": "https://www.youtube.com/watch?v=abc123xyz",
-                "view_count": 87654,
-                "like_count": 3456,
-                "published_at": "2025-08-20T15:30:00+09:00"
-            },
-            {
-                "video_id": "xyz789abc",
-                "title": "コードレビューで役立つ技術書3選",
-                "channel_name": "エンジニアTV",
-                "thumbnail_url": "https://i.ytimg.com/vi/xyz789abc/mqdefault.jpg",
-                "video_url": "https://www.youtube.com/watch?v=xyz789abc",
-                "view_count": 65432,
-                "like_count": 2345,
-                "published_at": "2025-10-01T12:00:00+09:00"
-            }
-        ]
-    }
-}
+# データベース依存性
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
 
 
-@router.get("/{asin}")
-async def get_book_detail(asin: str):
-    """書籍詳細取得"""
-    if asin not in SAMPLE_BOOKS_DETAIL:
-        raise HTTPException(status_code=404, detail="Book not found")
+@router.get("/{asin}", response_model=dict)
+async def get_book_detail(
+    asin: str,
+    db: Session = Depends(get_db)
+):
+    """
+    書籍詳細情報取得
     
-    return SAMPLE_BOOKS_DETAIL[asin]
+    Args:
+        asin: Amazon ASIN
+    
+    Returns:
+        書籍詳細（YouTube動画リスト含む）
+    """
+    try:
+        # 書籍情報を取得
+        book = db.query(Book).filter(Book.asin == asin).first()
+        
+        if not book:
+            raise HTTPException(status_code=404, detail=f"書籍が見つかりません: {asin}")
+        
+        # 関連するYouTube動画を取得
+        youtube_videos = (
+            db.query(YouTubeVideo)
+            .join(BookMention, YouTubeVideo.id == BookMention.video_id)
+            .filter(BookMention.book_id == book.id)
+            .order_by(YouTubeVideo.view_count.desc())
+            .all()
+        )
+        
+        # レスポンス形式に変換
+        return {
+            **book.to_dict(),
+            "youtube_videos": [video.to_dict() for video in youtube_videos]
+        }
+    
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"書籍情報取得エラー: {str(e)}")
 
+
+@router.get("/", response_model=dict)
+async def search_books(
+    q: str = None,
+    locale: str = "ja",
+    limit: int = 20,
+    offset: int = 0,
+    db: Session = Depends(get_db)
+):
+    """
+    書籍検索
+    
+    Args:
+        q: 検索キーワード（タイトルまたは著者）
+        locale: ロケール (ja/en)
+        limit: 取得件数
+        offset: オフセット
+    
+    Returns:
+        書籍リスト
+    """
+    try:
+        query = db.query(Book).filter(Book.locale == locale)
+        
+        # キーワード検索
+        if q:
+            search_pattern = f"%{q}%"
+            query = query.filter(
+                (Book.title.ilike(search_pattern)) |
+                (Book.author.ilike(search_pattern))
+            )
+        
+        # 人気順でソート
+        query = query.order_by(Book.total_views.desc())
+        
+        # ページネーション
+        total = query.count()
+        books = query.offset(offset).limit(limit).all()
+        
+        return {
+            "total": total,
+            "limit": limit,
+            "offset": offset,
+            "books": [book.to_dict() for book in books]
+        }
+    
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"書籍検索エラー: {str(e)}")
