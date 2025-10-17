@@ -29,6 +29,9 @@ class Settings(BaseSettings):
     # Timezone
     TIMEZONE: str = "Asia/Tokyo"
     
+    # Environment
+    ENVIRONMENT: str = "development"
+    
     class Config:
         env_file = ".env"
         case_sensitive = True

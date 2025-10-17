@@ -19,7 +19,7 @@ google-auth-httplib2==0.2.0
 google-auth-oauthlib==1.2.0
 
 # Amazon Product Advertising API
-python-amazon-paapi==5.1.0
+python-amazon-paapi==5.0.1
 
 # HTML パース（Amazon リンク展開用）
 beautifulsoup4==4.12.2

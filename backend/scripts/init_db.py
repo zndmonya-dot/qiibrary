@@ -11,6 +11,7 @@ sys.path.append(str(Path(__file__).resolve().parents[1]))
 
 from datetime import datetime, date, timedelta
 import random
+from sqlalchemy import func
 from app.database import SessionLocal, engine, Base
 from app.models import Book, BookDailyStat, YouTubeVideo, BookMention, SearchKeyword
 
