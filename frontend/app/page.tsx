@@ -84,14 +84,27 @@ export default function Home() {
       
       <main className="container mx-auto px-4 py-8">
         {/* ヘッダー */}
-        <div className="mb-8 bg-qiita-card dark:bg-dark-surface rounded-lg p-6 border-l-4 border-qiita-green shadow-sm">
-          <h2 className="text-3xl font-bold mb-2 flex items-center gap-2 text-qiita-text-dark dark:text-white">
-            <i className="ri-fire-line text-qiita-green dark:text-dark-green"></i>
-            IT技術書ランキング
-          </h2>
-          <p className="text-qiita-text-dark dark:text-dark-text font-medium">
-            Qiita記事で言及されたIT技術書をランキング形式で表示
-          </p>
+        <div className="mb-8 bg-gradient-to-r from-qiita-card to-qiita-surface dark:from-dark-surface dark:to-dark-surface-light rounded-xl p-8 border-l-4 border-qiita-green dark:border-dark-green shadow-md">
+          <div className="flex items-start justify-between">
+            <div>
+              <h2 className="text-4xl font-bold mb-3 flex items-center gap-3 text-qiita-text-dark dark:text-white">
+                <i className="ri-fire-line text-qiita-green dark:text-dark-green text-4xl"></i>
+                IT技術書ランキング
+              </h2>
+              <p className="text-qiita-text dark:text-dark-text font-medium text-lg leading-relaxed">
+                Qiita記事で言及されたIT技術書をランキング形式で表示
+              </p>
+              <div className="mt-4 flex items-center gap-2 text-sm text-qiita-text dark:text-dark-text">
+                <i className="ri-information-line text-qiita-green dark:text-dark-green"></i>
+                <span>毎日自動更新 • 実際の開発者が選んだ技術書</span>
+              </div>
+            </div>
+            <div className="hidden md:block">
+              <div className="w-16 h-16 bg-qiita-green/10 dark:bg-dark-green/20 rounded-full flex items-center justify-center">
+                <i className="ri-book-2-line text-3xl text-qiita-green dark:text-dark-green"></i>
+              </div>
+            </div>
+          </div>
         </div>
         
         {/* タブ */}
@@ -176,21 +189,29 @@ export default function Home() {
             </div>
             
             <div className="space-y-4 mb-8">
-              {paginatedRankings.map((item, index) => (
-                <div
-                  key={item.book.id}
-                  style={{ 
-                    animationDelay: index < 10 ? `${index * 0.02}s` : '0.2s'
-                  }}
-                  className={index < 20 ? "animate-fade-in" : ""}
-                >
-                  <BookCard
-                    rank={item.rank}
-                    book={item.book}
-                    stats={item.stats}
-                  />
+              {paginatedRankings.length > 0 ? (
+                paginatedRankings.map((item, index) => (
+                  <div
+                    key={item.book.id}
+                    style={{ 
+                      animationDelay: index < 10 ? `${index * 0.02}s` : '0.2s'
+                    }}
+                    className={index < 20 ? "animate-fade-in" : ""}
+                  >
+                    <BookCard
+                      rank={item.rank}
+                      book={item.book}
+                      stats={item.stats}
+                    />
+                  </div>
+                ))
+              ) : (
+                <div className="bg-qiita-card dark:bg-dark-surface rounded-lg p-12 text-center border border-qiita-border dark:border-dark-border shadow-sm">
+                  <i className="ri-inbox-line text-6xl text-qiita-text-light dark:text-dark-text-light mb-4"></i>
+                  <h3 className="text-xl font-bold text-qiita-text-dark dark:text-white mb-2">データがありません</h3>
+                  <p className="text-qiita-text dark:text-dark-text">この期間のランキングデータはまだ収集されていません。</p>
                 </div>
-              ))}
+              )}
             </div>
             
             {/* ページネーションボタン */}
