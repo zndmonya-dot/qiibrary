@@ -155,21 +155,11 @@ html {
   /* タブボタン */
   .tab-button {
     @apply px-6 py-3 font-medium transition-colors duration-150 ease-out
-           relative overflow-hidden rounded-t-lg
+           relative flex-1
            text-qiita-text dark:text-dark-text hover:text-qiita-text-dark dark:hover:text-white;
   }
   
   .tab-button.active {
-    @apply bg-white dark:bg-dark-surface text-qiita-text-dark dark:text-white;
-  }
-  
-  .tab-button::after {
-    content: '';
-    @apply absolute bottom-0 left-0 w-full h-1 bg-qiita-green
-           transform scale-x-0 transition-transform duration-150 ease-out;
-  }
-  
-  .tab-button.active::after {
-    @apply scale-x-100;
+    @apply text-qiita-text-dark dark:text-white;
   }
 }

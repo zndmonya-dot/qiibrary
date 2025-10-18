@@ -73,9 +73,9 @@ export default function Home() {
   };
 
   const getPeriodLabel = () => {
-    if (period === 'daily') return '今日のランキング';
-    if (period === 'monthly') return '今月のランキング';
-    return '今年のランキング';
+    if (period === 'daily') return '24時間のランキング';
+    if (period === 'monthly') return '30日間のランキング';
+    return '365日間のランキング';
   };
 
   return (
@@ -99,52 +99,58 @@ export default function Home() {
                 <span>毎日自動更新 • 実際の開発者が選んだ技術書</span>
               </div>
             </div>
-            <div className="hidden md:block">
-              <div className="w-16 h-16 bg-qiita-surface dark:bg-dark-surface-light rounded-full flex items-center justify-center border border-qiita-border dark:border-dark-border">
-                <i className="ri-book-2-line text-3xl text-qiita-green dark:text-dark-green"></i>
-              </div>
-            </div>
           </div>
         </div>
         
-        {/* タブ */}
-        <div className="flex gap-2 mb-6 border-b border-qiita-border dark:border-dark-border bg-qiita-card dark:bg-dark-surface rounded-t-lg">
-          <button
-            onClick={() => {
-              setPeriod('daily');
-              analytics.changeRankingPeriod('daily');
-            }}
-            className={`tab-button ${
-              period === 'daily' ? 'active' : ''
-            }`}
-          >
-            <i className="ri-calendar-line mr-1"></i>
-            今日
-          </button>
-          <button
-            onClick={() => {
-              setPeriod('monthly');
-              analytics.changeRankingPeriod('monthly');
-            }}
-            className={`tab-button ${
-              period === 'monthly' ? 'active' : ''
-            }`}
-          >
-            <i className="ri-calendar-2-line mr-1"></i>
-            今月
-          </button>
-          <button
-            onClick={() => {
-              setPeriod('yearly');
-              analytics.changeRankingPeriod('yearly');
-            }}
-            className={`tab-button ${
-              period === 'yearly' ? 'active' : ''
-            }`}
-          >
-            <i className="ri-calendar-check-line mr-1"></i>
-            今年
-          </button>
+        {/* タブ - スライドアニメーション付き */}
+        <div className="relative mb-6 bg-qiita-card dark:bg-dark-surface rounded-t-lg border-b border-qiita-border dark:border-dark-border">
+          <div className="flex relative">
+            <button
+              onClick={() => {
+                setPeriod('daily');
+                analytics.changeRankingPeriod('daily');
+              }}
+              className={`tab-button ${
+                period === 'daily' ? 'active' : ''
+              }`}
+            >
+              <i className="ri-time-line mr-1"></i>
+              24時間
+            </button>
+            <button
+              onClick={() => {
+                setPeriod('monthly');
+                analytics.changeRankingPeriod('monthly');
+              }}
+              className={`tab-button ${
+                period === 'monthly' ? 'active' : ''
+              }`}
+            >
+              <i className="ri-calendar-line mr-1"></i>
+              30日間
+            </button>
+            <button
+              onClick={() => {
+                setPeriod('yearly');
+                analytics.changeRankingPeriod('yearly');
+              }}
+              className={`tab-button ${
+                period === 'yearly' ? 'active' : ''
+              }`}
+            >
+              <i className="ri-calendar-check-line mr-1"></i>
+              365日間
+            </button>
+            
+            {/* スライドするアンダーバー */}
+            <div 
+              className="absolute bottom-0 h-0.5 bg-qiita-green dark:bg-dark-green transition-all duration-300 ease-in-out"
+              style={{
+                left: period === 'daily' ? '0%' : period === 'monthly' ? '33.333%' : '66.666%',
+                width: '33.333%'
+              }}
+            />
+          </div>
         </div>
         
         {/* ランキング表示 */}
