@@ -165,34 +165,22 @@ class QiitaService:
     
     def extract_book_references(self, body: str) -> Set[str]:
         """
-        記事本文から書籍情報（ISBN、Amazon ASIN）を抽出
+        記事本文からAmazonリンクの書籍識別子（ISBN-10/ASIN）を抽出
+        
+        ※仕様：Amazonリンクのみを検知（ISBNの直接記述は無視）
         
         Args:
             body: 記事本文（Markdown）
             
         Returns:
-            抽出された識別子のセット（ISBN-10、ISBN-13、Amazon ASIN）
+            抽出された識別子のセット（Amazon ISBN-10/ASIN 10桁のみ）
         """
         references = set()
         
         if not body:
             return references
         
-        # ISBN-13パターン（978または979で始まる13桁）
-        isbn13_pattern = r'(?:ISBN[-:\s]?)?(?:978|979)[-\s]?\d{1,5}[-\s]?\d{1,7}[-\s]?\d{1,7}[-\s]?\d'
-        for match in re.finditer(isbn13_pattern, body):
-            isbn = re.sub(r'[^\d]', '', match.group())
-            if len(isbn) == 13:
-                references.add(isbn)
-        
-        # ISBN-10パターン
-        isbn10_pattern = r'(?:ISBN[-:\s]?)?(\d{1,5}[-\s]?\d{1,7}[-\s]?\d{1,7}[-\s]?[\dX])'
-        for match in re.finditer(isbn10_pattern, body):
-            isbn = re.sub(r'[^\dX]', '', match.group())
-            if len(isbn) == 10:
-                references.add(isbn)
-        
-        # AmazonリンクからASIN/ISBNを抽出（10桁の英数字）
+        # AmazonリンクからASIN/ISBNを抽出（10桁の英数字のみ）
         # 対応パターン:
         # - https://www.amazon.co.jp/dp/4297139642/
         # - https://www.amazon.co.jp/gp/product/4297139642/
@@ -220,11 +208,11 @@ class QiitaService:
                 # 短縮URLの場合は7文字以上でも受け入れる（ASINの可能性）
                 elif 'amzn' in pattern and len(identifier) >= 7:
                     # 注: 短縮URLは実際のASINに解決する必要があるが、
-                        # 簡易実装として10桁のみを対象とする
-                        if len(identifier) == 10:
-                            references.add(identifier.upper())
-            
-            return references
+                    # 簡易実装として10桁のみを対象とする
+                    if len(identifier) == 10:
+                        references.add(identifier.upper())
+        
+        return references
     
     def get_articles_with_book_references(
         self,
