@@ -9,15 +9,6 @@ class Settings(BaseSettings):
     # Redis（サンプルデモ用にオプショナル）
     REDIS_URL: str = "redis://localhost:6379/0"
     
-    # YouTube API（サンプルデモ用にオプショナル）
-    YOUTUBE_API_KEY: str = "dummy_youtube_api_key"
-    
-    # Amazon API（サンプルデモ用にオプショナル）
-    AMAZON_ACCESS_KEY: str = "dummy_amazon_access_key"
-    AMAZON_SECRET_KEY: str = "dummy_amazon_secret_key"
-    AMAZON_ASSOCIATE_TAG: str = "yourtag-22"
-    AMAZON_REGION: str = "jp"
-    
     # JWT
     SECRET_KEY: str = "your-secret-key-change-this-in-production"
     ALGORITHM: str = "HS256"
@@ -36,6 +27,7 @@ class Settings(BaseSettings):
         env_file = ".env"
         env_file_encoding = 'utf-8'
         case_sensitive = True
+        extra = 'ignore'  # 不要な環境変数を無視
 
 
 settings = Settings()
