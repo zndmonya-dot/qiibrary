@@ -19,11 +19,9 @@ export default function BookDetailPage() {
   const [book, setBook] = useState<BookDetail | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [locale, setLocaleState] = useState<Locale>('ja');
+  const [locale, setLocaleState] = useState<Locale>(() => getLocale());
 
   useEffect(() => {
-    setLocaleState(getLocale());
-    
     // 言語変更イベントをリッスン
     const handleLocaleChangeEvent = () => {
       setLocaleState(getLocale());
@@ -249,8 +247,18 @@ export default function BookDetailPage() {
                       rel="noopener noreferrer"
                       className="btn-youtube inline-flex items-center gap-2 text-lg px-8 py-4"
                     >
-                      <i className="ri-shopping-cart-line text-xl"></i>
-                      <span>Amazonで購入</span>
+                      {book.affiliate_url?.includes('zenn.dev') ? (
+                        <>
+                          <i className="ri-book-open-line text-xl"></i>
+                          <span>Zennで読む</span>
+                        </>
+                      ) : (
+                        // 将来的に楽天ブックスURL用
+                        <>
+                          <i className="ri-shopping-cart-line text-xl"></i>
+                          <span>書籍を購入</span>
+                        </>
+                      )}
                     </a>
                   </div>
                 </div>
@@ -280,16 +288,36 @@ export default function BookDetailPage() {
             
                 {/* 下部CTA */}
                 <div className="card-youtube text-center py-10">
-                  <i className="ri-shopping-bag-3-line text-5xl text-youtube-red mb-4"></i>
-                  <p className="text-xl mb-6 text-white font-medium">この本に興味を持ちましたか？</p>
+                  {book.affiliate_url?.includes('zenn.dev') ? (
+                    <>
+                      <i className="ri-book-open-line text-5xl text-youtube-red mb-4"></i>
+                      <p className="text-xl mb-6 text-white font-medium">この本をZennで読みませんか？</p>
+                    </>
+                  ) : (
+                    // 将来的に楽天ブックスURL用
+                    <>
+                      <i className="ri-shopping-bag-3-line text-5xl text-youtube-red mb-4"></i>
+                      <p className="text-xl mb-6 text-white font-medium">この本に興味を持ちましたか？</p>
+                    </>
+                  )}
                   <a
                     href={book.affiliate_url}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="btn-youtube inline-flex items-center gap-2 text-lg px-10 py-4"
                   >
-                    <i className="ri-shopping-cart-line text-xl"></i>
-                    <span>Amazonで購入する</span>
+                    {book.affiliate_url?.includes('zenn.dev') ? (
+                      <>
+                        <i className="ri-book-open-line text-xl"></i>
+                        <span>Zennで読む</span>
+                      </>
+                    ) : (
+                      // 将来的に楽天ブックスURL用
+                      <>
+                        <i className="ri-shopping-cart-line text-xl"></i>
+                        <span>書籍を購入する</span>
+                      </>
+                    )}
                   </a>
                 </div>
               </div>

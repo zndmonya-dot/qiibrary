@@ -18,7 +18,7 @@ class Book(Base):
     # 主キー
     id = Column(Integer, primary_key=True, index=True)
     
-    # 書籍情報（Amazon ASIN または Zenn slug等）
+    # 書籍情報（Zenn slug / 楽天ISBN / その他ID）
     asin = Column(String(100), nullable=False, unique=True, index=True)
     title = Column(String(500), nullable=False)
     author = Column(String(200))
@@ -36,8 +36,8 @@ class Book(Base):
     
     # 画像・URL
     image_url = Column(String(500))
-    amazon_url = Column(String(500))  # Nullable - Zenn Booksにはない
-    affiliate_url = Column(String(500))  # Nullable - 必須ではない
+    amazon_url = Column(String(500))  # Nullable - 非推奨（削除予定）
+    affiliate_url = Column(String(500))  # Nullable - Zenn URL / 楽天ブックスURL等
     
     # 説明文
     description = Column(Text)

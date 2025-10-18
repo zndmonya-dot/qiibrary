@@ -17,11 +17,9 @@ interface BookCardProps {
 }
 
 export default function BookCard({ rank, book, stats }: BookCardProps) {
-  const [locale, setLocaleState] = useState<'ja' | 'en'>('ja');
+  const [locale, setLocaleState] = useState<'ja' | 'en'>(() => getLocale());
 
   useEffect(() => {
-    setLocaleState(getLocale());
-    
     // 言語変更イベントをリッスン
     const handleLocaleChangeEvent = () => {
       setLocaleState(getLocale());
@@ -133,7 +131,7 @@ export default function BookCard({ rank, book, stats }: BookCardProps) {
             <StarRating
               rating={book.rating}
               reviewCount={book.review_count || undefined}
-              amazonUrl={book.amazon_url}
+              bookUrl={book.affiliate_url}
               size="sm"
             />
           )}
@@ -154,16 +152,28 @@ export default function BookCard({ rank, book, stats }: BookCardProps) {
         
         {/* 統計情報 */}
         <div className="flex items-center gap-3">
-          <div className="flex items-center gap-1.5 bg-youtube-dark-bg/50 px-3 py-1.5 rounded-full border border-youtube-dark-surface/50">
-            <i className="ri-eye-line text-blue-400"></i>
-            <span className="text-sm font-medium text-white">{formatNumber(stats.total_views)}</span>
-            <span className="text-xs text-secondary">{t('views')}</span>
-          </div>
-          <div className="flex items-center gap-1.5 bg-youtube-dark-bg/50 px-3 py-1.5 rounded-full border border-youtube-dark-surface/50">
-            <i className="ri-youtube-line text-youtube-red"></i>
-            <span className="text-sm font-medium text-white">{stats.mention_count}</span>
-            <span className="text-xs text-secondary">{t('videosCount')}</span>
-          </div>
+          {stats.total_views > 0 ? (
+            // YouTube動画がある場合: 再生数と動画数
+            <>
+              <div className="flex items-center gap-1.5 bg-youtube-dark-bg/50 px-3 py-1.5 rounded-full border border-youtube-dark-surface/50">
+                <i className="ri-eye-line text-blue-400"></i>
+                <span className="text-sm font-medium text-white">{formatNumber(stats.total_views)}</span>
+                <span className="text-xs text-secondary">{t('views')}</span>
+              </div>
+              <div className="flex items-center gap-1.5 bg-youtube-dark-bg/50 px-3 py-1.5 rounded-full border border-youtube-dark-surface/50">
+                <i className="ri-youtube-line text-youtube-red"></i>
+                <span className="text-sm font-medium text-white">{stats.mention_count}</span>
+                <span className="text-xs text-secondary">{t('videosCount')}</span>
+              </div>
+            </>
+          ) : (
+            // Zenn Booksの場合: いいね数
+            <div className="flex items-center gap-1.5 bg-youtube-dark-bg/50 px-3 py-1.5 rounded-full border border-youtube-dark-surface/50">
+              <i className="ri-heart-line text-pink-400"></i>
+              <span className="text-sm font-medium text-white">{formatNumber(stats.mention_count)}</span>
+              <span className="text-xs text-secondary">{t('likes')}</span>
+            </div>
+          )}
         </div>
       </div>
       
@@ -199,8 +209,18 @@ export default function BookCard({ rank, book, stats }: BookCardProps) {
               className="btn-youtube inline-flex items-center gap-1 text-sm"
               onClick={() => analytics.clickAmazonLink(book.asin, book.title)}
             >
-              <i className="ri-shopping-cart-line text-lg"></i>
-              {t('buyOnAmazon')}
+              {book.affiliate_url?.includes('zenn.dev') ? (
+                <>
+                  <i className="ri-book-open-line text-lg"></i>
+                  {t('viewOnZenn')}
+                </>
+              ) : (
+                // 将来的に楽天ブックスURL用
+                <>
+                  <i className="ri-shopping-cart-line text-lg"></i>
+                  {t('buyBook')}
+                </>
+              )}
             </a>
           </div>
         </div>

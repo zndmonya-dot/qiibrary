@@ -133,19 +133,9 @@ export default function Footer() {
 
         {/* Bottom Bar */}
         <div className="pt-8 border-t border-youtube-dark-hover">
-          <div className="flex flex-col md:flex-row justify-between items-center gap-3 text-xs text-secondary">
-            <div className="flex items-center gap-2">
-              <i className="ri-copyright-line"></i>
-              <span>{currentYear} BookTuber. All rights reserved.</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <i className="ri-amazon-line text-youtube-red"></i>
-              <span>
-                {locale === 'ja' 
-                  ? 'Amazonアソシエイト・プログラム参加者'
-                  : 'Amazon Associates Program Participant'}
-              </span>
-            </div>
+          <div className="flex justify-center items-center gap-2 text-xs text-secondary">
+            <i className="ri-copyright-line"></i>
+            <span>{currentYear} BookTuber. All rights reserved.</span>
           </div>
         </div>
       </div>

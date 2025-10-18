@@ -1,11 +1,11 @@
 interface StarRatingProps {
   rating: number;
   reviewCount?: number;
-  amazonUrl: string;
+  bookUrl?: string;  // 将来的に楽天ブックスURLなどを受け付ける
   size?: 'sm' | 'md' | 'lg';
 }
 
-export default function StarRating({ rating, reviewCount, amazonUrl, size = 'md' }: StarRatingProps) {
+export default function StarRating({ rating, reviewCount, bookUrl, size = 'md' }: StarRatingProps) {
   const sizeClasses = {
     sm: 'text-lg',
     md: 'text-xl',
@@ -18,13 +18,8 @@ export default function StarRating({ rating, reviewCount, amazonUrl, size = 'md'
     lg: 'text-xl',
   };
 
-  return (
-    <a 
-      href={`${amazonUrl}#customerReviews`}
-      target="_blank"
-      rel="noopener noreferrer"
-      className="flex items-center gap-2 hover:opacity-80 transition-opacity duration-200 cursor-pointer"
-    >
+  const content = (
+    <span className="flex items-center gap-2">
       <span className={`flex items-center ${sizeClasses[size]}`}>
         {[1, 2, 3, 4, 5].map((star) => (
           <i 
@@ -43,7 +38,23 @@ export default function StarRating({ rating, reviewCount, amazonUrl, size = 'md'
       {reviewCount && (
         <span className="text-xs text-secondary">({reviewCount.toLocaleString()})</span>
       )}
-    </a>
+    </span>
   );
+
+  // レビューURLがある場合はリンク、ない場合は通常の表示
+  if (bookUrl) {
+    return (
+      <a 
+        href={`${bookUrl}#review`}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="hover:opacity-80 transition-opacity duration-200 cursor-pointer"
+      >
+        {content}
+      </a>
+    );
+  }
+
+  return content;
 }
 
