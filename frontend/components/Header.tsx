@@ -2,24 +2,28 @@
 
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
-import { getTheme, setTheme, type Theme } from '@/lib/theme';
+import { getTheme, setTheme } from '@/lib/theme';
+import type { Theme } from '@/lib/constants';
 
 export default function Header() {
-  // 初期値をlocalStorageから直接取得（SSR対応）
+  // 初期値をDOMの状態から取得（layout.tsxのスクリプトで既に適用されている）
   const [theme, setThemeState] = useState<Theme>(() => {
     if (typeof window !== 'undefined') {
-      return getTheme();
+      // DOMに既にdarkクラスがあるかチェック
+      const hasDarkClass = document.documentElement.classList.contains('dark');
+      if (hasDarkClass) {
+        return 'dark';
+      }
+      // localStorageもチェック
+      const stored = localStorage.getItem('theme');
+      if (stored === 'dark') {
+        return 'dark';
+      }
     }
     return 'system';
   });
 
   useEffect(() => {
-    // マウント時に一度だけテーマを確認
-    const currentTheme = getTheme();
-    if (currentTheme !== theme) {
-      setThemeState(currentTheme);
-    }
-    
     // テーマ変更イベントをリッスン
     const handleThemeChangeEvent = () => {
       setThemeState(getTheme());

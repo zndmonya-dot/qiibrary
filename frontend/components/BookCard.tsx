@@ -30,7 +30,7 @@ function BookCard({ rank, book, stats }: BookCardProps) {
   };
 
   return (
-    <div className="card-primary flex gap-5 border border-qiita-border hover:border-qiita-green/30 dark:hover:border-dark-green/50">
+    <div className="card-primary flex gap-5 border border-qiita-border">
       {/* ランク表示 */}
       <div className="flex-shrink-0 w-14 flex items-center justify-center">
         <div className="flex flex-col items-center">
