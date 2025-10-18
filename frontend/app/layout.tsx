@@ -61,28 +61,20 @@ export default function RootLayout({
 }) {
   return (
     <html lang="ja" suppressHydrationWarning>
-      <head>
+      <head />
+      <body>
+        {/* テーマ適用スクリプト - 最優先で実行（ブロッキング） */}
         <script
           dangerouslySetInnerHTML={{
             __html: `
-              (function() {
-                try {
-                  const theme = localStorage.getItem('theme');
-                  // darkの場合のみdarkクラスを追加、それ以外（systemやnull）はライトモード
-                  if (theme === 'dark') {
-                    document.documentElement.classList.add('dark');
-                  } else {
-                    document.documentElement.classList.remove('dark');
-                  }
-                } catch (e) {
-                  // エラー時はライトモード（darkクラスなし）
+              try {
+                if (localStorage.getItem('theme') === 'dark') {
+                  document.documentElement.classList.add('dark');
                 }
-              })();
+              } catch (e) {}
             `,
           }}
         />
-      </head>
-      <body>
         <PageTransition>
           {children}
         </PageTransition>
