@@ -6,6 +6,7 @@ import Footer from '@/components/Footer';
 import BookCard from '@/components/BookCard';
 import { getRankings, RankingResponse } from '@/lib/api';
 import { analytics, trackPageView } from '@/lib/analytics';
+import { ITEMS_PER_PAGE } from '@/lib/constants';
 
 type PeriodType = 'daily' | 'monthly' | 'yearly';
 
@@ -15,7 +16,6 @@ export default function Home() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
-  const ITEMS_PER_PAGE = 25;
   
   const now = new Date();
   const currentYear = now.getFullYear();

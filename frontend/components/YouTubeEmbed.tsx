@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import { YouTubeVideo } from '@/lib/api';
 import { formatNumber, formatRelativeTime } from '@/lib/utils';
 
@@ -5,7 +6,7 @@ interface YouTubeEmbedProps {
   video: YouTubeVideo;
 }
 
-export default function YouTubeEmbed({ video }: YouTubeEmbedProps) {
+function YouTubeEmbed({ video }: YouTubeEmbedProps) {
   return (
     <div className="bg-white dark:bg-dark-surface rounded-lg p-4 border border-qiita-border dark:border-dark-border shadow-md hover:shadow-lg transition-shadow duration-150 h-full flex flex-col">
       {/* YouTube埋め込み */}
@@ -69,4 +70,6 @@ export default function YouTubeEmbed({ video }: YouTubeEmbedProps) {
     </div>
   );
 }
+
+export default memo(YouTubeEmbed);
 

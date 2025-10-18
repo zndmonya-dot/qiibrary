@@ -1,5 +1,6 @@
 'use client';
 
+import { memo } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Book, BookStats } from '@/lib/api';
@@ -14,7 +15,7 @@ interface BookCardProps {
   stats: BookStats;
 }
 
-export default function BookCard({ rank, book, stats }: BookCardProps) {
+function BookCard({ rank, book, stats }: BookCardProps) {
   // ランクに応じた色を決定
   const getRankStyle = () => {
     if (rank === 1) return 'text-yellow-500 drop-shadow-[0_0_8px_rgba(234,179,8,0.5)]'; // 金
@@ -195,4 +196,6 @@ export default function BookCard({ rank, book, stats }: BookCardProps) {
     </div>
   );
 }
+
+export default memo(BookCard);
 
