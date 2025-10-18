@@ -4,8 +4,6 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { Book, BookStats } from '@/lib/api';
 import { formatNumber, formatPublicationDate } from '@/lib/utils';
-import { t, getLocale } from '@/lib/locale';
-import { useState, useEffect } from 'react';
 import StarRating from './StarRating';
 import PriceDisplay from './PriceDisplay';
 import { analytics } from '@/lib/analytics';
@@ -17,26 +15,12 @@ interface BookCardProps {
 }
 
 export default function BookCard({ rank, book, stats }: BookCardProps) {
-  const [locale, setLocaleState] = useState<'ja' | 'en'>(() => getLocale());
-
-  useEffect(() => {
-    // 言語変更イベントをリッスン
-    const handleLocaleChangeEvent = () => {
-      setLocaleState(getLocale());
-    };
-    
-    window.addEventListener('localeChange', handleLocaleChangeEvent);
-    
-    return () => {
-      window.removeEventListener('localeChange', handleLocaleChangeEvent);
-    };
-  }, []);
   // ランクに応じた色を決定
   const getRankStyle = () => {
-    if (rank === 1) return 'text-yellow-400 drop-shadow-[0_0_8px_rgba(234,179,8,0.5)]'; // 金
-    if (rank === 2) return 'text-gray-300 drop-shadow-[0_0_8px_rgba(209,213,219,0.5)]'; // 銀
-    if (rank === 3) return 'text-orange-400 drop-shadow-[0_0_8px_rgba(251,146,60,0.5)]'; // 銅
-    return 'text-youtube-red';
+    if (rank === 1) return 'text-yellow-500 drop-shadow-[0_0_8px_rgba(234,179,8,0.5)]'; // 金
+    if (rank === 2) return 'text-gray-400 drop-shadow-[0_0_8px_rgba(156,163,175,0.5)]'; // 銀
+    if (rank === 3) return 'text-orange-500 drop-shadow-[0_0_8px_rgba(251,146,60,0.5)]'; // 銅
+    return 'text-qiita-green';
   };
 
   const getRankIcon = () => {
@@ -45,7 +29,7 @@ export default function BookCard({ rank, book, stats }: BookCardProps) {
   };
 
   return (
-    <div className="card-youtube flex gap-4 border border-transparent hover:border-youtube-dark-text-secondary/20">
+    <div className="card-primary flex gap-4 border border-qiita-border hover:border-qiita-green/30">
       {/* ランク表示 */}
       <div className="flex-shrink-0 w-12 flex items-center justify-center">
         <div className="flex flex-col items-center">
@@ -61,15 +45,15 @@ export default function BookCard({ rank, book, stats }: BookCardProps) {
       {/* 書籍画像（大きく・中央配置） */}
       <div className="flex-shrink-0 flex items-center justify-center">
         <Link 
-          href={`/books/${book.asin}`} 
+          href={`/books/${book.isbn}`} 
           prefetch={true} 
           className="block transition-opacity duration-200 hover:opacity-90"
-          onClick={() => analytics.clickBook(book.asin, book.title, rank)}
+          onClick={() => analytics.clickBook(book.isbn || '', book.title, rank)}
         >
-              {book.image_url ? (
+              {(book.thumbnail_url || book.image_url) ? (
                 <div className="relative w-[160px] h-[240px]">
                   <Image
-                    src={book.image_url}
+                    src={book.thumbnail_url || book.image_url || ''}
                     alt={book.title}
                     width={160}
                     height={240}
@@ -80,14 +64,14 @@ export default function BookCard({ rank, book, stats }: BookCardProps) {
                   const target = e.target as HTMLImageElement;
                   target.style.display = 'none';
                   if (target.parentElement) {
-                    target.parentElement.innerHTML = '<div class="w-[160px] h-[240px] bg-youtube-dark-hover rounded flex items-center justify-center"><i class="ri-book-line text-5xl text-youtube-dark-text-secondary"></i></div>';
+                    target.parentElement.innerHTML = '<div class="w-[160px] h-[240px] bg-qiita-surface rounded flex items-center justify-center"><i class="ri-book-line text-5xl text-qiita-text-light"></i></div>';
                   }
                 }}
               />
             </div>
           ) : (
-            <div className="w-[160px] h-[240px] bg-youtube-dark-hover rounded flex items-center justify-center">
-              <i className="ri-book-line text-5xl text-youtube-dark-text-secondary"></i>
+            <div className="w-[160px] h-[240px] bg-qiita-surface dark:bg-dark-surface-light rounded flex items-center justify-center">
+              <i className="ri-book-line text-5xl text-qiita-text-light dark:text-dark-text-light"></i>
             </div>
           )}
         </Link>
@@ -96,17 +80,17 @@ export default function BookCard({ rank, book, stats }: BookCardProps) {
           {/* 書籍情報（左側） */}
           <div className="flex-1 min-w-0 max-w-md">
             <Link 
-              href={`/books/${book.asin}`} 
+              href={`/books/${book.isbn}`} 
               prefetch={true} 
-              className="hover:text-youtube-red transition-colors duration-200 inline-block"
-              onClick={() => analytics.clickBook(book.asin, book.title, rank)}
+              className="hover:text-qiita-green dark:hover:text-dark-green transition-colors duration-200 inline-block text-qiita-text-dark dark:text-white"
+              onClick={() => analytics.clickBook(book.isbn || '', book.title, rank)}
             >
-              <h3 className="text-lg font-semibold mb-2 line-clamp-2">
+              <h3 className="text-lg font-bold mb-2 line-clamp-2">
                 {book.title}
               </h3>
             </Link>
         
-        <div className="space-y-1 text-sm text-secondary mb-3">
+        <div className="space-y-1 text-sm text-qiita-text-dark dark:text-dark-text mb-3 font-medium">
           {book.author && (
             <p className="flex items-center gap-1">
               <i className="ri-user-line"></i>
@@ -122,7 +106,7 @@ export default function BookCard({ rank, book, stats }: BookCardProps) {
           {book.publication_date && (
             <p className="flex items-center gap-1">
               <i className="ri-calendar-line"></i>
-              <span>{formatPublicationDate(book.publication_date, locale)}</span>
+              <span>{formatPublicationDate(book.publication_date)}</span>
             </p>
           )}
           
@@ -155,23 +139,23 @@ export default function BookCard({ rank, book, stats }: BookCardProps) {
           {stats.total_views > 0 ? (
             // YouTube動画がある場合: 再生数と動画数
             <>
-              <div className="flex items-center gap-1.5 bg-youtube-dark-bg/50 px-3 py-1.5 rounded-full border border-youtube-dark-surface/50">
-                <i className="ri-eye-line text-blue-400"></i>
-                <span className="text-sm font-medium text-white">{formatNumber(stats.total_views)}</span>
-                <span className="text-xs text-secondary">{t('views')}</span>
+              <div className="flex items-center gap-1.5 bg-white dark:bg-dark-surface-light px-3 py-1.5 rounded-full border border-qiita-border dark:border-dark-border shadow-sm">
+                <i className="ri-eye-line text-blue-500"></i>
+                <span className="text-sm font-semibold text-qiita-text-dark dark:text-white">{formatNumber(stats.total_views)}</span>
+                <span className="text-xs text-qiita-text dark:text-dark-text font-medium">回</span>
               </div>
-              <div className="flex items-center gap-1.5 bg-youtube-dark-bg/50 px-3 py-1.5 rounded-full border border-youtube-dark-surface/50">
+              <div className="flex items-center gap-1.5 bg-white dark:bg-dark-surface-light px-3 py-1.5 rounded-full border border-qiita-border dark:border-dark-border shadow-sm">
                 <i className="ri-youtube-line text-youtube-red"></i>
-                <span className="text-sm font-medium text-white">{stats.mention_count}</span>
-                <span className="text-xs text-secondary">{t('videosCount')}</span>
+                <span className="text-sm font-semibold text-qiita-text-dark dark:text-white">{stats.mention_count}</span>
+                <span className="text-xs text-qiita-text dark:text-dark-text font-medium">動画</span>
               </div>
             </>
           ) : (
-            // Zenn Booksの場合: いいね数
-            <div className="flex items-center gap-1.5 bg-youtube-dark-bg/50 px-3 py-1.5 rounded-full border border-youtube-dark-surface/50">
-              <i className="ri-heart-line text-pink-400"></i>
-              <span className="text-sm font-medium text-white">{formatNumber(stats.mention_count)}</span>
-              <span className="text-xs text-secondary">{t('likes')}</span>
+            // Qiita記事の場合: 言及数
+            <div className="flex items-center gap-1.5 bg-white dark:bg-dark-surface-light px-3 py-1.5 rounded-full border border-qiita-border dark:border-dark-border shadow-sm">
+              <i className="ri-article-line text-qiita-green"></i>
+              <span className="text-sm font-semibold text-qiita-text-dark dark:text-white">{formatNumber(stats.mention_count)}</span>
+              <span className="text-xs text-qiita-text dark:text-dark-text font-medium">記事</span>
             </div>
           )}
         </div>
@@ -179,49 +163,32 @@ export default function BookCard({ rank, book, stats }: BookCardProps) {
       
       {/* 書籍概要とアクションボタン（右側） */}
       {book.description && (
-        <div className="flex-1 min-w-0 pl-4 border-l-2 border-youtube-dark-surface flex flex-col justify-between">
+        <div className="flex-1 min-w-0 pl-4 border-l-2 border-qiita-border dark:border-dark-border flex flex-col justify-between">
           {/* 概要 */}
           <div className="flex-1 flex flex-col">
-            <h4 className="text-sm font-semibold text-youtube-dark-text mb-3 flex items-center gap-1.5">
-              <i className="ri-amazon-line text-youtube-red"></i>
-              {locale === 'ja' ? 'Amazon商品説明' : 'Amazon Product Description'}
+            <h4 className="text-sm font-bold text-qiita-text-dark dark:text-white mb-3 flex items-center gap-1.5">
+              <i className="ri-book-open-line text-qiita-green"></i>
+              書籍説明
             </h4>
-            <p className="text-sm text-secondary line-clamp-5 leading-relaxed">
+            <p className="text-sm text-qiita-text-dark dark:text-dark-text line-clamp-5 leading-relaxed font-medium">
               {book.description}
             </p>
           </div>
           
           {/* アクションボタン（右下） */}
           <div className="flex gap-2 mt-4 justify-end">
-            <Link
-              href={`/books/${book.asin}`}
-              prefetch={true}
-              className="inline-flex items-center gap-1 border-2 border-youtube-red text-youtube-red hover:bg-youtube-red hover:text-white px-4 py-2 rounded text-sm font-medium transition-all duration-200"
-              onClick={() => analytics.clickBook(book.asin, book.title, rank)}
-            >
-              <i className="ri-play-circle-line text-lg"></i>
-              {t('watchVideos')}
-            </Link>
-            <a
-              href={book.affiliate_url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="btn-youtube inline-flex items-center gap-1 text-sm"
-              onClick={() => analytics.clickAmazonLink(book.asin, book.title)}
-            >
-              {book.affiliate_url?.includes('zenn.dev') ? (
-                <>
-                  <i className="ri-book-open-line text-lg"></i>
-                  {t('viewOnZenn')}
-                </>
-              ) : (
-                // 将来的に楽天ブックスURL用
-                <>
-                  <i className="ri-shopping-cart-line text-lg"></i>
-                  {t('buyBook')}
-                </>
-              )}
-            </a>
+            {book.amazon_affiliate_url && (
+              <a
+                href={book.amazon_affiliate_url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="btn-amazon inline-flex items-center gap-1 text-sm"
+                onClick={() => analytics.clickAmazonLink(book.isbn || '', book.title)}
+              >
+                <i className="ri-amazon-line text-lg"></i>
+                Amazonで購入
+              </a>
+            )}
           </div>
         </div>
       )}

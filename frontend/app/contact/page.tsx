@@ -1,25 +1,8 @@
 'use client';
 
 import Header from '@/components/Header';
-import { useState, useEffect } from 'react';
-import { getLocale } from '@/lib/locale';
 
 export default function ContactPage() {
-  const [locale, setLocaleState] = useState<'ja' | 'en'>('ja');
-
-  useEffect(() => {
-    setLocaleState(getLocale());
-    
-    const handleLocaleChangeEvent = () => {
-      setLocaleState(getLocale());
-    };
-    
-    window.addEventListener('localeChange', handleLocaleChangeEvent);
-    
-    return () => {
-      window.removeEventListener('localeChange', handleLocaleChangeEvent);
-    };
-  }, []);
 
   return (
     <div className="min-h-screen">

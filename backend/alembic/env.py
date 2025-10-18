@@ -12,14 +12,14 @@ from pathlib import Path
 # プロジェクトルートをパスに追加
 sys.path.append(str(Path(__file__).resolve().parents[1]))
 
-from app.config import settings
+from app.config.settings import settings
 from app.database import Base
+# 新しいモデルをインポート
 from app.models import (
+    QiitaArticle,
     Book,
-    BookDailyStat,
-    YouTubeVideo,
-    BookMention,
-    SearchKeyword,
+    BookQiitaMention,
+    BookYouTubeLink,
 )
 
 # this is the Alembic Config object, which provides

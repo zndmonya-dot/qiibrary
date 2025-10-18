@@ -1,6 +1,5 @@
 import type { Metadata } from 'next'
 import './globals.css'
-import Footer from '@/components/Footer'
 import PageTransition from '@/components/PageTransition'
 
 export const metadata: Metadata = {
@@ -53,12 +52,6 @@ export const metadata: Metadata = {
       'max-snippet': -1,
     },
   },
-  icons: {
-    icon: '/favicon.ico',
-    shortcut: '/favicon.ico',
-    apple: '/apple-touch-icon.png',
-  },
-  manifest: '/site.webmanifest',
 }
 
 export default function RootLayout({
@@ -67,12 +60,32 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="ja">
+    <html lang="ja" suppressHydrationWarning>
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function() {
+                try {
+                  const theme = localStorage.getItem('theme');
+                  // darkの場合のみdarkクラスを追加、それ以外（systemやnull）はライトモード
+                  if (theme === 'dark') {
+                    document.documentElement.classList.add('dark');
+                  } else {
+                    document.documentElement.classList.remove('dark');
+                  }
+                } catch (e) {
+                  // エラー時はライトモード（darkクラスなし）
+                }
+              })();
+            `,
+          }}
+        />
+      </head>
       <body>
         <PageTransition>
           {children}
         </PageTransition>
-        <Footer />
       </body>
     </html>
   )

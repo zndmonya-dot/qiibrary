@@ -1,11 +1,11 @@
 """
-書籍関連モデル
+書籍関連モデル（Qiita + 楽天ブックス対応）
 """
 
-from sqlalchemy import Column, Integer, String, Float, Date, DateTime, Text, ForeignKey, Index, UniqueConstraint
+from sqlalchemy import Column, Integer, String, Float, Date, DateTime, Text, ForeignKey, Index
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
-from datetime import datetime, date
+from sqlalchemy.dialects.postgresql import JSONB
 
 from ..database import Base
 
@@ -18,76 +18,63 @@ class Book(Base):
     # 主キー
     id = Column(Integer, primary_key=True, index=True)
     
-    # 書籍情報（Zenn slug / 楽天ISBN / その他ID）
-    asin = Column(String(100), nullable=False, unique=True, index=True)
+    # 書籍識別子
+    isbn = Column(String(20), nullable=False, unique=True, index=True)  # ISBN-10 or ISBN-13
+    
+    # 基本情報
     title = Column(String(500), nullable=False)
-    author = Column(String(200))
+    author = Column(String(300))
     publisher = Column(String(200))
     publication_date = Column(Date)
     
-    # 価格情報
-    price = Column(Integer)  # 通常価格（円 or セント）
-    sale_price = Column(Integer)  # セール価格
-    discount_rate = Column(Integer)  # 割引率（%）
+    # 書籍データ（JSON）- openBDやその他のソースから取得したメタデータ
+    book_data = Column(JSONB)
     
-    # レビュー情報
-    rating = Column(Float)  # 星評価 (0.0 - 5.0)
-    review_count = Column(Integer)  # レビュー数
+    # Amazonリンク
+    amazon_url = Column(String(500))
+    amazon_affiliate_url = Column(String(500))  # Amazonアフィリエイトリンク
     
-    # 画像・URL
-    image_url = Column(String(500))
-    amazon_url = Column(String(500))  # Nullable - 非推奨（削除予定）
-    affiliate_url = Column(String(500))  # Nullable - Zenn URL / 楽天ブックスURL等
-    
-    # 説明文
+    # 書籍説明
     description = Column(Text)
     
-    # ロケール
-    locale = Column(String(2), nullable=False, default='ja', index=True)  # ja/en
+    # サムネイル画像
+    thumbnail_url = Column(String(500))
     
-    # 統計情報（キャッシュ用）
-    total_views = Column(Integer, default=0, index=True)
-    total_mentions = Column(Integer, default=0, index=True)
-    latest_mention_at = Column(DateTime)
+    # 統計情報（キャッシュ）
+    total_mentions = Column(Integer, default=0, index=True)  # Qiita記事での言及数
+    latest_mention_at = Column(DateTime, index=True)
     
     # タイムスタンプ
     created_at = Column(DateTime, default=func.now(), nullable=False)
     updated_at = Column(DateTime, default=func.now(), onupdate=func.now(), nullable=False)
     
     # リレーション
-    mentions = relationship('BookMention', back_populates='book', cascade='all, delete-orphan')
-    daily_stats = relationship('BookDailyStat', back_populates='book', cascade='all, delete-orphan')
+    qiita_mentions = relationship('BookQiitaMention', back_populates='book', cascade='all, delete-orphan')
+    youtube_links = relationship('BookYouTubeLink', back_populates='book', cascade='all, delete-orphan')
     
     # インデックス
     __table_args__ = (
-        Index('idx_books_locale_views', 'locale', 'total_views'),
-        Index('idx_books_locale_mentions', 'locale', 'total_mentions'),
+        Index('idx_books_mentions', 'total_mentions'),
         Index('idx_books_latest_mention', 'latest_mention_at'),
     )
     
     def __repr__(self):
-        return f"<Book(asin='{self.asin}', title='{self.title}', locale='{self.locale}')>"
+        return f"<Book(isbn='{self.isbn}', title='{self.title}')>"
     
     def to_dict(self):
         """辞書形式に変換"""
         return {
             'id': self.id,
-            'asin': self.asin,
+            'isbn': self.isbn,
             'title': self.title,
             'author': self.author,
             'publisher': self.publisher,
             'publication_date': self.publication_date.isoformat() if self.publication_date else None,
-            'price': self.price,
-            'sale_price': self.sale_price,
-            'discount_rate': self.discount_rate,
-            'rating': self.rating,
-            'review_count': self.review_count,
-            'image_url': self.image_url,
+            'book_data': self.book_data,
             'amazon_url': self.amazon_url,
-            'affiliate_url': self.affiliate_url,
+            'amazon_affiliate_url': self.amazon_affiliate_url,
             'description': self.description,
-            'locale': self.locale,
-            'total_views': self.total_views,
+            'thumbnail_url': self.thumbnail_url,
             'total_mentions': self.total_mentions,
             'latest_mention_at': self.latest_mention_at.isoformat() if self.latest_mention_at else None,
             'created_at': self.created_at.isoformat() if self.created_at else None,
@@ -95,10 +82,46 @@ class Book(Base):
         }
 
 
-class BookDailyStat(Base):
-    """書籍の日次統計"""
+class BookQiitaMention(Base):
+    """書籍とQiita記事の関連（中間テーブル）"""
     
-    __tablename__ = 'book_daily_stats'
+    __tablename__ = 'book_qiita_mentions'
+    
+    # 主キー
+    id = Column(Integer, primary_key=True, index=True)
+    
+    # 外部キー
+    book_id = Column(Integer, ForeignKey('books.id', ondelete='CASCADE'), nullable=False)
+    article_id = Column(Integer, ForeignKey('qiita_articles.id', ondelete='CASCADE'), nullable=False)
+    
+    # 言及日時（記事の公開日時）
+    mentioned_at = Column(DateTime, nullable=False, index=True)
+    
+    # 抽出された識別子（ISBN、ASIN等）
+    extracted_identifier = Column(String(100), nullable=False)
+    
+    # タイムスタンプ
+    created_at = Column(DateTime, default=func.now(), nullable=False)
+    
+    # リレーション
+    book = relationship('Book', back_populates='qiita_mentions')
+    article = relationship('QiitaArticle', back_populates='book_mentions')
+    
+    # インデックス
+    __table_args__ = (
+        Index('idx_book_qiita_book', 'book_id', 'mentioned_at'),
+        Index('idx_book_qiita_article', 'article_id', 'mentioned_at'),
+        Index('idx_book_qiita_date', 'mentioned_at'),
+    )
+    
+    def __repr__(self):
+        return f"<BookQiitaMention(book_id={self.book_id}, article_id={self.article_id})>"
+
+
+class BookYouTubeLink(Base):
+    """書籍とYouTube動画のリンク（手動追加）"""
+    
+    __tablename__ = 'book_youtube_links'
     
     # 主キー
     id = Column(Integer, primary_key=True, index=True)
@@ -106,37 +129,27 @@ class BookDailyStat(Base):
     # 外部キー
     book_id = Column(Integer, ForeignKey('books.id', ondelete='CASCADE'), nullable=False)
     
-    # 日付
-    date = Column(Date, nullable=False, index=True)
+    # YouTube動画情報
+    youtube_url = Column(String(500), nullable=False)
+    youtube_video_id = Column(String(20))  # 動画ID（例: dQw4w9WgXcQ）
+    title = Column(String(500))
+    thumbnail_url = Column(String(500))
     
-    # 日次統計
-    daily_views = Column(Integer, default=0)  # その日の再生回数合計
-    daily_mentions = Column(Integer, default=0)  # その日の紹介動画数
+    # 表示順序（1, 2, 3）
+    display_order = Column(Integer, default=1, nullable=False)
     
     # タイムスタンプ
     created_at = Column(DateTime, default=func.now(), nullable=False)
+    updated_at = Column(DateTime, default=func.now(), onupdate=func.now(), nullable=False)
     
     # リレーション
-    book = relationship('Book', back_populates='daily_stats')
+    book = relationship('Book', back_populates='youtube_links')
     
-    # ユニーク制約とインデックス
+    # インデックス
     __table_args__ = (
-        UniqueConstraint('book_id', 'date', name='uq_book_date'),
-        Index('idx_stats_date_views', 'date', 'daily_views'),
-        Index('idx_stats_book_date', 'book_id', 'date'),
+        Index('idx_youtube_links_book', 'book_id', 'display_order'),
     )
     
     def __repr__(self):
-        return f"<BookDailyStat(book_id={self.book_id}, date='{self.date}', views={self.daily_views})>"
-    
-    def to_dict(self):
-        """辞書形式に変換"""
-        return {
-            'id': self.id,
-            'book_id': self.book_id,
-            'date': self.date.isoformat() if self.date else None,
-            'daily_views': self.daily_views,
-            'daily_mentions': self.daily_mentions,
-            'created_at': self.created_at.isoformat() if self.created_at else None,
-        }
+        return f"<BookYouTubeLink(book_id={self.book_id}, youtube_url='{self.youtube_url}')>"
 

@@ -1,16 +1,13 @@
 """
-SQLAlchemy モデル
+SQLAlchemy モデル（Qiita + 楽天ブックス対応）
 """
 
-from .book import Book, BookDailyStat
-from .youtube_video import YouTubeVideo, BookMention
-from .search_keyword import SearchKeyword
+from .qiita_article import QiitaArticle
+from .book import Book, BookQiitaMention, BookYouTubeLink
 
 __all__ = [
+    'QiitaArticle',
     'Book',
-    'BookDailyStat',
-    'YouTubeVideo',
-    'BookMention',
-    'SearchKeyword',
+    'BookQiitaMention',
+    'BookYouTubeLink',
 ]
-

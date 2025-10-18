@@ -1,16 +1,15 @@
 """
-書籍APIエンドポイント
-実データベースから書籍詳細を取得
+書籍APIエンドポイント（Qiitaベース）
 """
 
 from fastapi import APIRouter, HTTPException, Depends
 from sqlalchemy.orm import Session
-from typing import List
+from typing import List, Optional
 
 from ..database import SessionLocal
-from ..models.book import Book
-from ..models.youtube_video import YouTubeVideo, BookMention
-from ..schemas.book import BookDetail, YouTubeVideo as YouTubeVideoSchema
+from ..models.book import Book, BookQiitaMention, BookYouTubeLink
+from ..models.qiita_article import QiitaArticle
+from ..services.openbd_service import get_openbd_service
 
 router = APIRouter()
 
@@ -24,52 +23,80 @@ def get_db():
         db.close()
 
 
-@router.get("/{asin}", response_model=dict)
+@router.get("/{isbn}", response_model=dict)
 async def get_book_detail(
-    asin: str,
+    isbn: str,
     db: Session = Depends(get_db)
 ):
     """
     書籍詳細情報取得
     
     Args:
-        asin: Amazon ASIN
+        isbn: ISBN-10 or ISBN-13
     
     Returns:
-        書籍詳細（YouTube動画リスト含む）
+        書籍詳細（Qiita記事・YouTube動画リスト含む）
     """
     try:
         # 書籍情報を取得
-        book = db.query(Book).filter(Book.asin == asin).first()
+        book = db.query(Book).filter(Book.isbn == isbn).first()
         
         if not book:
-            raise HTTPException(status_code=404, detail=f"書籍が見つかりません: {asin}")
+            raise HTTPException(status_code=404, detail=f"書籍が見つかりません: {isbn}")
         
-        # 関連するYouTube動画を取得
-        youtube_videos = (
-            db.query(YouTubeVideo)
-            .join(BookMention, YouTubeVideo.id == BookMention.video_id)
-            .filter(BookMention.book_id == book.id)
-            .order_by(YouTubeVideo.view_count.desc())
+        # 関連するQiita記事を取得
+        qiita_articles = (
+            db.query(QiitaArticle)
+            .join(BookQiitaMention, QiitaArticle.id == BookQiitaMention.article_id)
+            .filter(BookQiitaMention.book_id == book.id)
+            .order_by(QiitaArticle.likes_count.desc())
+            .limit(10)
             .all()
         )
         
+        # 関連するYouTube動画リンクを取得
+        youtube_links = (
+            db.query(BookYouTubeLink)
+            .filter(BookYouTubeLink.book_id == book.id)
+            .order_by(BookYouTubeLink.display_order)
+            .all()
+        )
+        
+        # 動的にAmazonアフィリエイトURLを生成
+        openbd_service = get_openbd_service()
+        amazon_affiliate_url = openbd_service.generate_amazon_affiliate_url(book.isbn)
+        
         # レスポンス形式に変換
+        book_dict = book.to_dict()
+        book_dict["amazon_affiliate_url"] = amazon_affiliate_url  # アフィリエイトURLを上書き
+        
         return {
-            **book.to_dict(),
-            "youtube_videos": [video.to_dict() for video in youtube_videos]
+            "book": book_dict,
+            "qiita_articles": [article.to_dict() for article in qiita_articles],
+            "youtube_links": [
+                {
+                    "id": link.id,
+                    "youtube_url": link.youtube_url,
+                    "youtube_video_id": link.youtube_video_id,
+                    "title": link.title,
+                    "thumbnail_url": link.thumbnail_url,
+                    "display_order": link.display_order,
+                }
+                for link in youtube_links
+            ]
         }
     
     except HTTPException:
         raise
     except Exception as e:
+        import traceback
+        traceback.print_exc()
         raise HTTPException(status_code=500, detail=f"書籍情報取得エラー: {str(e)}")
 
 
 @router.get("/", response_model=dict)
 async def search_books(
-    q: str = None,
-    locale: str = "ja",
+    q: Optional[str] = None,
     limit: int = 20,
     offset: int = 0,
     db: Session = Depends(get_db)
@@ -79,7 +106,6 @@ async def search_books(
     
     Args:
         q: 検索キーワード（タイトルまたは著者）
-        locale: ロケール (ja/en)
         limit: 取得件数
         offset: オフセット
     
@@ -87,7 +113,7 @@ async def search_books(
         書籍リスト
     """
     try:
-        query = db.query(Book).filter(Book.locale == locale)
+        query = db.query(Book)
         
         # キーワード検索
         if q:
@@ -97,8 +123,8 @@ async def search_books(
                 (Book.author.ilike(search_pattern))
             )
         
-        # 人気順でソート
-        query = query.order_by(Book.total_views.desc())
+        # 人気順でソート（言及数）
+        query = query.order_by(Book.total_mentions.desc())
         
         # ページネーション
         total = query.count()
@@ -112,4 +138,6 @@ async def search_books(
         }
     
     except Exception as e:
+        import traceback
+        traceback.print_exc()
         raise HTTPException(status_code=500, detail=f"書籍検索エラー: {str(e)}")

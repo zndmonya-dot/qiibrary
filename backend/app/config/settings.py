@@ -6,6 +6,15 @@ class Settings(BaseSettings):
     # Database
     DATABASE_URL: str = "postgresql://postgres:postgres@localhost:5432/booktuber?client_encoding=utf8"
     
+    # API Keys
+    QIITA_API_TOKEN: str = ""
+    
+    # Affiliate IDs
+    AMAZON_ASSOCIATE_TAG: str = ""  # Amazonアフィリエイトタグ
+    
+    # Admin
+    ADMIN_TOKEN: str = ""  # 管理画面アクセス用トークン
+    
     # Redis（サンプルデモ用にオプショナル）
     REDIS_URL: str = "redis://localhost:6379/0"
     

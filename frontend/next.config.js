@@ -21,11 +21,15 @@ const nextConfig = {
         protocol: 'https',
         hostname: 'storage.googleapis.com',
       },
-      // 将来的に楽天ブックスAPI用の画像ホストを追加予定
-      // {
-      //   protocol: 'https',
-      //   hostname: 'thumbnail.image.rakuten.co.jp',
-      // },
+      // 楽天ブックスAPI画像ホスト
+      {
+        protocol: 'https',
+        hostname: 'thumbnail.image.rakuten.co.jp',
+      },
+      {
+        protocol: 'https',
+        hostname: 'books.rakuten.co.jp',
+      },
     ],
     dangerouslyAllowSVG: true,
     contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
