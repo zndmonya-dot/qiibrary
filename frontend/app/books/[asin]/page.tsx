@@ -110,10 +110,10 @@ export default function BookDetailPage() {
                 <div className="flex-shrink-0 lg:w-72">
                   {/* 書籍画像 */}
                   <div className="mb-4 flex justify-center">
-                    {book.image_url ? (
+                    {book.thumbnail_url ? (
                       <div className="relative w-[200px] h-[300px]">
                         <Image
-                          src={book.image_url}
+                          src={book.thumbnail_url}
                           alt={book.title}
                           width={200}
                           height={300}

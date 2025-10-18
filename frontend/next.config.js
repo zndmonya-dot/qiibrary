@@ -30,6 +30,11 @@ const nextConfig = {
         protocol: 'https',
         hostname: 'books.rakuten.co.jp',
       },
+      // Google Books API画像ホスト
+      {
+        protocol: 'https',
+        hostname: 'books.google.com',
+      },
     ],
     dangerouslyAllowSVG: true,
     contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",

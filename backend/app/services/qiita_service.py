@@ -9,6 +9,7 @@ import re
 from typing import List, Dict, Any, Optional, Set
 from datetime import datetime
 from bs4 import BeautifulSoup
+from urllib.parse import urlparse
 
 from ..config.settings import settings
 
@@ -163,6 +164,39 @@ class QiitaService:
             'body': article_data.get('body', ''),  # 本文も含める
         }
     
+    def resolve_shortened_url(self, short_url: str) -> Optional[str]:
+        """
+        短縮URLをリダイレクト先から実際のISBN/ASINに解決
+        
+        Args:
+            short_url: 短縮URL（例: https://amzn.to/xxxxx）
+            
+        Returns:
+            10桁のISBN-10/ASIN、見つからない場合はNone
+        """
+        try:
+            # リダイレクトを追跡（最大5回）
+            response = requests.head(short_url, allow_redirects=True, timeout=5)
+            final_url = response.url
+            
+            # リダイレクト先のURLから/dp/または/gp/product/のパターンを抽出
+            patterns = [
+                r'/dp/([A-Z0-9]{10})',
+                r'/gp/product/([A-Z0-9]{10})',
+                r'/ASIN/([A-Z0-9]{10})'
+            ]
+            
+            for pattern in patterns:
+                match = re.search(pattern, final_url, re.IGNORECASE)
+                if match:
+                    return match.group(1).upper()
+            
+            return None
+            
+        except Exception as e:
+            logger.debug(f"短縮URL解決エラー ({short_url}): {e}")
+            return None
+    
     def extract_book_references(self, body: str) -> Set[str]:
         """
         記事本文からAmazonリンクの書籍識別子（ISBN-10/ASIN）を抽出
@@ -187,7 +221,9 @@ class QiitaService:
         # - https://amazon.co.jp/exec/obidos/ASIN/4297139642/
         # - https://www.amazon.co.jp/書籍名/dp/4297139642/ref=...
         # - https://amzn.to/xxxxx や https://amzn.asia/d/xxxxx
-        amazon_patterns = [
+        
+        # 通常のAmazonリンク（10桁のISBN/ASIN）
+        standard_patterns = [
             r'amazon\.co\.jp/[^\s]*?/dp/([A-Z0-9]{10})',       # 標準dpリンク
             r'amazon\.co\.jp/dp/([A-Z0-9]{10})',               # 短縮dpリンク
             r'amazon\.co\.jp/gp/product/([A-Z0-9]{10})',       # 商品ページリンク
@@ -195,22 +231,39 @@ class QiitaService:
             r'amazon\.com/[^\s]*?/dp/([A-Z0-9]{10})',          # US版
             r'amazon\.com/dp/([A-Z0-9]{10})',
             r'amazon\.com/gp/product/([A-Z0-9]{10})',
-            r'amzn\.to/([A-Za-z0-9]{7,})',                     # 短縮URL (7文字以上)
-            r'amzn\.asia/d/([A-Za-z0-9]{7,})',                 # Asia短縮URL
         ]
         
-        for pattern in amazon_patterns:
+        # 短縮URLパターン
+        shortened_patterns = [
+            (r'amzn\.to/([A-Za-z0-9]{7,})', 'amzn.to'),         # 短縮URL
+            (r'amzn\.asia/d/([A-Za-z0-9]{7,})', 'amzn.asia'),   # Asia短縮URL
+        ]
+        
+        # 通常のAmazonリンクを処理
+        for pattern in standard_patterns:
             for match in re.finditer(pattern, body, re.IGNORECASE):
                 identifier = match.group(1)
-                # 10桁の英数字（ISBN-10またはASIN）のみを受け入れる
                 if len(identifier) == 10 and re.match(r'^[A-Z0-9]{10}$', identifier, re.IGNORECASE):
                     references.add(identifier.upper())
-                # 短縮URLの場合は7文字以上でも受け入れる（ASINの可能性）
-                elif 'amzn' in pattern and len(identifier) >= 7:
-                    # 注: 短縮URLは実際のASINに解決する必要があるが、
-                    # 簡易実装として10桁のみを対象とする
-                    if len(identifier) == 10:
-                        references.add(identifier.upper())
+        
+        # 短縮URLを処理
+        for pattern, url_type in shortened_patterns:
+            for match in re.finditer(pattern, body, re.IGNORECASE):
+                identifier = match.group(1)
+                
+                # 完全なURLを再構築
+                if url_type == 'amzn.to':
+                    short_url = f'https://amzn.to/{identifier}'
+                elif url_type == 'amzn.asia':
+                    short_url = f'https://amzn.asia/d/{identifier}'
+                else:
+                    continue
+                
+                # リダイレクト先から実際のISBN/ASINを取得
+                resolved_id = self.resolve_shortened_url(short_url)
+                if resolved_id:
+                    references.add(resolved_id)
+                    logger.debug(f"短縮URL解決: {short_url} → {resolved_id}")
         
         return references
     
