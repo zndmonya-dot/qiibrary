@@ -84,7 +84,7 @@ function BookCard({ rank, book, stats }: BookCardProps) {
             <Link 
               href={`/books/${book.isbn}`} 
               prefetch={true} 
-              className="hover:text-qiita-green dark:hover:text-dark-green transition-colors duration-200 inline-block text-qiita-text-dark dark:text-white"
+              className="inline-block text-qiita-text-dark dark:text-white"
               onClick={() => analytics.clickBook(book.isbn || '', book.title, rank)}
             >
               <h3 className="text-lg font-bold mb-2 line-clamp-2">
@@ -157,11 +157,15 @@ function BookCard({ rank, book, stats }: BookCardProps) {
             </>
           ) : (
             // Qiita記事の場合: 言及数
-            <div className="flex items-center gap-2 bg-qiita-green/10 dark:bg-qiita-green/20 px-4 py-2 rounded-lg border border-qiita-green/30 dark:border-qiita-green/50">
+            <Link 
+              href={`/books/${book.isbn}#qiita-articles`}
+              prefetch={true}
+              className="flex items-center gap-2 bg-qiita-green/10 dark:bg-qiita-green/20 px-4 py-2 rounded-lg border border-qiita-green/30 dark:border-qiita-green/50 hover:bg-qiita-green/20 dark:hover:bg-qiita-green/30 transition-colors duration-150 cursor-pointer"
+            >
               <i className="ri-article-line text-qiita-green dark:text-dark-green text-lg"></i>
               <span className="text-base font-bold text-qiita-text-dark dark:text-white">{formatNumber(stats.mention_count)}</span>
               <span className="text-sm text-qiita-green dark:text-dark-green font-medium">件の記事で言及</span>
-            </div>
+            </Link>
           )}
         </div>
       </div>
@@ -169,8 +173,13 @@ function BookCard({ rank, book, stats }: BookCardProps) {
       {/* 書籍概要とアクションボタン（右側） */}
       {book.description && (
         <div className="flex-1 min-w-0 pl-4 border-l-2 border-qiita-border dark:border-dark-border flex flex-col justify-between">
-          {/* 概要 */}
-          <div className="flex-1 flex flex-col">
+          {/* 概要 - クリック可能 */}
+          <Link 
+            href={`/books/${book.isbn}`}
+            prefetch={true}
+            className="flex-1 flex flex-col cursor-pointer hover:opacity-80 transition-opacity duration-150"
+            onClick={() => analytics.clickBook(book.isbn || '', book.title, rank)}
+          >
             <h4 className="text-sm font-bold text-qiita-text-dark dark:text-white mb-3 flex items-center gap-1.5">
               <i className="ri-book-open-line text-qiita-green"></i>
               書籍説明
@@ -178,7 +187,7 @@ function BookCard({ rank, book, stats }: BookCardProps) {
             <p className="text-sm text-qiita-text-dark dark:text-dark-text line-clamp-5 leading-relaxed font-medium">
               {book.description}
             </p>
-          </div>
+          </Link>
           
           {/* アクションボタン（右下） */}
           <div className="flex gap-2 mt-4 justify-end">

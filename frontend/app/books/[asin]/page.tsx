@@ -244,7 +244,7 @@ export default function BookDetailPage() {
         
             {/* Qiita記事セクション */}
             {book.qiita_articles && book.qiita_articles.length > 0 && (
-              <div className="mb-12">
+              <div id="qiita-articles" className="mb-12 scroll-mt-24">
                 {/* セクションヘッダー */}
                 <div className="mb-6">
                   <div className="bg-qiita-green/10 dark:bg-qiita-green/20 rounded-lg p-5 border-l-4 border-qiita-green">
