@@ -6,24 +6,30 @@ import { getTheme, setTheme } from '@/lib/theme';
 import type { Theme } from '@/lib/constants';
 
 export default function Header() {
-  // 初期値をDOMの状態から取得（layout.tsxのスクリプトで既に適用されている）
-  const [theme, setThemeState] = useState<Theme>(() => {
-    if (typeof window !== 'undefined') {
-      // DOMに既にdarkクラスがあるかチェック
+  // 初期値はSSR対応でsystemにしておく
+  const [theme, setThemeState] = useState<Theme>('system');
+
+  useEffect(() => {
+    // マウント時にDOMとlocalStorageから正確なテーマを取得
+    const detectTheme = (): Theme => {
+      // 1. DOMのクラスをチェック（最優先）
       const hasDarkClass = document.documentElement.classList.contains('dark');
       if (hasDarkClass) {
         return 'dark';
       }
-      // localStorageもチェック
+      
+      // 2. localStorageをチェック
       const stored = localStorage.getItem('theme');
       if (stored === 'dark') {
         return 'dark';
       }
-    }
-    return 'system';
-  });
-
-  useEffect(() => {
+      
+      return 'system';
+    };
+    
+    const currentTheme = detectTheme();
+    setThemeState(currentTheme);
+    
     // テーマ変更イベントをリッスン
     const handleThemeChangeEvent = () => {
       setThemeState(getTheme());
