@@ -132,14 +132,14 @@ export default function BookDetailPage() {
                   
                   {/* 統計情報（目立たせる） */}
                   <div className="grid grid-cols-2 gap-3 mb-4">
-                    <div className="flex flex-col items-center justify-center p-4 bg-gradient-to-br from-qiita-green/10 to-qiita-green/5 dark:from-qiita-green/20 dark:to-qiita-green/10 rounded-lg border-2 border-qiita-green/30 dark:border-qiita-green/40 shadow-sm">
+                    <div className="flex flex-col items-center justify-center p-4 bg-qiita-green/10 dark:bg-qiita-green/20 rounded-lg border-2 border-qiita-green/30 dark:border-qiita-green/40">
                       <i className="ri-article-line text-qiita-green dark:text-dark-green text-3xl mb-2"></i>
                       <div className="text-2xl font-bold text-qiita-text-dark dark:text-white">
                         {book.qiita_articles?.length || 0}
                       </div>
                       <div className="text-xs text-qiita-text dark:text-dark-text font-semibold">記事</div>
                     </div>
-                    <div className="flex flex-col items-center justify-center p-4 bg-gradient-to-br from-pink-50 to-pink-100/50 dark:from-pink-900/20 dark:to-pink-800/10 rounded-lg border-2 border-pink-200 dark:border-pink-800/40 shadow-sm">
+                    <div className="flex flex-col items-center justify-center p-4 bg-pink-50 dark:bg-pink-900/20 rounded-lg border-2 border-pink-200 dark:border-pink-800/40">
                       <i className="ri-heart-fill text-pink-500 dark:text-pink-400 text-3xl mb-2"></i>
                       <div className="text-2xl font-bold text-qiita-text-dark dark:text-white">
                         {formatNumber(book.qiita_articles?.reduce((sum, a) => sum + a.likes_count, 0) || 0)}
@@ -247,7 +247,7 @@ export default function BookDetailPage() {
               <div className="mb-12">
                 {/* セクションヘッダー */}
                 <div className="mb-6">
-                  <div className="bg-gradient-to-r from-qiita-green/10 to-qiita-green/5 dark:from-qiita-green/20 dark:to-qiita-green/10 rounded-lg p-5 border-l-4 border-qiita-green shadow-sm">
+                  <div className="bg-qiita-green/10 dark:bg-qiita-green/20 rounded-lg p-5 border-l-4 border-qiita-green">
                     <h2 className="text-2xl font-bold flex items-center gap-3 text-qiita-text-dark dark:text-white">
                       <div className="w-12 h-12 bg-qiita-green dark:bg-dark-green rounded-full flex items-center justify-center">
                         <i className="ri-article-fill text-white text-2xl"></i>
@@ -342,7 +342,7 @@ export default function BookDetailPage() {
               <div className="mb-12">
                 {/* セクションヘッダー */}
                 <div className="mb-6">
-                  <div className="bg-gradient-to-r from-youtube-red/10 to-youtube-red/5 dark:from-youtube-red/20 dark:to-youtube-red/10 rounded-lg p-5 border-l-4 border-youtube-red shadow-sm">
+                  <div className="bg-youtube-red/10 dark:bg-youtube-red/20 rounded-lg p-5 border-l-4 border-youtube-red">
                     <h2 className="text-2xl font-bold flex items-center gap-3 text-qiita-text-dark dark:text-white">
                       <div className="w-12 h-12 bg-youtube-red rounded-full flex items-center justify-center">
                         <i className="ri-youtube-fill text-white text-2xl"></i>

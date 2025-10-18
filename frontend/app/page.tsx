@@ -84,7 +84,7 @@ export default function Home() {
       
       <main className="container mx-auto px-4 py-8">
         {/* ヘッダー */}
-        <div className="mb-8 bg-gradient-to-r from-qiita-card to-qiita-surface dark:from-dark-surface dark:to-dark-surface-light rounded-xl p-8 border-l-4 border-qiita-green dark:border-dark-green shadow-md">
+        <div className="mb-8 bg-qiita-card dark:bg-dark-surface rounded-xl p-8 border-l-4 border-qiita-green dark:border-dark-green shadow-sm">
           <div className="flex items-start justify-between">
             <div>
               <h2 className="text-4xl font-bold mb-3 flex items-center gap-3 text-qiita-text-dark dark:text-white">
@@ -100,7 +100,7 @@ export default function Home() {
               </div>
             </div>
             <div className="hidden md:block">
-              <div className="w-16 h-16 bg-qiita-green/10 dark:bg-dark-green/20 rounded-full flex items-center justify-center">
+              <div className="w-16 h-16 bg-qiita-surface dark:bg-dark-surface-light rounded-full flex items-center justify-center border border-qiita-border dark:border-dark-border">
                 <i className="ri-book-2-line text-3xl text-qiita-green dark:text-dark-green"></i>
               </div>
             </div>

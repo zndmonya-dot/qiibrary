@@ -65,14 +65,14 @@ function BookCard({ rank, book, stats }: BookCardProps) {
                   const target = e.target as HTMLImageElement;
                   target.style.display = 'none';
                   if (target.parentElement) {
-                    target.parentElement.innerHTML = '<div class="w-[160px] h-[240px] bg-gradient-to-br from-qiita-green/10 via-qiita-surface to-qiita-surface-2 dark:from-dark-green/20 dark:via-dark-surface-light dark:to-dark-surface rounded shadow-md flex flex-col items-center justify-center gap-3 border border-qiita-border dark:border-dark-border"><i class="ri-image-2-line text-5xl text-qiita-green/40 dark:text-dark-green/40"></i><span class="text-xs text-qiita-text dark:text-dark-text font-medium px-2 text-center">画像読込失敗</span></div>';
+                    target.parentElement.innerHTML = '<div class="w-[160px] h-[240px] bg-qiita-surface dark:bg-dark-surface-light rounded shadow-sm flex flex-col items-center justify-center gap-3 border border-qiita-border dark:border-dark-border"><i class="ri-image-2-line text-6xl text-qiita-text-light dark:text-dark-text-light"></i><span class="text-xs text-qiita-text dark:text-dark-text font-medium px-2 text-center">画像読込失敗</span></div>';
                   }
                 }}
               />
             </div>
           ) : (
-            <div className="w-[160px] h-[240px] bg-gradient-to-br from-qiita-green/10 via-qiita-surface to-qiita-surface-2 dark:from-dark-green/20 dark:via-dark-surface-light dark:to-dark-surface rounded shadow-md flex flex-col items-center justify-center gap-3 border border-qiita-border dark:border-dark-border">
-              <i className="ri-book-2-line text-6xl text-qiita-green/40 dark:text-dark-green/40"></i>
+            <div className="w-[160px] h-[240px] bg-qiita-surface dark:bg-dark-surface-light rounded shadow-sm flex flex-col items-center justify-center gap-3 border border-qiita-border dark:border-dark-border">
+              <i className="ri-book-2-line text-6xl text-qiita-text-light dark:text-dark-text-light"></i>
               <span className="text-xs text-qiita-text dark:text-dark-text font-medium px-2 text-center">画像なし</span>
             </div>
           )}
@@ -139,17 +139,17 @@ function BookCard({ rank, book, stats }: BookCardProps) {
           )}
         </div>
         
-        {/* 統計情報 - より目立つデザイン */}
+        {/* 統計情報 - フラットデザイン */}
         <div className="flex items-center gap-3">
           {stats.total_views > 0 ? (
             // YouTube動画がある場合: 再生数と動画数
             <>
-              <div className="flex items-center gap-2 bg-gradient-to-r from-blue-50 to-blue-100/50 dark:from-blue-900/20 dark:to-blue-800/10 px-4 py-2 rounded-lg border border-blue-200 dark:border-blue-700 shadow-sm">
+              <div className="flex items-center gap-2 bg-blue-50 dark:bg-blue-900/20 px-4 py-2 rounded-lg border border-blue-200 dark:border-blue-700">
                 <i className="ri-eye-line text-blue-600 dark:text-blue-400 text-lg"></i>
                 <span className="text-base font-bold text-blue-900 dark:text-blue-100">{formatNumber(stats.total_views)}</span>
                 <span className="text-sm text-blue-700 dark:text-blue-300 font-medium">回再生</span>
               </div>
-              <div className="flex items-center gap-2 bg-gradient-to-r from-red-50 to-red-100/50 dark:from-red-900/20 dark:to-red-800/10 px-4 py-2 rounded-lg border border-red-200 dark:border-red-700 shadow-sm">
+              <div className="flex items-center gap-2 bg-red-50 dark:bg-red-900/20 px-4 py-2 rounded-lg border border-red-200 dark:border-red-700">
                 <i className="ri-youtube-line text-youtube-red text-lg"></i>
                 <span className="text-base font-bold text-red-900 dark:text-red-100">{stats.mention_count}</span>
                 <span className="text-sm text-red-700 dark:text-red-300 font-medium">動画</span>
@@ -157,7 +157,7 @@ function BookCard({ rank, book, stats }: BookCardProps) {
             </>
           ) : (
             // Qiita記事の場合: 言及数
-            <div className="flex items-center gap-2 bg-gradient-to-r from-qiita-green/10 to-qiita-green/5 dark:from-qiita-green/20 dark:to-qiita-green/10 px-4 py-2 rounded-lg border border-qiita-green/30 dark:border-qiita-green/50 shadow-sm">
+            <div className="flex items-center gap-2 bg-qiita-green/10 dark:bg-qiita-green/20 px-4 py-2 rounded-lg border border-qiita-green/30 dark:border-qiita-green/50">
               <i className="ri-article-line text-qiita-green dark:text-dark-green text-lg"></i>
               <span className="text-base font-bold text-qiita-text-dark dark:text-white">{formatNumber(stats.mention_count)}</span>
               <span className="text-sm text-qiita-green dark:text-dark-green font-medium">件の記事で言及</span>
