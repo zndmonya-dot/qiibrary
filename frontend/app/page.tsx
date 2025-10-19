@@ -297,27 +297,26 @@ export default function Home() {
           </div>
         )}
         
-        {!error && rankings && (
+        {!error && rankings && loading && (
+          <div className="bg-qiita-card dark:bg-dark-surface rounded-lg p-12 border border-qiita-border dark:border-dark-border shadow-sm">
+            <div className="flex flex-col justify-center items-center">
+              <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-qiita-green dark:border-dark-green mb-4"></div>
+              <p className="text-qiita-text dark:text-dark-text text-sm font-medium animate-pulse">読み込み中...</p>
+            </div>
+          </div>
+        )}
+
+        {!error && rankings && !loading && (
           <div className="animate-fade-in">
-            {/* タブ切り替え時のローディング表示 */}
-            {loading && (
-              <div className="mb-4 bg-qiita-card dark:bg-dark-surface rounded-lg p-3 border border-qiita-border dark:border-dark-border shadow-sm">
-                <div className="flex items-center gap-3">
-                  <div className="animate-spin rounded-full h-5 w-5 border-t-2 border-b-2 border-qiita-green dark:border-dark-green"></div>
-                  <span className="text-sm text-qiita-text dark:text-dark-text font-medium">読み込み中...</span>
-                </div>
-              </div>
-            )}
-            
             <div className="mb-6 flex items-center justify-between bg-qiita-card dark:bg-dark-surface p-4 rounded-lg shadow-sm border border-qiita-border dark:border-dark-border">
               <div className="flex items-center gap-2">
                 <i className="ri-trophy-line text-qiita-green dark:text-dark-green text-2xl"></i>
                 <h2 className="text-lg font-semibold text-qiita-text-dark dark:text-white">
-                  {getPeriodLabel()} TOP50
+                  {getPeriodLabel()} 全{filteredRankings.length}件
                 </h2>
               </div>
               <div className="text-sm text-qiita-text dark:text-dark-text">
-                {(currentPage - 1) * ITEMS_PER_PAGE + 1} - {Math.min(currentPage * ITEMS_PER_PAGE, rankings.rankings.length)} / {rankings.rankings.length}件
+                {(currentPage - 1) * ITEMS_PER_PAGE + 1} - {Math.min(currentPage * ITEMS_PER_PAGE, filteredRankings.length)} / {filteredRankings.length}件
               </div>
             </div>
             
