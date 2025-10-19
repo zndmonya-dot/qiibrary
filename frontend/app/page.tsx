@@ -11,19 +11,35 @@ import { ITEMS_PER_PAGE } from '@/lib/constants';
 type PeriodType = 'daily' | 'monthly' | 'yearly' | 'all' | 'year';
 
 export default function Home() {
-  // 初期値は固定（ユーザー設定は保存しない）
-  const [period, setPeriod] = useState<PeriodType>('yearly');
-  const [selectedYear, setSelectedYear] = useState<number | null>(null);
+  // sessionStorageから初期値を取得（ある場合）
+  const getInitialState = () => {
+    if (typeof window !== 'undefined') {
+      const savedState = sessionStorage.getItem('rankingPageState');
+      if (savedState) {
+        try {
+          return JSON.parse(savedState);
+        } catch (e) {
+          return null;
+        }
+      }
+    }
+    return null;
+  };
+
+  const initialState = getInitialState();
+
+  const [period, setPeriod] = useState<PeriodType>(initialState?.period || 'yearly');
+  const [selectedYear, setSelectedYear] = useState<number | null>(initialState?.selectedYear || null);
   const [selectedMonth, setSelectedMonth] = useState<number | null>(null);
   const [availableYears, setAvailableYears] = useState<number[]>([]);
   const [rankings, setRankings] = useState<RankingResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [searchQuery, setSearchQuery] = useState('');
+  const [currentPage, setCurrentPage] = useState(initialState?.currentPage || 1);
+  const [searchQuery, setSearchQuery] = useState(initialState?.searchQuery || '');
   const [showAllYears, setShowAllYears] = useState(false);
-  const [isRestoring, setIsRestoring] = useState(false);
-  const [savedScrollY, setSavedScrollY] = useState<number | null>(null);
+  const [isRestoring, setIsRestoring] = useState(!!initialState);
+  const [savedScrollY, setSavedScrollY] = useState<number | null>(initialState?.scrollY || null);
 
   // ページ状態をsessionStorageに保存
   const savePageState = () => {
@@ -39,27 +55,11 @@ export default function Home() {
     }
   };
 
-  // ページ状態をsessionStorageから復元（初回のみ）
+  // 初回マウント時にsessionStorageをクリア（復元完了後）
   useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const savedState = sessionStorage.getItem('rankingPageState');
-      if (savedState) {
-        try {
-          const state = JSON.parse(savedState);
-          setIsRestoring(true);
-          setCurrentPage(state.currentPage || 1);
-          setPeriod(state.period || 'yearly');
-          setSelectedYear(state.selectedYear || null);
-          setSearchQuery(state.searchQuery || '');
-          setSavedScrollY(state.scrollY || 0);
-          
-          // 復元後は保存データをクリア（次回は通常動作）
-          sessionStorage.removeItem('rankingPageState');
-        } catch (e) {
-          console.error('Failed to restore page state:', e);
-          setIsRestoring(false);
-        }
-      }
+    if (typeof window !== 'undefined' && initialState) {
+      // 次回は通常動作にするため、復元完了後にクリア
+      sessionStorage.removeItem('rankingPageState');
     }
   }, []);
 
