@@ -120,6 +120,7 @@ export default function BookDetailPage() {
                           width={200}
                           height={300}
                           className="rounded-lg shadow-lg"
+                          style={{ width: '200px', height: 'auto', maxHeight: '300px', objectFit: 'cover' }}
                           priority
                           placeholder="blur"
                           blurDataURL="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjMwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMjAwIiBoZWlnaHQ9IjMwMCIgZmlsbD0iIzJCMkIyQiIvPjwvc3ZnPg=="

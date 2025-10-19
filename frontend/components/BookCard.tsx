@@ -66,6 +66,7 @@ function BookCard({ rank, book, stats }: BookCardProps) {
                     width={160}
                     height={240}
                     className="rounded shadow-lg"
+                    style={{ width: '160px', height: 'auto', maxHeight: '240px', objectFit: 'cover' }}
                     loading={rank > 10 ? "lazy" : "eager"}
                     priority={rank <= 5}
                 onError={(e) => {
