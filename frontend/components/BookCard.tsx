@@ -107,7 +107,7 @@ function BookCard({ rank, book, stats, onNavigate }: BookCardProps) {
                 analytics.clickBook(book.isbn || '', book.title, rank);
               }}
             >
-              <h3 className="text-base md:text-lg font-bold mb-2 line-clamp-2">
+              <h3 className="text-sm md:text-base font-bold mb-2 line-clamp-2">
                 {book.title || `ISBN: ${book.isbn} の書籍`}
               </h3>
             </Link>
