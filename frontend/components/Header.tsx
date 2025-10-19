@@ -2,47 +2,19 @@
 
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
-import { getTheme, setTheme } from '@/lib/theme';
+import { getCurrentTheme, toggleTheme } from '@/lib/theme';
 import type { Theme } from '@/lib/constants';
 
 export default function Header() {
-  // 初期値をlocalStorageから取得（SSR時は'system'にフォールバック）
-  const [theme, setThemeState] = useState<Theme>('system');
+  const [theme, setThemeState] = useState<Theme>('dark');
 
   useEffect(() => {
-    // マウント時に正確なテーマを取得して設定
-    const detectTheme = (): Theme => {
-      // 1. localStorageをチェック（最優先）
-      const stored = localStorage.getItem('theme');
-      if (stored === 'dark') {
-        return 'dark';
-      }
-      
-      // 2. DOMのクラスをチェック
-      const hasDarkClass = document.documentElement.classList.contains('dark');
-      if (hasDarkClass) {
-        return 'dark';
-      }
-      
-      return 'system';
-    };
-    
-    setThemeState(detectTheme());
-    
-    // テーマ変更イベントをリッスン
-    const handleThemeChangeEvent = () => {
-      setThemeState(getTheme());
-    };
-    
-    window.addEventListener('themeChange', handleThemeChangeEvent);
-    
-    return () => {
-      window.removeEventListener('themeChange', handleThemeChangeEvent);
-    };
-  }, []); // 空の依存配列で初回のみ実行
+    // DOMから現在のテーマを取得
+    setThemeState(getCurrentTheme());
+  }, []);
 
-  const handleThemeChange = (newTheme: Theme) => {
-    setTheme(newTheme);
+  const handleToggleTheme = () => {
+    const newTheme = toggleTheme();
     setThemeState(newTheme);
   };
 
@@ -73,41 +45,19 @@ export default function Header() {
             このサイトについて
           </Link>
           
-          {/* テーマスイッチャー - Modern Toggle */}
-          <div className="relative inline-flex items-center bg-qiita-surface dark:bg-dark-surface-light rounded-full p-1 h-10 transition-colors duration-300">
-            {/* Sliding background */}
-            <div
-              className={`absolute top-1 bottom-1 left-1 w-[calc(50%-0.125rem)] bg-qiita-green dark:bg-dark-green rounded-full transition-transform duration-150 ease-out shadow-md ${
-                theme === 'dark' ? 'translate-x-full' : 'translate-x-0'
-              }`}
-            />
-            
-            {/* Buttons */}
-            <button
-              onClick={() => handleThemeChange('system')}
-              className={`relative z-10 h-8 px-4 flex items-center justify-center gap-1 text-sm font-semibold rounded-full transition-colors duration-150 ${
-                theme === 'system'
-                  ? 'text-white'
-                  : 'text-qiita-text dark:text-dark-text hover:text-qiita-text-dark dark:hover:text-white'
-              }`}
-              title="ライトモード"
-            >
-              <i className="ri-sun-line text-base"></i>
-              <span>Light</span>
-            </button>
-            <button
-              onClick={() => handleThemeChange('dark')}
-              className={`relative z-10 h-8 px-4 flex items-center justify-center gap-1 text-sm font-semibold rounded-full transition-colors duration-150 ${
-                theme === 'dark'
-                  ? 'text-white'
-                  : 'text-qiita-text dark:text-dark-text hover:text-qiita-text-dark dark:hover:text-white'
-              }`}
-              title="ダークモード"
-            >
-              <i className="ri-moon-line text-base"></i>
-              <span>Dark</span>
-            </button>
-          </div>
+          {/* テーマトグルボタン - シンプルなクリックで反転 */}
+          <button
+            onClick={handleToggleTheme}
+            className="relative flex items-center justify-center gap-2 px-4 py-2 bg-qiita-surface dark:bg-dark-surface-light rounded-full transition-all duration-200 hover:bg-qiita-green/10 dark:hover:bg-dark-green/20 group"
+            title={theme === 'dark' ? 'ライトモードに切り替え' : 'ダークモードに切り替え'}
+          >
+            {/* アイコン - ダークモードの時は太陽、ライトモードの時は月 */}
+            {theme === 'dark' ? (
+              <i className="ri-sun-line text-xl text-qiita-green dark:text-dark-green transition-transform duration-200 group-hover:scale-110"></i>
+            ) : (
+              <i className="ri-moon-line text-xl text-qiita-green dark:text-dark-green transition-transform duration-200 group-hover:scale-110"></i>
+            )}
+          </button>
         </nav>
       </div>
     </header>

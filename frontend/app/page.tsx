@@ -11,7 +11,7 @@ import { ITEMS_PER_PAGE } from '@/lib/constants';
 type PeriodType = 'daily' | 'monthly' | 'yearly' | 'all' | 'year';
 
 export default function Home() {
-  // SSRハイドレーションエラーを防ぐため、初期値は固定
+  // 初期値は固定（ユーザー設定は保存しない）
   const [period, setPeriod] = useState<PeriodType>('yearly');
   const [selectedYear, setSelectedYear] = useState<number | null>(null);
   const [selectedMonth, setSelectedMonth] = useState<number | null>(null);
@@ -21,28 +21,6 @@ export default function Home() {
   const [error, setError] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [searchQuery, setSearchQuery] = useState('');
-  const [mounted, setMounted] = useState(false);
-  
-  // クライアントサイドでlocalStorageから復元
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const savedPeriod = localStorage.getItem('ranking_period');
-      const savedYear = localStorage.getItem('ranking_selected_year');
-      
-      if (savedPeriod && ['daily', 'monthly', 'yearly', 'all', 'year'].includes(savedPeriod)) {
-        setPeriod(savedPeriod as PeriodType);
-      }
-      
-      if (savedYear) {
-        const year = parseInt(savedYear);
-        if (!isNaN(year)) {
-          setSelectedYear(year);
-        }
-      }
-      
-      setMounted(true);
-    }
-  }, []);
 
   // 期間選択オプションを生成（年のみ）
   const generatePeriodOptions = () => {
@@ -68,23 +46,6 @@ export default function Home() {
     };
     fetchYears();
   }, []);
-
-  // 状態をlocalStorageに保存（mountedの場合のみ）
-  useEffect(() => {
-    if (mounted && typeof window !== 'undefined') {
-      localStorage.setItem('ranking_period', period);
-    }
-  }, [period, mounted]);
-
-  useEffect(() => {
-    if (mounted && typeof window !== 'undefined') {
-      if (selectedYear !== null) {
-        localStorage.setItem('ranking_selected_year', selectedYear.toString());
-      } else {
-        localStorage.removeItem('ranking_selected_year');
-      }
-    }
-  }, [selectedYear, mounted]);
 
   useEffect(() => {
     const fetchRankings = async () => {

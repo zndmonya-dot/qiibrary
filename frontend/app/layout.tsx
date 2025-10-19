@@ -63,18 +63,11 @@ export default function RootLayout({
     <html lang="ja" suppressHydrationWarning>
       <head />
       <body>
-        {/* テーマ適用スクリプト - 最優先で実行（ブロッキング） */}
+        {/* デフォルトでダークモード（ユーザー設定は保存しない） */}
         <script
           dangerouslySetInnerHTML={{
             __html: `
-              try {
-                var theme = localStorage.getItem('theme');
-                if (theme === 'dark') {
-                  document.documentElement.classList.add('dark');
-                } else {
-                  document.documentElement.classList.remove('dark');
-                }
-              } catch (e) {}
+              document.documentElement.classList.add('dark');
             `,
           }}
         />

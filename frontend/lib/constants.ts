@@ -16,16 +16,9 @@ export const DEFAULT_RANKING_LIMIT = 50;
 // ========================================
 // テーマ設定
 // ========================================
-export const THEME_STORAGE_KEY = 'theme';
-export const VALID_THEMES = ['system', 'dark'] as const;
+export const VALID_THEMES = ['light', 'dark'] as const;
 export type Theme = typeof VALID_THEMES[number];
-
-// ========================================
-// ローカルストレージキー
-// ========================================
-export const STORAGE_KEYS = {
-  THEME: THEME_STORAGE_KEY,
-} as const;
+export const DEFAULT_THEME: Theme = 'dark'; // デフォルトはダークモード
 
 // ========================================
 // カラー設定
