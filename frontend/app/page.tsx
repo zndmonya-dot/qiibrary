@@ -380,7 +380,7 @@ export default function Home() {
         
         {/* ランキング表示 */}
         {loading && !rankings && (
-          <div className="bg-qiita-card dark:bg-dark-surface rounded-lg p-12 border border-qiita-border dark:border-dark-border shadow-sm">
+          <div className="p-12">
             <div className="flex flex-col justify-center items-center">
               <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-qiita-green dark:border-dark-green mb-4"></div>
               <p className="text-qiita-text dark:text-dark-text text-sm font-medium animate-pulse">読み込み中...</p>
@@ -398,7 +398,7 @@ export default function Home() {
         )}
         
         {!error && rankings && loading && (
-          <div className="bg-qiita-card dark:bg-dark-surface rounded-lg p-12 border border-qiita-border dark:border-dark-border shadow-sm">
+          <div className="p-12">
             <div className="flex flex-col justify-center items-center">
               <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-qiita-green dark:border-dark-green mb-4"></div>
               <p className="text-qiita-text dark:text-dark-text text-sm font-medium animate-pulse">読み込み中...</p>
