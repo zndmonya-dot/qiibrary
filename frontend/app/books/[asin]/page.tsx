@@ -49,7 +49,7 @@ export default function BookDetailPage() {
       <div className="min-h-screen bg-qiita-bg dark:bg-dark-bg">
         <Header />
         <main className="container mx-auto px-4 min-h-[calc(100vh-120px)] flex items-center justify-center">
-          <LoadingSpinner message="書籍情報を読み込み中..." />
+          <LoadingSpinner />
         </main>
       </div>
     );
