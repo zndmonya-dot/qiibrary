@@ -180,7 +180,7 @@ export default function BookDetailPage() {
                 {/* 左側: 基本情報 + 説明 */}
                 <div className="flex-1 min-w-0 flex flex-col">
                   {/* 基本情報グリッド */}
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-6">
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-4 md:mb-6">
                     {book.author && (
                       <div className="bg-white dark:bg-dark-surface rounded-lg p-4 border border-qiita-border dark:border-dark-border shadow-sm">
                         <div className="flex items-center gap-2 mb-2">
