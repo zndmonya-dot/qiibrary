@@ -87,17 +87,17 @@ export default function BookDetailPage() {
             {/* 戻るボタン */}
             <button
               onClick={() => router.push('/')}
-              className="flex items-center gap-2 text-secondary hover:text-qiita-green dark:hover:text-dark-green mb-6 transition-all duration-200 group"
+              className="flex items-center gap-2 text-secondary hover:text-qiita-green dark:hover:text-dark-green mb-6 transition-all duration-200 group text-base md:text-lg lg:text-xl font-semibold lg:font-bold"
             >
-              <i className="ri-arrow-left-line group-hover:-translate-x-1 transition-transform duration-200"></i>
+              <i className="ri-arrow-left-line group-hover:-translate-x-1 transition-transform duration-200 text-lg md:text-xl lg:text-2xl"></i>
               <span>ランキングに戻る</span>
             </button>
             
             {/* タイトルエリア */}
             <div className="mb-6">
               <div className="bg-qiita-card dark:bg-dark-surface rounded-lg p-4 md:p-6 border-l-4 border-qiita-green shadow-sm">
-                <h1 className="text-lg md:text-3xl font-bold flex items-center gap-2 md:gap-3 text-qiita-text-dark dark:text-white leading-tight">
-                  <i className="ri-book-marked-line text-qiita-green dark:text-dark-green text-xl md:text-3xl flex-shrink-0"></i>
+                <h1 className="text-lg md:text-3xl lg:text-4xl font-bold lg:font-extrabold flex items-center gap-2 md:gap-3 text-qiita-text-dark dark:text-white leading-tight">
+                  <i className="ri-book-marked-line text-qiita-green dark:text-dark-green text-xl md:text-3xl lg:text-4xl flex-shrink-0"></i>
                   <span className="break-words">{book.title}</span>
                 </h1>
               </div>
@@ -134,18 +134,18 @@ export default function BookDetailPage() {
                   {/* 統計情報 */}
                   <div className="grid grid-cols-2 gap-3 mb-4">
                     <div className="flex flex-col items-center justify-center p-3 md:p-4 bg-qiita-green/10 dark:bg-qiita-green/20 rounded-lg border-2 border-qiita-green/30 dark:border-qiita-green/40">
-                      <i className="ri-article-line text-qiita-green dark:text-dark-green text-xl md:text-2xl mb-1 md:mb-2"></i>
-                      <div className="text-lg md:text-xl font-bold text-qiita-text-dark dark:text-white">
+                      <i className="ri-article-line text-qiita-green dark:text-dark-green text-xl md:text-2xl lg:text-3xl mb-1 md:mb-2"></i>
+                      <div className="text-lg md:text-xl lg:text-2xl font-bold lg:font-extrabold text-qiita-text-dark dark:text-white">
                         {book.qiita_articles?.length || 0}
                       </div>
-                      <div className="text-xs text-qiita-text dark:text-dark-text font-semibold">記事</div>
+                      <div className="text-xs lg:text-sm text-qiita-text dark:text-dark-text font-semibold lg:font-bold">記事</div>
                     </div>
                     <div className="flex flex-col items-center justify-center p-3 md:p-4 bg-pink-50 dark:bg-pink-900/20 rounded-lg border-2 border-pink-200 dark:border-pink-800/40">
-                      <i className="ri-heart-fill text-pink-500 dark:text-pink-400 text-xl md:text-2xl mb-1 md:mb-2"></i>
-                      <div className="text-lg md:text-xl font-bold text-qiita-text-dark dark:text-white">
+                      <i className="ri-heart-fill text-pink-500 dark:text-pink-400 text-xl md:text-2xl lg:text-3xl mb-1 md:mb-2"></i>
+                      <div className="text-lg md:text-xl lg:text-2xl font-bold lg:font-extrabold text-qiita-text-dark dark:text-white">
                         {formatNumber(book.qiita_articles?.reduce((sum, a) => sum + a.likes_count, 0) || 0)}
                       </div>
-                      <div className="text-xs text-qiita-text dark:text-dark-text font-semibold">いいね</div>
+                      <div className="text-xs lg:text-sm text-qiita-text dark:text-dark-text font-semibold lg:font-bold">いいね</div>
                     </div>
                   </div>
                   
@@ -170,10 +170,10 @@ export default function BookDetailPage() {
                     {book.author && (
                       <div className="bg-white dark:bg-dark-surface rounded-lg p-4 border border-qiita-border dark:border-dark-border shadow-sm">
                         <div className="flex items-center gap-2 mb-2">
-                          <i className="ri-user-line text-qiita-green dark:text-dark-green text-lg"></i>
-                          <span className="text-xs text-secondary mb-2 font-semibold">著者</span>
+                          <i className="ri-user-line text-qiita-green dark:text-dark-green text-lg lg:text-xl"></i>
+                          <span className="text-xs lg:text-sm text-secondary mb-2 font-semibold lg:font-bold">著者</span>
                         </div>
-                        <div className="text-sm text-qiita-text-dark dark:text-white font-semibold line-clamp-2">
+                        <div className="text-sm lg:text-base text-qiita-text-dark dark:text-white font-semibold lg:font-bold line-clamp-2">
                           {book.author}
                         </div>
                       </div>
@@ -181,10 +181,10 @@ export default function BookDetailPage() {
                     {book.publisher && (
                       <div className="bg-white dark:bg-dark-surface rounded-lg p-4 border border-qiita-border dark:border-dark-border shadow-sm">
                         <div className="flex items-center gap-2 mb-2">
-                          <i className="ri-building-line text-qiita-green dark:text-dark-green text-lg"></i>
-                          <span className="text-xs text-secondary font-semibold">出版社</span>
+                          <i className="ri-building-line text-qiita-green dark:text-dark-green text-lg lg:text-xl"></i>
+                          <span className="text-xs lg:text-sm text-secondary font-semibold lg:font-bold">出版社</span>
                         </div>
-                        <div className="text-sm text-qiita-text-dark dark:text-white font-semibold">
+                        <div className="text-sm lg:text-base text-qiita-text-dark dark:text-white font-semibold lg:font-bold">
                           {book.publisher}
                         </div>
                       </div>
@@ -192,10 +192,10 @@ export default function BookDetailPage() {
                     {book.publication_date && (
                       <div className="bg-white dark:bg-dark-surface rounded-lg p-4 border border-qiita-border dark:border-dark-border shadow-sm">
                         <div className="flex items-center gap-2 mb-2">
-                          <i className="ri-calendar-line text-qiita-green dark:text-dark-green text-lg"></i>
-                          <span className="text-xs text-secondary font-semibold">発売日</span>
+                          <i className="ri-calendar-line text-qiita-green dark:text-dark-green text-lg lg:text-xl"></i>
+                          <span className="text-xs lg:text-sm text-secondary font-semibold lg:font-bold">発売日</span>
                         </div>
-                        <div className="text-sm text-qiita-text-dark dark:text-white font-semibold">
+                        <div className="text-sm lg:text-base text-qiita-text-dark dark:text-white font-semibold lg:font-bold">
                           {formatPublicationDate(book.publication_date)}
                         </div>
                       </div>
@@ -206,10 +206,10 @@ export default function BookDetailPage() {
                   {book.description && (
                     <div className="bg-white dark:bg-dark-surface rounded-lg p-4 md:p-6 border border-qiita-border dark:border-dark-border shadow-sm flex-1">
                       <div className="flex items-center gap-2 mb-3 md:mb-4">
-                        <i className="ri-book-open-line text-qiita-green dark:text-dark-green text-lg"></i>
-                        <span className="text-xs text-secondary font-semibold">書籍説明</span>
+                        <i className="ri-book-open-line text-qiita-green dark:text-dark-green text-lg lg:text-xl"></i>
+                        <span className="text-xs lg:text-sm text-secondary font-semibold lg:font-bold">書籍説明</span>
                       </div>
-                      <div className="text-xs lg:text-sm text-qiita-text-dark dark:text-dark-text leading-relaxed whitespace-pre-wrap font-medium">
+                      <div className="text-xs lg:text-base text-qiita-text-dark dark:text-dark-text leading-relaxed whitespace-pre-wrap font-medium">
                         {book.description}
                       </div>
                     </div>
@@ -255,18 +255,18 @@ export default function BookDetailPage() {
                 {/* セクションヘッダー */}
                 <div className="mb-6">
                   <div className="bg-qiita-green/10 dark:bg-qiita-green/20 rounded-lg p-3 md:p-5 border-l-4 border-qiita-green">
-                    <h2 className="text-base md:text-xl font-bold flex items-center gap-2 md:gap-3 text-qiita-text-dark dark:text-white">
-                      <div className="w-10 h-10 md:w-12 md:h-12 bg-qiita-green dark:bg-dark-green rounded-full flex items-center justify-center flex-shrink-0">
-                        <i className="ri-article-fill text-white text-lg md:text-2xl"></i>
+                    <h2 className="text-base md:text-xl lg:text-2xl font-bold lg:font-extrabold flex items-center gap-2 md:gap-3 text-qiita-text-dark dark:text-white">
+                      <div className="w-10 h-10 md:w-12 md:h-12 lg:w-14 lg:h-14 bg-qiita-green dark:bg-dark-green rounded-full flex items-center justify-center flex-shrink-0">
+                        <i className="ri-article-fill text-white text-lg md:text-2xl lg:text-3xl"></i>
                       </div>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 md:gap-3 flex-wrap">
-                          <span className="text-sm md:text-base">この本を紹介しているQiita記事</span>
-                          <span className="bg-qiita-green dark:bg-dark-green text-white text-xs md:text-sm font-bold px-2 md:px-3 py-0.5 md:py-1 rounded-full">
+                          <span className="text-sm md:text-base lg:text-lg">この本を紹介しているQiita記事</span>
+                          <span className="bg-qiita-green dark:bg-dark-green text-white text-xs md:text-sm lg:text-base font-bold px-2 md:px-3 lg:px-4 py-0.5 md:py-1 rounded-full">
                             {book.qiita_articles.length}件
                           </span>
                         </div>
-                        <p className="text-xs md:text-sm text-qiita-text dark:text-dark-text font-normal mt-1">
+                        <p className="text-xs md:text-sm lg:text-base text-qiita-text dark:text-dark-text font-normal lg:font-medium mt-1">
                           実際に使ってみた開発者の声
                         </p>
                       </div>
@@ -285,17 +285,17 @@ export default function BookDetailPage() {
                     >
                       <div className="flex items-start gap-3 md:gap-4">
                         <div className="flex-shrink-0">
-                          <div className="w-10 h-10 md:w-12 md:h-12 bg-qiita-green/10 dark:bg-qiita-green/20 rounded-lg flex items-center justify-center border border-qiita-green/30 dark:border-qiita-green/40 group-hover:border-qiita-green/50 transition-colors">
-                            <i className="ri-article-line text-qiita-green dark:text-dark-green text-lg md:text-2xl"></i>
+                          <div className="w-10 h-10 md:w-12 md:h-12 lg:w-14 lg:h-14 bg-qiita-green/10 dark:bg-qiita-green/20 rounded-lg flex items-center justify-center border border-qiita-green/30 dark:border-qiita-green/40 group-hover:border-qiita-green/50 transition-colors">
+                            <i className="ri-article-line text-qiita-green dark:text-dark-green text-lg md:text-2xl lg:text-3xl"></i>
                           </div>
                         </div>
                         
                         <div className="flex-1 min-w-0">
-                          <h3 className="text-qiita-text-dark dark:text-white font-bold mb-2 group-hover:text-qiita-green dark:group-hover:text-dark-green transition-colors line-clamp-2 text-sm md:text-base">
+                          <h3 className="text-qiita-text-dark dark:text-white font-bold lg:font-extrabold mb-2 group-hover:text-qiita-green dark:group-hover:text-dark-green transition-colors line-clamp-2 text-sm md:text-base lg:text-lg">
                             {article.title}
                           </h3>
                           
-                          <div className="flex flex-wrap items-center gap-4 text-sm text-qiita-text dark:text-dark-text mb-3 font-medium">
+                          <div className="flex flex-wrap items-center gap-4 text-sm lg:text-base text-qiita-text dark:text-dark-text mb-3 font-medium lg:font-semibold">
                             <div className="flex items-center gap-1.5">
                               <i className="ri-user-line"></i>
                               <span>{article.author_name || article.author_id}</span>
@@ -347,16 +347,16 @@ export default function BookDetailPage() {
                   <div className="mt-6 flex gap-2 md:gap-4 justify-center flex-wrap">
                     <button
                       onClick={() => setDisplayedArticlesCount(prev => Math.min(prev + 10, book.qiita_articles.length))}
-                      className="px-4 md:px-6 py-2 md:py-3 text-sm md:text-base bg-qiita-green dark:bg-dark-green text-white rounded-lg hover:opacity-90 transition-opacity font-semibold flex items-center gap-1.5 md:gap-2"
+                      className="px-4 md:px-6 py-2 md:py-3 text-sm md:text-base lg:text-lg bg-qiita-green dark:bg-dark-green text-white rounded-lg hover:opacity-90 transition-opacity font-semibold lg:font-bold flex items-center justify-center gap-1.5 md:gap-2"
                     >
-                      <i className="ri-arrow-down-line text-base md:text-lg"></i>
+                      <i className="ri-arrow-down-line text-base md:text-lg lg:text-xl"></i>
                       もっと見る（+10件）
                     </button>
                     <button
                       onClick={() => setDisplayedArticlesCount(book.qiita_articles.length)}
-                      className="px-4 md:px-6 py-2 md:py-3 text-sm md:text-base bg-qiita-surface dark:bg-dark-surface-light text-qiita-text-dark dark:text-white rounded-lg hover:bg-qiita-green/10 dark:hover:bg-qiita-green/20 transition-colors font-semibold border border-qiita-border dark:border-dark-border flex items-center gap-1.5 md:gap-2"
+                      className="px-4 md:px-6 py-2 md:py-3 text-sm md:text-base lg:text-lg bg-qiita-surface dark:bg-dark-surface-light text-qiita-text-dark dark:text-white rounded-lg hover:bg-qiita-green/10 dark:hover:bg-qiita-green/20 transition-colors font-semibold lg:font-bold border border-qiita-border dark:border-dark-border flex items-center justify-center gap-1.5 md:gap-2"
                     >
-                      <i className="ri-list-check text-base md:text-lg"></i>
+                      <i className="ri-list-check text-base md:text-lg lg:text-xl"></i>
                       すべて表示（全{book.qiita_articles.length}件）
                     </button>
                   </div>
@@ -370,18 +370,18 @@ export default function BookDetailPage() {
                 {/* セクションヘッダー */}
                 <div className="mb-6">
                   <div className="bg-youtube-red/10 dark:bg-youtube-red/20 rounded-lg p-3 md:p-5 border-l-4 border-youtube-red">
-                    <h2 className="text-base md:text-xl font-bold flex items-center gap-2 md:gap-3 text-qiita-text-dark dark:text-white">
-                      <div className="w-10 h-10 md:w-12 md:h-12 bg-youtube-red rounded-full flex items-center justify-center flex-shrink-0">
-                        <i className="ri-youtube-fill text-white text-lg md:text-2xl"></i>
+                    <h2 className="text-base md:text-xl lg:text-2xl font-bold lg:font-extrabold flex items-center gap-2 md:gap-3 text-qiita-text-dark dark:text-white">
+                      <div className="w-10 h-10 md:w-12 md:h-12 lg:w-14 lg:h-14 bg-youtube-red rounded-full flex items-center justify-center flex-shrink-0">
+                        <i className="ri-youtube-fill text-white text-lg md:text-2xl lg:text-3xl"></i>
                       </div>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 md:gap-3 flex-wrap">
-                          <span className="text-sm md:text-base">この本を紹介しているYouTube動画</span>
-                          <span className="bg-youtube-red text-white text-xs md:text-sm font-bold px-2 md:px-3 py-0.5 md:py-1 rounded-full">
+                          <span className="text-sm md:text-base lg:text-lg">この本を紹介しているYouTube動画</span>
+                          <span className="bg-youtube-red text-white text-xs md:text-sm lg:text-base font-bold px-2 md:px-3 lg:px-4 py-0.5 md:py-1 rounded-full">
                             {book.youtube_videos.length}件
                           </span>
                         </div>
-                        <p className="text-xs md:text-sm text-qiita-text dark:text-dark-text font-normal mt-1">
+                        <p className="text-xs md:text-sm lg:text-base text-qiita-text dark:text-dark-text font-normal lg:font-medium mt-1">
                           動画で詳しい解説をチェック
                         </p>
                       </div>
