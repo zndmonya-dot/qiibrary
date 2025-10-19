@@ -66,10 +66,12 @@ export default function Home() {
     fetchYears();
   }, []);
 
-  // 状態をlocalStorageに保存
+  // 状態をlocalStorageに保存（デバウンス付き）
   useEffect(() => {
     if (typeof window !== 'undefined') {
+      // 状態が変更されたら即座に保存
       localStorage.setItem('ranking_period', period);
+      console.log('Period saved to localStorage:', period);
     }
   }, [period]);
 
@@ -77,8 +79,10 @@ export default function Home() {
     if (typeof window !== 'undefined') {
       if (selectedYear !== null) {
         localStorage.setItem('ranking_selected_year', selectedYear.toString());
+        console.log('Year saved to localStorage:', selectedYear);
       } else {
         localStorage.removeItem('ranking_selected_year');
+        console.log('Year removed from localStorage');
       }
     }
   }, [selectedYear]);
@@ -152,9 +156,12 @@ export default function Home() {
   };
 
   const getPeriodLabel = () => {
-    if (period === 'daily') return '24時間のランキング';
-    if (period === 'monthly') return '30日間のランキング';
-    return '365日間のランキング';
+    if (period === 'daily') return '24時間';
+    if (period === 'monthly') return '30日間';
+    if (period === 'yearly') return '365日間';
+    if (period === 'year' && selectedYear) return `${selectedYear}年`;
+    if (period === 'all') return '全期間';
+    return '365日間'; // デフォルト
   };
 
   return (
@@ -230,12 +237,13 @@ export default function Home() {
             {/* 期間タブ */}
             <button
               onClick={() => {
+                console.log('24時間 clicked, current period:', period, 'selectedYear:', selectedYear);
                 setPeriod('daily');
                 setSelectedYear(null);
                 analytics.changeRankingPeriod('daily');
               }}
               className={`px-4 py-2 rounded-lg font-semibold transition-all duration-150 ${
-                period === 'daily' && selectedYear === null
+                period === 'daily'
                   ? 'bg-qiita-green dark:bg-dark-green text-white shadow-sm' 
                   : 'bg-qiita-surface dark:bg-dark-surface-light text-qiita-text-dark dark:text-dark-text hover:bg-qiita-green/10 dark:hover:bg-qiita-green/20'
               }`}
@@ -250,7 +258,7 @@ export default function Home() {
                 analytics.changeRankingPeriod('monthly');
               }}
               className={`px-4 py-2 rounded-lg font-semibold transition-all duration-150 ${
-                period === 'monthly' && selectedYear === null
+                period === 'monthly'
                   ? 'bg-qiita-green dark:bg-dark-green text-white shadow-sm'
                   : 'bg-qiita-surface dark:bg-dark-surface-light text-qiita-text-dark dark:text-dark-text hover:bg-qiita-green/10 dark:hover:bg-qiita-green/20'
               }`}
@@ -265,7 +273,7 @@ export default function Home() {
                 analytics.changeRankingPeriod('yearly');
               }}
               className={`px-4 py-2 rounded-lg font-semibold transition-all duration-150 ${
-                period === 'yearly' && selectedYear === null
+                period === 'yearly'
                   ? 'bg-qiita-green dark:bg-dark-green text-white shadow-sm'
                   : 'bg-qiita-surface dark:bg-dark-surface-light text-qiita-text-dark dark:text-dark-text hover:bg-qiita-green/10 dark:hover:bg-qiita-green/20'
               }`}
@@ -280,7 +288,7 @@ export default function Home() {
                 analytics.changeRankingPeriod('all');
               }}
               className={`px-4 py-2 rounded-lg font-semibold transition-all duration-150 ${
-                period === 'all' && selectedYear === null
+                period === 'all'
                   ? 'bg-qiita-green dark:bg-dark-green text-white shadow-sm'
                   : 'bg-qiita-surface dark:bg-dark-surface-light text-qiita-text-dark dark:text-dark-text hover:bg-qiita-green/10 dark:hover:bg-qiita-green/20'
               }`}
@@ -308,7 +316,7 @@ export default function Home() {
               }}
               disabled={availableYears.length === 0}
               className={`px-4 py-2 rounded-lg font-semibold transition-all duration-150 border ${
-                period === 'year' && selectedYear !== null
+                period === 'year'
                   ? 'bg-qiita-green dark:bg-dark-green text-white border-qiita-green dark:border-dark-green shadow-sm'
                   : 'bg-qiita-surface dark:bg-dark-surface-light text-qiita-text-dark dark:text-dark-text border-qiita-border dark:border-dark-border hover:bg-qiita-green/10 dark:hover:bg-qiita-green/20'
               } ${availableYears.length === 0 ? 'opacity-50 cursor-not-allowed' : ''}`}
