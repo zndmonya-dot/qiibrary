@@ -67,6 +67,7 @@ class RankingService:
                 Book.amazon_url,
                 Book.amazon_affiliate_url,
                 Book.total_mentions,
+                Book.first_mentioned_at,
                 func.count(BookQiitaMention.id).label('mention_count'),
                 func.count(func.distinct(QiitaArticle.id)).label('article_count'),
                 func.sum(QiitaArticle.likes_count).label('total_likes'),
@@ -130,6 +131,7 @@ class RankingService:
             Book.amazon_url,
             Book.amazon_affiliate_url,
             Book.total_mentions,
+            Book.first_mentioned_at,
         )
         
         results = query.all()
@@ -169,12 +171,19 @@ class RankingService:
         
         # ランキング形式に整形
         rankings = []
+        now = datetime.now()
         for rank, (calculated_score, row, _) in enumerate(top_results, start=1):
             # スコアと統計情報を再計算
             mention_count = int(row.mention_count) if row.mention_count else 0
             article_count = int(row.article_count) if row.article_count else 0
             total_likes = int(row.total_likes) if row.total_likes else 0
             avg_likes = total_likes / article_count if article_count > 0 else 0
+            
+            # NEWバッジ判定：初登場から30日以内
+            is_new = False
+            if row.first_mentioned_at:
+                days_since_first = (now - row.first_mentioned_at).days
+                is_new = days_since_first <= 30
             
             # 動的にAmazonアフィリエイトURLを生成
             amazon_affiliate_url = self.openbd_service.generate_amazon_affiliate_url(row.isbn)
@@ -201,6 +210,7 @@ class RankingService:
                     "avg_likes": round(avg_likes, 2),  # 平均いいね数
                     "score": round(calculated_score, 2),  # スコア
                     "latest_mention_at": row.latest_mention_at.isoformat() if row.latest_mention_at else None,
+                    "is_new": is_new,  # NEWバッジ表示フラグ
                 }
             })
         

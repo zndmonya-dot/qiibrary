@@ -28,7 +28,16 @@ function BookCard({ rank, book, stats }: BookCardProps) {
   };
 
   return (
-    <div className="card-primary flex gap-5 border border-qiita-border">
+    <div className="card-primary flex gap-5 border border-qiita-border relative">
+      {/* NEWバッジ（右上） */}
+      {stats.is_new && (
+        <div className="absolute top-3 right-3 z-10">
+          <div className="px-3 py-1 bg-gradient-to-r from-red-500 to-pink-500 rounded-full shadow-lg">
+            <span className="text-xs font-bold text-white tracking-wider">NEW</span>
+          </div>
+        </div>
+      )}
+      
       {/* ランク表示 */}
       <div className="flex-shrink-0 w-14 flex items-center justify-center">
         <div className="flex flex-col items-center">

@@ -45,6 +45,7 @@ export interface BookStats {
   avg_likes: number;
   score: number;
   latest_mention_at: string | null;
+  is_new: boolean; // NEWバッジ表示フラグ（初登場から30日以内）
   total_views?: number; // YouTube動画用（オプション）
 }
 
