@@ -134,7 +134,7 @@ export default function BookDetailPage() {
                   </div>
                   
                   {/* 統計情報 */}
-                  <div className="grid grid-cols-2 gap-3">
+                  <div className="grid grid-cols-2 gap-3 mb-4">
                     <div className="flex flex-col items-center justify-center p-3 md:p-4 bg-qiita-green/10 dark:bg-qiita-green/20 rounded-lg border-2 border-qiita-green/30 dark:border-qiita-green/40">
                       <i className="ri-article-line text-qiita-green dark:text-dark-green text-xl md:text-2xl mb-1 md:mb-2"></i>
                       <div className="text-lg md:text-xl font-bold text-qiita-text-dark dark:text-white">
@@ -150,6 +150,19 @@ export default function BookDetailPage() {
                       <div className="text-xs text-qiita-text dark:text-dark-text font-semibold">いいね</div>
                     </div>
                   </div>
+                  
+                  {/* 購入ボタン（デスクトップのみ） */}
+                  {book.amazon_affiliate_url && (
+                    <a
+                      href={book.amazon_affiliate_url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="btn-amazon w-full justify-center text-center py-3 mb-4"
+                    >
+                      <i className="ri-amazon-line text-xl"></i>
+                      <span>Amazonで購入</span>
+                    </a>
+                  )}
                   
                   {/* 星評価 */}
                   {book.rating && (
@@ -223,7 +236,7 @@ export default function BookDetailPage() {
                         <i className="ri-book-open-line text-qiita-green dark:text-dark-green text-lg"></i>
                         <span className="text-xs text-secondary font-semibold">書籍説明</span>
                       </div>
-                      <div className="text-xs md:text-sm text-qiita-text-dark dark:text-dark-text leading-relaxed whitespace-pre-wrap font-medium md:max-h-64 md:overflow-y-auto">
+                      <div className="text-xs md:text-sm text-qiita-text-dark dark:text-dark-text leading-relaxed whitespace-pre-wrap font-medium lg:max-h-64 lg:overflow-y-auto">
                         {book.description}
                       </div>
                     </div>
@@ -247,13 +260,13 @@ export default function BookDetailPage() {
                     </div>
                   </div>
                   
-                  {/* 購入ボタン */}
+                  {/* 購入ボタン（スマホのみ） */}
                   {book.amazon_affiliate_url && (
                     <a
                       href={book.amazon_affiliate_url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="btn-amazon w-full justify-center text-center py-3 mt-4"
+                      className="lg:hidden btn-amazon w-full justify-center text-center py-3 mt-4"
                     >
                       <i className="ri-amazon-line text-xl"></i>
                       <span>Amazonで購入</span>

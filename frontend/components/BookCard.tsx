@@ -75,15 +75,14 @@ function BookCard({ rank, book, stats, onNavigate }: BookCardProps) {
                     alt={book.title}
                     width={160}
                     height={240}
-                    className="rounded shadow-lg w-full h-auto"
-                    style={{ maxHeight: '180px', objectFit: 'cover' }}
+                    className="rounded shadow-lg w-full h-full object-cover"
                     loading={rank > 10 ? "lazy" : "eager"}
                     priority={rank <= 5}
                 onError={(e) => {
                   const target = e.target as HTMLImageElement;
                   target.style.display = 'none';
                   if (target.parentElement) {
-                    target.parentElement.innerHTML = '<div class="w-[160px] h-[240px] bg-qiita-surface dark:bg-dark-surface-light rounded shadow-sm flex flex-col items-center justify-center gap-3 border border-qiita-border dark:border-dark-border"><i class="ri-image-2-line text-6xl text-qiita-text-light dark:text-dark-text-light"></i><span class="text-xs text-qiita-text dark:text-dark-text font-medium px-2 text-center">画像読込失敗</span></div>';
+                    target.parentElement.innerHTML = '<div class="w-[120px] h-[180px] md:w-[160px] md:h-[240px] bg-qiita-surface dark:bg-dark-surface-light rounded shadow-sm flex flex-col items-center justify-center gap-3 border border-qiita-border dark:border-dark-border"><i class="ri-image-2-line text-4xl md:text-6xl text-qiita-text-light dark:text-dark-text-light"></i><span class="text-xs text-qiita-text dark:text-dark-text font-medium px-2 text-center">画像読込失敗</span></div>';
                   }
                 }}
               />
