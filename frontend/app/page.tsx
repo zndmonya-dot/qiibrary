@@ -315,15 +315,8 @@ export default function Home() {
                   {getPeriodLabel()}
                 </h2>
               </div>
-              <div className="flex items-center gap-4">
-                <div className="text-sm text-qiita-text dark:text-dark-text">
-                  {(currentPage - 1) * ITEMS_PER_PAGE + 1} - {Math.min(currentPage * ITEMS_PER_PAGE, filteredRankings.length)} / {filteredRankings.length}件
-                </div>
-                <div className="px-3 py-1 bg-qiita-green/10 dark:bg-dark-green/20 border border-qiita-green/30 dark:border-dark-green/50 rounded-lg">
-                  <span className="text-sm font-bold text-qiita-green dark:text-dark-green">
-                    全 {filteredRankings.length} 件
-                  </span>
-                </div>
+              <div className="text-sm text-qiita-text dark:text-dark-text">
+                {(currentPage - 1) * ITEMS_PER_PAGE + 1} - {Math.min(currentPage * ITEMS_PER_PAGE, filteredRankings.length)} / {filteredRankings.length}件
               </div>
             </div>
             
