@@ -290,37 +290,38 @@ export default function Home() {
             </button>
             
             {/* 年別ドロップダウン */}
-            {availableYears.length > 0 && (
-              <select
-                value={period === 'year' && selectedYear ? `year-${selectedYear}` : ''}
-                onChange={(e) => {
-                  const value = e.target.value;
-                  if (value === '') {
-                    // 空の値が選択された場合は年別ランキングを解除して365日間に戻す
-                    setSelectedYear(null);
-                    setPeriod('yearly');
-                    analytics.changeRankingPeriod('yearly');
-                  } else if (value.startsWith('year-')) {
-                    const year = parseInt(value.replace('year-', ''));
-                    setSelectedYear(year);
-                    setPeriod('year');
-                    analytics.changeRankingPeriod(`year-${year}`);
-                  }
-                }}
-                className={`px-4 py-2 rounded-lg font-semibold transition-all duration-150 border ${
-                  period === 'year'
-                    ? 'bg-qiita-green dark:bg-dark-green text-white border-qiita-green dark:border-dark-green shadow-sm'
-                    : 'bg-qiita-surface dark:bg-dark-surface-light text-qiita-text-dark dark:text-dark-text border-qiita-border dark:border-dark-border hover:bg-qiita-green/10 dark:hover:bg-qiita-green/20'
-                }`}
-              >
-                <option value="">年別ランキング</option>
-                {generatePeriodOptions().map(option => (
-                  <option key={option.value} value={option.value}>
-                    {option.label}
-                  </option>
-                ))}
-              </select>
-            )}
+            <select
+              value={period === 'year' && selectedYear ? `year-${selectedYear}` : ''}
+              onChange={(e) => {
+                const value = e.target.value;
+                if (value === '') {
+                  // 空の値が選択された場合は年別ランキングを解除して365日間に戻す
+                  setSelectedYear(null);
+                  setPeriod('yearly');
+                  analytics.changeRankingPeriod('yearly');
+                } else if (value.startsWith('year-')) {
+                  const year = parseInt(value.replace('year-', ''));
+                  setSelectedYear(year);
+                  setPeriod('year');
+                  analytics.changeRankingPeriod(`year-${year}`);
+                }
+              }}
+              disabled={availableYears.length === 0}
+              className={`px-4 py-2 rounded-lg font-semibold transition-all duration-150 border ${
+                period === 'year'
+                  ? 'bg-qiita-green dark:bg-dark-green text-white border-qiita-green dark:border-dark-green shadow-sm'
+                  : 'bg-qiita-surface dark:bg-dark-surface-light text-qiita-text-dark dark:text-dark-text border-qiita-border dark:border-dark-border hover:bg-qiita-green/10 dark:hover:bg-qiita-green/20'
+              } ${availableYears.length === 0 ? 'opacity-50 cursor-not-allowed' : ''}`}
+            >
+              <option value="">
+                {availableYears.length === 0 ? '読み込み中...' : '年別ランキング'}
+              </option>
+              {generatePeriodOptions().map(option => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
           </div>
         </div>
         
