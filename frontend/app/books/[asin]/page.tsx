@@ -105,7 +105,7 @@ export default function BookDetailPage() {
             
             {/* 書籍情報セクション */}
             <div className="card-primary mb-8">
-              <div className="flex flex-col lg:flex-row-reverse gap-6">
+              <div className="flex flex-col lg:flex-row-reverse lg:items-stretch gap-6">
                 {/* 右側: 画像 + 統計情報（デスクトップのみ） */}
                 <div className="hidden lg:flex lg:flex-col flex-shrink-0 lg:w-72">
                   {/* 書籍画像 */}
@@ -164,9 +164,9 @@ export default function BookDetailPage() {
                 </div>
                 
                 {/* 左側: 基本情報 + 説明 */}
-                <div className="flex-1 min-w-0 flex flex-col lg:h-full">
+                <div className="flex-1 min-w-0 flex flex-col">
                   {/* 基本情報グリッド */}
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-4 md:mb-6 lg:flex-shrink-0">
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-4 md:mb-6">
                     {book.author && (
                       <div className="bg-white dark:bg-dark-surface rounded-lg p-4 border border-qiita-border dark:border-dark-border shadow-sm">
                         <div className="flex items-center gap-2 mb-2">
@@ -204,7 +204,7 @@ export default function BookDetailPage() {
                   
                   {/* 説明文 */}
                   {book.description && (
-                    <div className="bg-white dark:bg-dark-surface rounded-lg p-4 md:p-6 border border-qiita-border dark:border-dark-border shadow-sm lg:flex-1 lg:min-h-0">
+                    <div className="bg-white dark:bg-dark-surface rounded-lg p-4 md:p-6 border border-qiita-border dark:border-dark-border shadow-sm flex-1">
                       <div className="flex items-center gap-2 mb-3 md:mb-4">
                         <i className="ri-book-open-line text-qiita-green dark:text-dark-green text-lg"></i>
                         <span className="text-xs text-secondary font-semibold">書籍説明</span>
