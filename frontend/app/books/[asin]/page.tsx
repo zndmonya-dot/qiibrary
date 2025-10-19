@@ -108,10 +108,10 @@ export default function BookDetailPage() {
             {/* 書籍情報セクション */}
             <div className="card-primary mb-8">
               <div className="flex flex-col lg:flex-row-reverse gap-6">
-                {/* 右側: 画像 + 統計情報（スマホでは統計情報が最後） */}
-                <div className="flex-shrink-0 lg:w-72 order-last lg:order-first">
-                  {/* 書籍画像（デスクトップのみ） */}
-                  <div className="mb-4 hidden lg:flex justify-center">
+                {/* 右側: 画像 + 統計情報（デスクトップのみ） */}
+                <div className="hidden lg:block flex-shrink-0 lg:w-72">
+                  {/* 書籍画像 */}
+                  <div className="mb-4 flex justify-center">
                     {book.thumbnail_url ? (
                       <div className="relative w-[200px] h-[300px]">
                         <Image
@@ -223,11 +223,29 @@ export default function BookDetailPage() {
                         <i className="ri-book-open-line text-qiita-green dark:text-dark-green text-lg"></i>
                         <span className="text-xs text-secondary font-semibold">書籍説明</span>
                       </div>
-                      <div className="text-xs md:text-sm text-qiita-text-dark dark:text-dark-text leading-relaxed whitespace-pre-wrap font-medium max-h-64 overflow-y-auto">
+                      <div className="text-xs md:text-sm text-qiita-text-dark dark:text-dark-text leading-relaxed whitespace-pre-wrap font-medium md:max-h-64 md:overflow-y-auto">
                         {book.description}
                       </div>
                     </div>
                   )}
+                  
+                  {/* 統計情報（スマホのみ） */}
+                  <div className="grid lg:hidden grid-cols-2 gap-3 mt-4">
+                    <div className="flex flex-col items-center justify-center p-3 bg-qiita-green/10 dark:bg-qiita-green/20 rounded-lg border-2 border-qiita-green/30 dark:border-qiita-green/40">
+                      <i className="ri-article-line text-qiita-green dark:text-dark-green text-xl mb-1"></i>
+                      <div className="text-lg font-bold text-qiita-text-dark dark:text-white">
+                        {book.qiita_articles?.length || 0}
+                      </div>
+                      <div className="text-xs text-qiita-text dark:text-dark-text font-semibold">記事</div>
+                    </div>
+                    <div className="flex flex-col items-center justify-center p-3 bg-pink-50 dark:bg-pink-900/20 rounded-lg border-2 border-pink-200 dark:border-pink-800/40">
+                      <i className="ri-heart-fill text-pink-500 dark:text-pink-400 text-xl mb-1"></i>
+                      <div className="text-lg font-bold text-qiita-text-dark dark:text-white">
+                        {formatNumber(book.qiita_articles?.reduce((sum, a) => sum + a.likes_count, 0) || 0)}
+                      </div>
+                      <div className="text-xs text-qiita-text dark:text-dark-text font-semibold">いいね</div>
+                    </div>
+                  </div>
                   
                   {/* 購入ボタン */}
                   {book.amazon_affiliate_url && (
