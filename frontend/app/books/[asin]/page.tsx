@@ -275,11 +275,15 @@ export default function BookDetailPage() {
                 
                 <div className="grid grid-cols-1 gap-4">
                   {book.qiita_articles.slice(0, displayedArticlesCount).map((article, index) => {
-                    // 最初の3つの記事にアニメーション遅延を適用
+                    // 表示される全ての記事に順次アニメーションを適用（最大600msの遅延）
+                    const delayIndex = index % 6; // 6記事ごとにリセット（0-5）
                     let animationClass = 'animate-fade-in-up';
-                    if (index === 0) animationClass = 'animate-fade-in-up';
-                    else if (index === 1) animationClass = 'animate-fade-in-up animate-delay-100';
-                    else if (index === 2) animationClass = 'animate-fade-in-up animate-delay-200';
+                    if (delayIndex === 0) animationClass = 'animate-fade-in-up';
+                    else if (delayIndex === 1) animationClass = 'animate-fade-in-up animate-delay-100';
+                    else if (delayIndex === 2) animationClass = 'animate-fade-in-up animate-delay-200';
+                    else if (delayIndex === 3) animationClass = 'animate-fade-in-up animate-delay-300';
+                    else if (delayIndex === 4) animationClass = 'animate-fade-in-up animate-delay-400';
+                    else if (delayIndex === 5) animationClass = 'animate-fade-in-up animate-delay-500';
                     
                     return (
                     <a
@@ -287,7 +291,7 @@ export default function BookDetailPage() {
                       href={article.url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className={`group bg-white dark:bg-dark-surface rounded-lg p-3 md:p-5 border border-qiita-border dark:border-dark-border hover:border-qiita-green/50 dark:hover:border-qiita-green/50 transition-colors duration-200 ${animationClass}`}
+                      className={`group bg-white dark:bg-dark-surface rounded-lg p-3 md:p-5 border border-qiita-border dark:border-dark-border transition-colors duration-200 ${animationClass}`}
                     >
                       <div className="flex items-start gap-3 md:gap-4">
                         <div className="flex-shrink-0">
