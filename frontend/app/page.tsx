@@ -180,18 +180,18 @@ export default function Home() {
       
       <main className="container mx-auto px-4 py-8">
         {/* ヘッダー */}
-        <div className="mb-8 bg-qiita-card dark:bg-dark-surface rounded-xl p-8 border-l-4 border-qiita-green dark:border-dark-green shadow-sm">
+        <div className="mb-6 md:mb-8 bg-qiita-card dark:bg-dark-surface rounded-xl p-4 md:p-8 border-l-4 border-qiita-green dark:border-dark-green shadow-sm">
           <div className="flex items-start justify-between">
             <div>
-              <h2 className="text-4xl font-bold mb-3 flex items-center gap-3 text-qiita-text-dark dark:text-white">
-                <i className="ri-fire-line text-qiita-green dark:text-dark-green text-4xl"></i>
+              <h2 className="text-xl md:text-4xl font-bold mb-2 md:mb-3 flex items-center gap-2 md:gap-3 text-qiita-text-dark dark:text-white">
+                <i className="ri-fire-line text-qiita-green dark:text-dark-green text-2xl md:text-4xl"></i>
                 IT技術書ランキング
               </h2>
-              <p className="text-qiita-text dark:text-dark-text font-medium text-lg leading-relaxed">
+              <p className="text-qiita-text dark:text-dark-text font-medium text-sm md:text-lg leading-relaxed">
                 Qiita記事で言及されたIT技術書をランキング形式で表示
               </p>
-              <div className="mt-4 flex items-center gap-2 text-sm text-qiita-text dark:text-dark-text">
-                <i className="ri-information-line text-qiita-green dark:text-dark-green"></i>
+              <div className="mt-2 md:mt-4 flex items-center gap-2 text-xs md:text-sm text-qiita-text dark:text-dark-text">
+                <i className="ri-information-line text-qiita-green dark:text-dark-green text-sm md:text-base"></i>
                 <span>毎日自動更新 • 実際の開発者が選んだ技術書</span>
               </div>
             </div>
@@ -199,9 +199,9 @@ export default function Home() {
         </div>
         
         {/* 検索バー */}
-        <div className="mb-6 bg-qiita-card dark:bg-dark-surface rounded-lg border border-qiita-border dark:border-dark-border p-4">
+        <div className="mb-6 bg-qiita-card dark:bg-dark-surface rounded-lg border border-qiita-border dark:border-dark-border p-3 md:p-4">
           <div className="relative">
-            <i className="ri-search-line absolute left-4 top-1/2 -translate-y-1/2 text-qiita-text dark:text-dark-text text-xl"></i>
+            <i className="ri-search-line absolute left-3 md:left-4 top-1/2 -translate-y-1/2 text-qiita-text dark:text-dark-text text-lg md:text-xl"></i>
             <input
               type="text"
               placeholder="書籍名、著者、出版社、ISBNで検索..."
@@ -213,7 +213,7 @@ export default function Home() {
                   analytics.search(e.target.value, filteredRankings.length);
                 }
               }}
-              className="w-full pl-12 pr-4 py-3 bg-qiita-surface dark:bg-dark-surface-light text-qiita-text-dark dark:text-white rounded-lg border border-qiita-border dark:border-dark-border focus:outline-none focus:ring-2 focus:ring-qiita-green dark:focus:ring-dark-green focus:border-transparent font-medium transition-all duration-150"
+              className="w-full pl-10 md:pl-12 pr-3 md:pr-4 py-2 md:py-3 text-sm md:text-base bg-qiita-surface dark:bg-dark-surface-light text-qiita-text-dark dark:text-white rounded-lg border border-qiita-border dark:border-dark-border focus:outline-none focus:ring-2 focus:ring-qiita-green dark:focus:ring-dark-green focus:border-transparent font-medium transition-all duration-150"
             />
             {searchQuery && (
               <button
@@ -449,10 +449,10 @@ export default function Home() {
             
             {/* ページネーション */}
             {totalPages > 1 && (
-              <div className="bg-qiita-card dark:bg-dark-surface rounded-lg p-6 shadow-sm border border-qiita-border dark:border-dark-border">
+              <div className="bg-qiita-card dark:bg-dark-surface rounded-lg p-3 md:p-6 shadow-sm border border-qiita-border dark:border-dark-border">
                 <div className="flex flex-col gap-4">
                   {/* ページネーションボタン */}
-                  <div className="flex items-center justify-center gap-2 flex-wrap">
+                  <div className="flex items-center justify-center gap-1 md:gap-2 flex-wrap">
                     {/* 最初のページへ */}
                     <button
                       onClick={() => {
@@ -460,28 +460,28 @@ export default function Home() {
                         window.scrollTo({ top: 0, behavior: 'smooth' });
                       }}
                       disabled={currentPage === 1}
-                      className={`flex items-center justify-center w-10 h-10 rounded-lg font-medium transition-all duration-150 ${
+                      className={`flex items-center justify-center w-8 h-8 md:w-10 md:h-10 rounded-lg font-medium transition-all duration-150 ${
                         currentPage === 1
                           ? 'bg-qiita-surface dark:bg-dark-surface-light text-qiita-text-light dark:text-dark-text-light cursor-not-allowed opacity-50'
                           : 'bg-qiita-surface dark:bg-dark-surface-light text-qiita-text dark:text-dark-text hover:bg-qiita-green/10 dark:hover:bg-qiita-green/20 hover:text-qiita-green dark:hover:text-dark-green'
                       }`}
                       title="最初のページ"
                     >
-                      <i className="ri-skip-back-mini-line text-lg"></i>
+                      <i className="ri-skip-back-mini-line text-base md:text-lg"></i>
                     </button>
                     
                     {/* 前のページへ */}
                     <button
                       onClick={handlePrevPage}
                       disabled={currentPage === 1}
-                      className={`flex items-center gap-1 px-4 h-10 rounded-lg font-medium transition-all duration-150 ${
+                      className={`flex items-center gap-0.5 md:gap-1 px-2 md:px-4 h-8 md:h-10 rounded-lg font-medium text-sm md:text-base transition-all duration-150 ${
                         currentPage === 1
                           ? 'bg-qiita-surface dark:bg-dark-surface-light text-qiita-text-light dark:text-dark-text-light cursor-not-allowed opacity-50'
                           : 'bg-qiita-surface dark:bg-dark-surface-light text-qiita-text dark:text-dark-text hover:bg-qiita-green/10 dark:hover:bg-qiita-green/20 hover:text-qiita-green dark:hover:text-dark-green'
                       }`}
                     >
-                      <i className="ri-arrow-left-s-line"></i>
-                      前へ
+                      <i className="ri-arrow-left-s-line text-base md:text-lg"></i>
+                      <span className="hidden sm:inline">前へ</span>
                     </button>
                     
                     {/* ページ番号リスト */}
@@ -531,7 +531,7 @@ export default function Home() {
                               setCurrentPage(page);
                               window.scrollTo({ top: 0, behavior: 'smooth' });
                             }}
-                            className={`flex items-center justify-center w-10 h-10 rounded-lg font-medium transition-all duration-150 ${
+                            className={`flex items-center justify-center w-8 h-8 md:w-10 md:h-10 rounded-lg font-medium text-xs md:text-base transition-all duration-150 ${
                               currentPage === page
                                 ? 'bg-qiita-green dark:bg-dark-green text-white shadow-sm'
                                 : 'bg-qiita-surface dark:bg-dark-surface-light text-qiita-text dark:text-dark-text hover:bg-qiita-green/10 dark:hover:bg-qiita-green/20 hover:text-qiita-green dark:hover:text-dark-green'
@@ -540,7 +540,7 @@ export default function Home() {
                             {page}
                           </button>
                         ) : (
-                          <span key={index} className="flex items-center justify-center w-10 h-10 text-qiita-text-light dark:text-dark-text-light">
+                          <span key={index} className="flex items-center justify-center w-6 md:w-10 h-8 md:h-10 text-qiita-text-light dark:text-dark-text-light text-xs md:text-base">
                             {page}
                           </span>
                         )
@@ -551,14 +551,14 @@ export default function Home() {
                     <button
                       onClick={handleNextPage}
                       disabled={currentPage === totalPages}
-                      className={`flex items-center gap-1 px-4 h-10 rounded-lg font-medium transition-all duration-150 ${
+                      className={`flex items-center gap-0.5 md:gap-1 px-2 md:px-4 h-8 md:h-10 rounded-lg font-medium text-sm md:text-base transition-all duration-150 ${
                         currentPage === totalPages
                           ? 'bg-qiita-surface dark:bg-dark-surface-light text-qiita-text-light dark:text-dark-text-light cursor-not-allowed opacity-50'
                           : 'bg-qiita-surface dark:bg-dark-surface-light text-qiita-text dark:text-dark-text hover:bg-qiita-green/10 dark:hover:bg-qiita-green/20 hover:text-qiita-green dark:hover:text-dark-green'
                       }`}
                     >
-                      次へ
-                      <i className="ri-arrow-right-s-line"></i>
+                      <span className="hidden sm:inline">次へ</span>
+                      <i className="ri-arrow-right-s-line text-base md:text-lg"></i>
                     </button>
                     
                     {/* 最後のページへ */}
@@ -568,20 +568,20 @@ export default function Home() {
                         window.scrollTo({ top: 0, behavior: 'smooth' });
                       }}
                       disabled={currentPage === totalPages}
-                      className={`flex items-center justify-center w-10 h-10 rounded-lg font-medium transition-all duration-150 ${
+                      className={`flex items-center justify-center w-8 h-8 md:w-10 md:h-10 rounded-lg font-medium transition-all duration-150 ${
                         currentPage === totalPages
                           ? 'bg-qiita-surface dark:bg-dark-surface-light text-qiita-text-light dark:text-dark-text-light cursor-not-allowed opacity-50'
                           : 'bg-qiita-surface dark:bg-dark-surface-light text-qiita-text dark:text-dark-text hover:bg-qiita-green/10 dark:hover:bg-qiita-green/20 hover:text-qiita-green dark:hover:text-dark-green'
                       }`}
                       title="最後のページ"
                     >
-                      <i className="ri-skip-forward-mini-line text-lg"></i>
+                      <i className="ri-skip-forward-mini-line text-base md:text-lg"></i>
                     </button>
                   </div>
                   
                   {/* ページ直接入力 */}
-                  <div className="flex items-center justify-center gap-3">
-                    <span className="text-sm text-qiita-text dark:text-dark-text">ページ指定:</span>
+                  <div className="flex items-center justify-center gap-2 md:gap-3">
+                    <span className="text-xs md:text-sm text-qiita-text dark:text-dark-text">ページ:</span>
                     <input
                       type="number"
                       min="1"
@@ -594,9 +594,9 @@ export default function Home() {
                           window.scrollTo({ top: 0, behavior: 'smooth' });
                         }
                       }}
-                      className="w-20 px-3 py-2 bg-qiita-surface dark:bg-dark-surface-light border border-qiita-border dark:border-dark-border rounded-lg text-center text-qiita-text-dark dark:text-white font-medium focus:outline-none focus:ring-2 focus:ring-qiita-green dark:focus:ring-dark-green"
+                      className="w-16 md:w-20 px-2 md:px-3 py-1.5 md:py-2 text-sm md:text-base bg-qiita-surface dark:bg-dark-surface-light border border-qiita-border dark:border-dark-border rounded-lg text-center text-qiita-text-dark dark:text-white font-medium focus:outline-none focus:ring-2 focus:ring-qiita-green dark:focus:ring-dark-green"
                     />
-                    <span className="text-sm text-qiita-text dark:text-dark-text">/ {totalPages}</span>
+                    <span className="text-xs md:text-sm text-qiita-text dark:text-dark-text">/ {totalPages}</span>
                   </div>
                 </div>
               </div>

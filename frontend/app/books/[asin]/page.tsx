@@ -97,10 +97,10 @@ export default function BookDetailPage() {
             
             {/* タイトルエリア */}
             <div className="mb-6">
-              <div className="bg-qiita-card dark:bg-dark-surface rounded-lg p-6 border-l-4 border-qiita-green shadow-sm">
-                <h1 className="text-4xl font-bold flex items-center gap-3 text-qiita-text-dark dark:text-white">
-                  <i className="ri-book-marked-line text-qiita-green dark:text-dark-green"></i>
-                  {book.title}
+              <div className="bg-qiita-card dark:bg-dark-surface rounded-lg p-4 md:p-6 border-l-4 border-qiita-green shadow-sm">
+                <h1 className="text-xl md:text-4xl font-bold flex items-center gap-2 md:gap-3 text-qiita-text-dark dark:text-white leading-tight">
+                  <i className="ri-book-marked-line text-qiita-green dark:text-dark-green text-2xl md:text-4xl flex-shrink-0"></i>
+                  <span className="break-words">{book.title}</span>
                 </h1>
               </div>
             </div>
