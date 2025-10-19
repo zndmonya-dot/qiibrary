@@ -28,7 +28,7 @@ async def get_rankings(
     days: Optional[int] = Query(None, ge=1, le=365, description="過去N日間（指定なし=全期間）"),
     year: Optional[int] = Query(None, ge=2015, le=2030, description="特定の年（例: 2024）"),
     month: Optional[int] = Query(None, ge=1, le=12, description="特定の月（1-12、yearと併用）"),
-    limit: int = Query(1000, ge=1, le=10000, description="取得件数（デフォルト: 1000）"),
+    limit: Optional[int] = Query(None, ge=1, le=100000, description="取得件数（指定なし=全件）"),
     db: Session = Depends(get_db)
 ):
     """
@@ -147,7 +147,7 @@ async def get_available_years(
 # レガシーエンドポイント（互換性のため）
 @router.get("/today", response_model=dict)
 async def get_today_rankings(
-    limit: int = Query(1000, ge=1, le=10000),
+    limit: Optional[int] = Query(None, ge=1, le=100000, description="取得件数（指定なし=全件）"),
     db: Session = Depends(get_db)
 ):
     """今日のランキング（全期間ランキングを返す）"""
@@ -156,7 +156,7 @@ async def get_today_rankings(
 
 @router.get("/last30days", response_model=dict)
 async def get_last30days_rankings(
-    limit: int = Query(1000, ge=1, le=10000),
+    limit: Optional[int] = Query(None, ge=1, le=100000, description="取得件数（指定なし=全件）"),
     db: Session = Depends(get_db)
 ):
     """過去30日間のランキング"""
@@ -165,7 +165,7 @@ async def get_last30days_rankings(
 
 @router.get("/last365days", response_model=dict)
 async def get_last365days_rankings(
-    limit: int = Query(1000, ge=1, le=10000),
+    limit: Optional[int] = Query(None, ge=1, le=100000, description="取得件数（指定なし=全件）"),
     db: Session = Depends(get_db)
 ):
     """過去365日間のランキング"""

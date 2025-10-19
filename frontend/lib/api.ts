@@ -118,13 +118,11 @@ export interface BookDetail extends Book {
  */
 export const getRankings = {
   /**
-   * 全期間ランキング（デフォルト）
-   * @param limit 取得件数（デフォルト: 1000）
+   * 全期間ランキング（全件取得）
    * @param tags フィルタリングするタグ
    */
-  all: async (limit: number = 1000, tags?: string[]): Promise<RankingResponse> => {
+  all: async (tags?: string[]): Promise<RankingResponse> => {
     const params = new URLSearchParams();
-    params.append('limit', limit.toString());
     if (tags && tags.length > 0) {
       params.append('tags', tags.join(','));
     }
@@ -133,63 +131,53 @@ export const getRankings = {
   },
   
   /**
-   * 24時間のランキング（latest_mention_at基準）
-   * @param limit 取得件数（デフォルト: 1000）
+   * 24時間のランキング（latest_mention_at基準、全件取得）
    */
-  daily: async (limit: number = 1000): Promise<RankingResponse> => {
+  daily: async (): Promise<RankingResponse> => {
     const params = new URLSearchParams();
-    params.append('limit', limit.toString());
     params.append('days', '1');
     const response = await api.get(`/api/rankings/?${params}`);
     return response.data;
   },
   
   /**
-   * 過去30日間のランキング（latest_mention_at基準）
-   * @param limit 取得件数（デフォルト: 1000）
+   * 過去30日間のランキング（latest_mention_at基準、全件取得）
    */
-  monthly: async (limit: number = 1000): Promise<RankingResponse> => {
+  monthly: async (): Promise<RankingResponse> => {
     const params = new URLSearchParams();
-    params.append('limit', limit.toString());
     params.append('days', '30');
     const response = await api.get(`/api/rankings/?${params}`);
     return response.data;
   },
   
   /**
-   * 過去365日間のランキング（latest_mention_at基準）
-   * @param limit 取得件数（デフォルト: 1000）
+   * 過去365日間のランキング（latest_mention_at基準、全件取得）
    */
-  yearly: async (limit: number = 1000): Promise<RankingResponse> => {
+  yearly: async (): Promise<RankingResponse> => {
     const params = new URLSearchParams();
-    params.append('limit', limit.toString());
     params.append('days', '365');
     const response = await api.get(`/api/rankings/?${params}`);
     return response.data;
   },
   
   /**
-   * 特定の年のランキング
+   * 特定の年のランキング（全件取得）
    * @param year 年（例: 2024）
-   * @param limit 取得件数（デフォルト: 1000）
    */
-  byYear: async (year: number, limit: number = 1000): Promise<RankingResponse> => {
+  byYear: async (year: number): Promise<RankingResponse> => {
     const params = new URLSearchParams();
-    params.append('limit', limit.toString());
     params.append('year', year.toString());
     const response = await api.get(`/api/rankings/?${params}`);
     return response.data;
   },
   
   /**
-   * 特定の年月のランキング
+   * 特定の年月のランキング（全件取得）
    * @param year 年（例: 2024）
    * @param month 月（1-12）
-   * @param limit 取得件数（デフォルト: 1000）
    */
-  byMonth: async (year: number, month: number, limit: number = 1000): Promise<RankingResponse> => {
+  byMonth: async (year: number, month: number): Promise<RankingResponse> => {
     const params = new URLSearchParams();
-    params.append('limit', limit.toString());
     params.append('year', year.toString());
     params.append('month', month.toString());
     const response = await api.get(`/api/rankings/?${params}`);

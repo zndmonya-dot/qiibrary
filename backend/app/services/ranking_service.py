@@ -29,7 +29,7 @@ class RankingService:
         days: Optional[int] = None,
         year: Optional[int] = None,
         month: Optional[int] = None,
-        limit: int = 50,
+        limit: Optional[int] = None,
         scoring_method: str = "weighted"
     ) -> List[Dict]:
         """
@@ -40,7 +40,7 @@ class RankingService:
             days: 過去N日間のランキング（latest_mention_at基準、Noneの場合は全期間）
             year: 特定の年のランキング（例: 2024）
             month: 特定の月のランキング（1-12、yearと併用）
-            limit: 取得件数
+            limit: 取得件数（Noneの場合は全件）
             scoring_method: スコアリング方式
                 - "simple": シンプル（言及数のみ）
                 - "weighted": 加重スコア（推奨）
@@ -160,8 +160,8 @@ class RankingService:
         # スコアでソート
         scored_results.sort(key=lambda x: x[0], reverse=True)
         
-        # 上位N件を取得とスコアを保持
-        top_results = scored_results[:limit]
+        # 上位N件を取得とスコアを保持（limitがNoneの場合は全件）
+        top_results = scored_results[:limit] if limit is not None else scored_results
         
         # ランキング形式に整形
         rankings = []
