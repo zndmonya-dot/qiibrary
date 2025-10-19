@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
-import { getCurrentTheme, toggleTheme } from '@/lib/theme';
+import { getCurrentTheme, applyTheme } from '@/lib/theme';
 import type { Theme } from '@/lib/constants';
 
 export default function Header() {
@@ -13,8 +13,8 @@ export default function Header() {
     setThemeState(getCurrentTheme());
   }, []);
 
-  const handleToggleTheme = () => {
-    const newTheme = toggleTheme();
+  const handleThemeChange = (newTheme: Theme) => {
+    applyTheme(newTheme);
     setThemeState(newTheme);
   };
 
@@ -45,19 +45,41 @@ export default function Header() {
             このサイトについて
           </Link>
           
-          {/* テーマトグルボタン - シンプルなクリックで反転 */}
-          <button
-            onClick={handleToggleTheme}
-            className="relative flex items-center justify-center gap-2 px-4 py-2 bg-qiita-surface dark:bg-dark-surface-light rounded-full transition-all duration-200 hover:bg-qiita-green/10 dark:hover:bg-dark-green/20 group"
-            title={theme === 'dark' ? 'ライトモードに切り替え' : 'ダークモードに切り替え'}
-          >
-            {/* アイコン - ダークモードの時は太陽、ライトモードの時は月 */}
-            {theme === 'dark' ? (
-              <i className="ri-sun-line text-xl text-qiita-green dark:text-dark-green transition-transform duration-200 group-hover:scale-110"></i>
-            ) : (
-              <i className="ri-moon-line text-xl text-qiita-green dark:text-dark-green transition-transform duration-200 group-hover:scale-110"></i>
-            )}
-          </button>
+          {/* テーマスイッチャー - 2ボタン */}
+          <div className="relative inline-flex items-center bg-qiita-surface dark:bg-dark-surface-light rounded-full p-1 h-10 transition-colors duration-300">
+            {/* Sliding background */}
+            <div
+              className={`absolute top-1 bottom-1 left-1 w-[calc(50%-0.125rem)] bg-qiita-green dark:bg-dark-green rounded-full transition-transform duration-150 ease-out shadow-md ${
+                theme === 'dark' ? 'translate-x-full' : 'translate-x-0'
+              }`}
+            />
+            
+            {/* Buttons */}
+            <button
+              onClick={() => handleThemeChange('light')}
+              className={`relative z-10 h-8 px-4 flex items-center justify-center gap-1 text-sm font-semibold rounded-full transition-colors duration-150 ${
+                theme === 'light'
+                  ? 'text-white'
+                  : 'text-qiita-text dark:text-dark-text hover:text-qiita-text-dark dark:hover:text-white'
+              }`}
+              title="ライトモード"
+            >
+              <i className="ri-sun-line text-base"></i>
+              <span>Light</span>
+            </button>
+            <button
+              onClick={() => handleThemeChange('dark')}
+              className={`relative z-10 h-8 px-4 flex items-center justify-center gap-1 text-sm font-semibold rounded-full transition-colors duration-150 ${
+                theme === 'dark'
+                  ? 'text-white'
+                  : 'text-qiita-text dark:text-dark-text hover:text-qiita-text-dark dark:hover:text-white'
+              }`}
+              title="ダークモード"
+            >
+              <i className="ri-moon-line text-base"></i>
+              <span>Dark</span>
+            </button>
+          </div>
         </nav>
       </div>
     </header>
