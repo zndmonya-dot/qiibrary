@@ -87,14 +87,14 @@ export default function BookDetailPage() {
             {/* 戻るボタン */}
             <button
               onClick={() => router.push('/')}
-              className="flex items-center gap-2 text-secondary hover:text-qiita-green dark:hover:text-dark-green mb-6 transition-colors duration-200 text-base md:text-lg lg:text-xl font-semibold lg:font-bold"
+              className="flex items-center gap-2 text-secondary hover:text-qiita-green dark:hover:text-dark-green mb-6 transition-colors duration-200 text-base md:text-lg lg:text-xl font-semibold lg:font-bold animate-fade-in-up"
             >
               <i className="ri-arrow-left-line text-lg md:text-xl lg:text-2xl"></i>
               <span>ランキングに戻る</span>
             </button>
             
             {/* タイトルエリア */}
-            <div className="mb-6 animate-fade-in-up">
+            <div className="mb-6 animate-fade-in-up animate-delay-100">
               <div className="bg-qiita-card dark:bg-dark-surface rounded-lg p-4 md:p-6 border-l-4 border-qiita-green shadow-sm">
                 <h1 className="text-lg md:text-3xl lg:text-4xl font-bold lg:font-extrabold flex items-center gap-2 md:gap-3 text-qiita-text-dark dark:text-white leading-tight">
                   <i className="ri-book-marked-line text-qiita-green dark:text-dark-green text-xl md:text-3xl lg:text-4xl flex-shrink-0"></i>
@@ -104,7 +104,7 @@ export default function BookDetailPage() {
             </div>
             
             {/* 書籍情報セクション */}
-            <div className="card-primary mb-8">
+            <div className="card-primary mb-8 animate-fade-in-up animate-delay-200">
               <div className="flex flex-col lg:flex-row-reverse lg:items-stretch gap-6">
                 {/* 右側: 画像 + 統計情報（デスクトップのみ） */}
                 <div className="hidden lg:flex lg:flex-col flex-shrink-0 lg:w-72">
@@ -251,9 +251,9 @@ export default function BookDetailPage() {
         
             {/* Qiita記事セクション */}
             {book.qiita_articles && book.qiita_articles.length > 0 && (
-              <div id="qiita-articles" className="mb-12 scroll-mt-24">
+              <div id="qiita-articles" className="mb-12 scroll-mt-24 animate-fade-in-up animate-delay-300">
                 {/* セクションヘッダー */}
-                <div className="mb-6 animate-fade-in-up">
+                <div className="mb-6">
                   <div className="bg-qiita-green/10 dark:bg-qiita-green/20 rounded-lg p-3 md:p-5 border-l-4 border-qiita-green">
                     <h2 className="text-base md:text-xl lg:text-2xl font-bold lg:font-extrabold flex items-center gap-2 md:gap-3 text-qiita-text-dark dark:text-white">
                       <div className="w-10 h-10 md:w-12 md:h-12 lg:w-14 lg:h-14 bg-qiita-green dark:bg-dark-green rounded-full flex items-center justify-center flex-shrink-0 shadow-lg">
@@ -366,9 +366,9 @@ export default function BookDetailPage() {
         
             {/* YouTube動画セクション */}
             {book.youtube_videos && book.youtube_videos.length > 0 && (
-              <div className="mb-12">
+              <div className="mb-12 animate-fade-in-up animate-delay-300">
                 {/* セクションヘッダー */}
-                <div className="mb-6 animate-fade-in-up">
+                <div className="mb-6">
                   <div className="bg-youtube-red/10 dark:bg-youtube-red/20 rounded-lg p-3 md:p-5 border-l-4 border-youtube-red">
                     <h2 className="text-base md:text-xl lg:text-2xl font-bold lg:font-extrabold flex items-center gap-2 md:gap-3 text-qiita-text-dark dark:text-white">
                       <div className="w-10 h-10 md:w-12 md:h-12 lg:w-14 lg:h-14 bg-youtube-red rounded-full flex items-center justify-center flex-shrink-0 shadow-lg">

@@ -134,6 +134,25 @@ html {
   animation: fadeInUp 0.5s ease-out;
 }
 
+/* アニメーション遅延（順次表示） */
+.animate-delay-100 {
+  animation-delay: 0.1s;
+  opacity: 0;
+  animation-fill-mode: forwards;
+}
+
+.animate-delay-200 {
+  animation-delay: 0.2s;
+  opacity: 0;
+  animation-fill-mode: forwards;
+}
+
+.animate-delay-300 {
+  animation-delay: 0.3s;
+  opacity: 0;
+  animation-fill-mode: forwards;
+}
+
 /* カスタムユーティリティ */
 @layer components {
   /* プライマリボタン（Qiita緑） */
