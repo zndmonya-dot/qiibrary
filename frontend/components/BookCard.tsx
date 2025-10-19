@@ -28,12 +28,16 @@ function BookCard({ rank, book, stats }: BookCardProps) {
   };
 
   return (
-    <div className="card-primary flex gap-5 border border-qiita-border relative">
-      {/* NEWバッジ（右上） */}
+    <div className="card-primary flex gap-5 border border-qiita-border relative overflow-hidden">
+      {/* NEWバッジ（右上・リボン風） */}
       {stats.is_new && (
-        <div className="absolute top-3 right-3 z-10">
-          <div className="px-3 py-1 bg-gradient-to-r from-red-500 to-pink-500 rounded-full shadow-lg">
-            <span className="text-xs font-bold text-white tracking-wider">NEW</span>
+        <div className="absolute top-2 right-2 z-10">
+          <div className="relative">
+            <div className="px-3 py-1 bg-qiita-green dark:bg-dark-green rounded shadow-md border border-qiita-green/50 dark:border-dark-green/50">
+              <span className="text-xs font-bold text-white tracking-wider">NEW</span>
+            </div>
+            {/* 小さな三角形の影 */}
+            <div className="absolute -bottom-1 right-0 w-0 h-0 border-l-[6px] border-l-transparent border-r-[6px] border-r-qiita-green/80 dark:border-r-dark-green/80 border-t-[6px] border-t-qiita-green dark:border-t-dark-green"></div>
           </div>
         </div>
       )}
