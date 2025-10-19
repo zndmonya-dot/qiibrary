@@ -4,22 +4,33 @@ import { useState, useEffect } from 'react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import BookCard from '@/components/BookCard';
-import { getRankings, RankingResponse } from '@/lib/api';
+import { getRankings, getAvailableYears, RankingResponse } from '@/lib/api';
 import { analytics, trackPageView } from '@/lib/analytics';
 import { ITEMS_PER_PAGE } from '@/lib/constants';
 
-type PeriodType = 'daily' | 'monthly' | 'yearly';
+type PeriodType = 'daily' | 'monthly' | 'yearly' | 'all' | 'year';
 
 export default function Home() {
   const [period, setPeriod] = useState<PeriodType>('daily');
+  const [selectedYear, setSelectedYear] = useState<number | null>(null);
+  const [availableYears, setAvailableYears] = useState<number[]>([]);
   const [rankings, setRankings] = useState<RankingResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
-  
-  const now = new Date();
-  const currentYear = now.getFullYear();
-  const currentMonth = now.getMonth() + 1;
+
+  // 利用可能な年のリストを取得
+  useEffect(() => {
+    const fetchYears = async () => {
+      try {
+        const years = await getAvailableYears();
+        setAvailableYears(years);
+      } catch (err) {
+        console.error('Failed to fetch available years:', err);
+      }
+    };
+    fetchYears();
+  }, []);
 
   useEffect(() => {
     const fetchRankings = async () => {
@@ -33,9 +44,14 @@ export default function Home() {
         if (period === 'daily') {
           data = await getRankings.daily();
         } else if (period === 'monthly') {
-          data = await getRankings.monthly(currentYear, currentMonth);
+          data = await getRankings.monthly();
+        } else if (period === 'yearly') {
+          data = await getRankings.yearly();
+        } else if (period === 'year' && selectedYear) {
+          data = await getRankings.byYear(selectedYear);
         } else {
-          data = await getRankings.yearly(currentYear);
+          // all
+          data = await getRankings.all();
         }
         
         setRankings(data);
@@ -48,7 +64,7 @@ export default function Home() {
     };
     
     fetchRankings();
-  }, [period, currentYear, currentMonth]);
+  }, [period, selectedYear]);
 
   // ページネーション用の計算
   const paginatedRankings = rankings ? rankings.rankings.slice(
@@ -103,15 +119,18 @@ export default function Home() {
         </div>
         
         {/* タブ - スライドアニメーション付き */}
-        <div className="relative mb-6 bg-qiita-card dark:bg-dark-surface rounded-t-lg border-b border-qiita-border dark:border-dark-border">
-          <div className="flex relative">
+        <div className="relative mb-6 bg-qiita-card dark:bg-dark-surface rounded-lg border border-qiita-border dark:border-dark-border p-4">
+          <div className="flex flex-wrap gap-2">
+            {/* 期間タブ */}
             <button
               onClick={() => {
                 setPeriod('daily');
                 analytics.changeRankingPeriod('daily');
               }}
-              className={`tab-button ${
-                period === 'daily' ? 'active' : ''
+              className={`px-4 py-2 rounded-lg font-semibold transition-all duration-150 ${
+                period === 'daily' 
+                  ? 'bg-qiita-green dark:bg-dark-green text-white shadow-sm' 
+                  : 'bg-qiita-surface dark:bg-dark-surface-light text-qiita-text-dark dark:text-dark-text hover:bg-qiita-green/10 dark:hover:bg-qiita-green/20'
               }`}
             >
               <i className="ri-time-line mr-1"></i>
@@ -122,8 +141,10 @@ export default function Home() {
                 setPeriod('monthly');
                 analytics.changeRankingPeriod('monthly');
               }}
-              className={`tab-button ${
-                period === 'monthly' ? 'active' : ''
+              className={`px-4 py-2 rounded-lg font-semibold transition-all duration-150 ${
+                period === 'monthly'
+                  ? 'bg-qiita-green dark:bg-dark-green text-white shadow-sm'
+                  : 'bg-qiita-surface dark:bg-dark-surface-light text-qiita-text-dark dark:text-dark-text hover:bg-qiita-green/10 dark:hover:bg-qiita-green/20'
               }`}
             >
               <i className="ri-calendar-line mr-1"></i>
@@ -134,22 +155,54 @@ export default function Home() {
                 setPeriod('yearly');
                 analytics.changeRankingPeriod('yearly');
               }}
-              className={`tab-button ${
-                period === 'yearly' ? 'active' : ''
+              className={`px-4 py-2 rounded-lg font-semibold transition-all duration-150 ${
+                period === 'yearly'
+                  ? 'bg-qiita-green dark:bg-dark-green text-white shadow-sm'
+                  : 'bg-qiita-surface dark:bg-dark-surface-light text-qiita-text-dark dark:text-dark-text hover:bg-qiita-green/10 dark:hover:bg-qiita-green/20'
               }`}
             >
               <i className="ri-calendar-check-line mr-1"></i>
               365日間
             </button>
-            
-            {/* スライドするアンダーバー */}
-            <div 
-              className="absolute bottom-0 h-0.5 bg-qiita-green dark:bg-dark-green transition-all duration-300 ease-in-out"
-              style={{
-                left: period === 'daily' ? '0%' : period === 'monthly' ? '33.333%' : '66.666%',
-                width: '33.333%'
+            <button
+              onClick={() => {
+                setPeriod('all');
+                analytics.changeRankingPeriod('all');
               }}
-            />
+              className={`px-4 py-2 rounded-lg font-semibold transition-all duration-150 ${
+                period === 'all'
+                  ? 'bg-qiita-green dark:bg-dark-green text-white shadow-sm'
+                  : 'bg-qiita-surface dark:bg-dark-surface-light text-qiita-text-dark dark:text-dark-text hover:bg-qiita-green/10 dark:hover:bg-qiita-green/20'
+              }`}
+            >
+              <i className="ri-infinity-line mr-1"></i>
+              全期間
+            </button>
+            
+            {/* 年別ドロップダウン */}
+            {availableYears.length > 0 && (
+              <select
+                value={period === 'year' && selectedYear ? selectedYear : ''}
+                onChange={(e) => {
+                  const year = parseInt(e.target.value);
+                  if (year) {
+                    setSelectedYear(year);
+                    setPeriod('year');
+                    analytics.changeRankingPeriod(`year-${year}`);
+                  }
+                }}
+                className={`px-4 py-2 rounded-lg font-semibold transition-all duration-150 border ${
+                  period === 'year'
+                    ? 'bg-qiita-green dark:bg-dark-green text-white border-qiita-green dark:border-dark-green shadow-sm'
+                    : 'bg-qiita-surface dark:bg-dark-surface-light text-qiita-text-dark dark:text-dark-text border-qiita-border dark:border-dark-border hover:bg-qiita-green/10 dark:hover:bg-qiita-green/20'
+                }`}
+              >
+                <option value="">年別ランキング</option>
+                {availableYears.map(year => (
+                  <option key={year} value={year}>{year}年</option>
+                ))}
+              </select>
+            )}
           </div>
         </div>
         

@@ -27,6 +27,7 @@ class RankingService:
         self,
         tags: Optional[List[str]] = None,
         days: Optional[int] = None,
+        year: Optional[int] = None,
         limit: int = 50,
         scoring_method: str = "weighted"
     ) -> List[Dict]:
@@ -35,7 +36,8 @@ class RankingService:
         
         Args:
             tags: フィルタするタグのリスト（例: ["Python", "JavaScript"]）
-            days: 過去N日間のランキング（Noneの場合は全期間）
+            days: 過去N日間のランキング（latest_mention_at基準、Noneの場合は全期間）
+            year: 特定の年のランキング（例: 2024）
             limit: 取得件数
             scoring_method: スコアリング方式
                 - "simple": シンプル（言及数のみ）
@@ -81,10 +83,20 @@ class RankingService:
             else:
                 query = query.filter(func.or_(*tag_conditions))
         
-        # 期間フィルタ
+        # 期間フィルタ（latest_mention_at基準）
         if days is not None:
             start_date = datetime.now() - timedelta(days=days)
-            query = query.filter(BookQiitaMention.mentioned_at >= start_date)
+            query = query.filter(Book.latest_mention_at >= start_date)
+        
+        # 年別フィルタ
+        if year is not None:
+            from datetime import date
+            year_start = date(year, 1, 1)
+            year_end = date(year, 12, 31)
+            query = query.filter(
+                Book.latest_mention_at >= year_start,
+                Book.latest_mention_at <= year_end
+            )
         
         # グループ化
         query = query.group_by(
@@ -205,6 +217,26 @@ class RankingService:
         )
         
         return sorted_tags
+    
+    def get_available_years(self) -> List[int]:
+        """
+        データが存在する年のリストを取得
+        
+        Returns:
+            年のリスト（降順）
+        """
+        from sqlalchemy import extract, distinct
+        from typing import Any, List as ListType
+        
+        # latest_mention_atから年を抽出
+        years: ListType[Any] = (
+            self.db.query(distinct(extract('year', Book.latest_mention_at)))
+            .filter(Book.latest_mention_at.isnot(None))
+            .order_by(extract('year', Book.latest_mention_at).desc())
+            .all()
+        )
+        
+        return [int(year[0]) for year in years if year[0]]
 
 
 # ヘルパー関数

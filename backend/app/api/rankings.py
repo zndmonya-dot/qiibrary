@@ -26,15 +26,17 @@ def get_db():
 async def get_rankings(
     tags: Optional[str] = Query(None, description="カンマ区切りのタグリスト（例: Python,JavaScript）"),
     days: Optional[int] = Query(None, ge=1, le=365, description="過去N日間（指定なし=全期間）"),
+    year: Optional[int] = Query(None, ge=2015, le=2030, description="特定の年（例: 2024）"),
     limit: int = Query(50, ge=1, le=100),
     db: Session = Depends(get_db)
 ):
     """
-    書籍ランキング取得（タグと期間でフィルタ可能）
+    書籍ランキング取得（タグ、期間、年でフィルタ可能）
     
     Args:
         tags: フィルタするタグ（カンマ区切り）
-        days: 過去N日間（Noneの場合は全期間）
+        days: 過去N日間（latest_mention_at基準、Noneの場合は全期間）
+        year: 特定の年（例: 2024）
         limit: 取得件数 (1-100)
     
     Returns:
@@ -50,12 +52,15 @@ async def get_rankings(
         rankings = ranking_service.get_ranking(
             tags=tag_list,
             days=days,
+            year=year,
             limit=limit,
             scoring_method="quality"  # 品質重視方式を使用
         )
         
         # 期間ラベルを生成
-        if days:
+        if year:
+            period_label = f"{year}年"
+        elif days:
             period_label = f"過去{days}日間"
         else:
             period_label = "全期間"
@@ -67,6 +72,7 @@ async def get_rankings(
             "period": {
                 "tags": tag_list,
                 "days": days,
+                "year": year,
                 "label": period_label
             },
             "rankings": rankings,
@@ -102,6 +108,32 @@ async def get_all_tags(
     except Exception as e:
         import traceback
         error_msg = f"Tags error: {repr(e)}"
+        traceback.print_exc()
+        raise HTTPException(status_code=500, detail=error_msg)
+
+
+@router.get("/years", response_model=dict)
+async def get_available_years(
+    db: Session = Depends(get_db)
+):
+    """
+    データが存在する年のリストを取得
+    
+    Returns:
+        年のリスト（降順）
+    """
+    try:
+        ranking_service = RankingService(db)
+        years = ranking_service.get_available_years()
+        
+        return {
+            "years": years,
+            "total": len(years)
+        }
+    
+    except Exception as e:
+        import traceback
+        error_msg = f"Years error: {repr(e)}"
         traceback.print_exc()
         raise HTTPException(status_code=500, detail=error_msg)
 
