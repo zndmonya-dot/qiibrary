@@ -6,8 +6,6 @@ import Image from 'next/image';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import YouTubeEmbed from '@/components/YouTubeEmbed';
-import StarRating from '@/components/StarRating';
-import PriceDisplay from '@/components/PriceDisplay';
 import { getBookDetail, BookDetail } from '@/lib/api';
 import { formatNumber, formatPublicationDate } from '@/lib/utils';
 
@@ -107,9 +105,9 @@ export default function BookDetailPage() {
             
             {/* 書籍情報セクション */}
             <div className="card-primary mb-8">
-              <div className="flex flex-col lg:flex-row-reverse lg:items-start gap-6">
+              <div className="flex flex-col lg:flex-row-reverse gap-6">
                 {/* 右側: 画像 + 統計情報（デスクトップのみ） */}
-                <div className="hidden lg:block flex-shrink-0 lg:w-72">
+                <div className="hidden lg:flex lg:flex-col flex-shrink-0 lg:w-72">
                   {/* 書籍画像 */}
                   <div className="mb-4 flex justify-center">
                     {book.thumbnail_url ? (
@@ -157,43 +155,18 @@ export default function BookDetailPage() {
                       href={book.amazon_affiliate_url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="btn-amazon w-full justify-center text-center py-3 mb-4"
+                      className="btn-amazon w-full justify-center text-center py-3"
                     >
                       <i className="ri-amazon-line text-xl"></i>
                       <span>Amazonで購入</span>
                     </a>
                   )}
-                  
-                  {/* 星評価 */}
-                  {book.rating && (
-                    <div className="mt-4">
-                      <StarRating
-                        rating={book.rating}
-                        reviewCount={book.review_count || undefined}
-                        amazonUrl={book.amazon_url}
-                        size="lg"
-                      />
-                    </div>
-                  )}
-                  
-                  {/* 価格情報 */}
-                  {book.price && (
-                    <div className="p-4 bg-white dark:bg-dark-surface rounded-lg border border-qiita-border dark:border-dark-border mt-4 shadow-sm">
-                      <div className="text-xs text-secondary mb-2 font-semibold">価格</div>
-                      <PriceDisplay
-                        price={book.price}
-                        salePrice={book.sale_price}
-                        discountRate={book.discount_rate}
-                        size="lg"
-                      />
-                    </div>
-                  )}
                 </div>
                 
                 {/* 左側: 基本情報 + 説明 */}
-                <div className="flex-1 min-w-0 flex flex-col">
+                <div className="flex-1 min-w-0 flex flex-col lg:h-full">
                   {/* 基本情報グリッド */}
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-4 md:mb-6">
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-4 md:mb-6 lg:flex-shrink-0">
                     {book.author && (
                       <div className="bg-white dark:bg-dark-surface rounded-lg p-4 border border-qiita-border dark:border-dark-border shadow-sm">
                         <div className="flex items-center gap-2 mb-2">
@@ -231,7 +204,7 @@ export default function BookDetailPage() {
                   
                   {/* 説明文 */}
                   {book.description && (
-                    <div className="bg-white dark:bg-dark-surface rounded-lg p-4 md:p-6 border border-qiita-border dark:border-dark-border shadow-sm">
+                    <div className="bg-white dark:bg-dark-surface rounded-lg p-4 md:p-6 border border-qiita-border dark:border-dark-border shadow-sm lg:flex-1 lg:min-h-0">
                       <div className="flex items-center gap-2 mb-3 md:mb-4">
                         <i className="ri-book-open-line text-qiita-green dark:text-dark-green text-lg"></i>
                         <span className="text-xs text-secondary font-semibold">書籍説明</span>
