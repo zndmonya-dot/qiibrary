@@ -6,6 +6,7 @@ import Image from 'next/image';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import YouTubeEmbed from '@/components/YouTubeEmbed';
+import LoadingSpinner from '@/components/LoadingSpinner';
 import { getBookDetail, BookDetail } from '@/lib/api';
 import { formatNumber, formatPublicationDate } from '@/lib/utils';
 
@@ -47,11 +48,9 @@ export default function BookDetailPage() {
     return (
       <div className="min-h-screen bg-qiita-bg dark:bg-dark-bg">
         <Header />
-        <div className="flex flex-col justify-center items-center py-20 animate-fade-in">
-          <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-qiita-green dark:border-dark-green mb-4"></div>
-          <p className="text-qiita-text dark:text-dark-text text-lg font-medium mb-2 animate-pulse">書籍情報を読み込み中...</p>
-          <p className="text-secondary text-sm">少々お待ちください</p>
-        </div>
+        <main className="container mx-auto px-4 min-h-[calc(100vh-120px)]">
+          <LoadingSpinner message="書籍情報を読み込み中..." size="lg" />
+        </main>
       </div>
     );
   }
