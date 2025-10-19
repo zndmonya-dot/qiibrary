@@ -355,7 +355,7 @@ export default function Home() {
           
           {/* 古い年の展開エリア */}
           {showAllYears && olderYears.length > 0 && (
-            <div className="flex flex-wrap gap-2 mt-3 pt-3 border-t border-qiita-border dark:border-dark-border">
+            <div className="flex flex-wrap gap-2 mt-3 pt-3 border-t border-qiita-border dark:border-dark-border animate-fade-in-up">
               {olderYears.map(year => (
                 <button
                   key={year}
@@ -407,8 +407,8 @@ export default function Home() {
         )}
 
         {!error && rankings && !loading && (
-          <div className="animate-fade-in-up animate-delay-300">
-            <div className="mb-6 flex items-center justify-between bg-qiita-card dark:bg-dark-surface p-4 rounded-lg shadow-sm border border-qiita-border dark:border-dark-border">
+          <div>
+            <div className="mb-6 flex items-center justify-between bg-qiita-card dark:bg-dark-surface p-4 rounded-lg shadow-sm border border-qiita-border dark:border-dark-border animate-fade-in-up animate-delay-300">
               <div className="flex items-center gap-2">
                 <i className="ri-trophy-line text-qiita-green dark:text-dark-green text-2xl"></i>
                 <h2 className="text-lg font-semibold text-qiita-text-dark dark:text-white">
@@ -422,16 +422,24 @@ export default function Home() {
             
             <div className="space-y-4 mb-8">
               {paginatedRankings.length > 0 ? (
-                paginatedRankings.map((item, index) => (
-                  <div key={item.book.id}>
-                    <BookCard
-                      rank={item.rank}
-                      book={item.book}
-                      stats={item.stats}
-                      onNavigate={savePageState}
-                    />
-                  </div>
-                ))
+                paginatedRankings.map((item, index) => {
+                  // 各ページの最初の3件（1位、2位、3位）に遅延アニメーション
+                  let animationClass = '';
+                  if (index === 0) animationClass = 'animate-fade-in-up animate-delay-400';
+                  else if (index === 1) animationClass = 'animate-fade-in-up animate-delay-500';
+                  else if (index === 2) animationClass = 'animate-fade-in-up animate-delay-600';
+                  
+                  return (
+                    <div key={item.book.id} className={animationClass}>
+                      <BookCard
+                        rank={item.rank}
+                        book={item.book}
+                        stats={item.stats}
+                        onNavigate={savePageState}
+                      />
+                    </div>
+                  );
+                })
               ) : (
                 <div className="bg-qiita-card dark:bg-dark-surface rounded-lg p-12 text-center border border-qiita-border dark:border-dark-border shadow-sm">
                   <i className="ri-inbox-line text-6xl text-qiita-text-light dark:text-dark-text-light mb-4"></i>
