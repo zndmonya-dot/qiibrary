@@ -312,11 +312,18 @@ export default function Home() {
               <div className="flex items-center gap-2">
                 <i className="ri-trophy-line text-qiita-green dark:text-dark-green text-2xl"></i>
                 <h2 className="text-lg font-semibold text-qiita-text-dark dark:text-white">
-                  {getPeriodLabel()} 全{filteredRankings.length}件
+                  {getPeriodLabel()}
                 </h2>
               </div>
-              <div className="text-sm text-qiita-text dark:text-dark-text">
-                {(currentPage - 1) * ITEMS_PER_PAGE + 1} - {Math.min(currentPage * ITEMS_PER_PAGE, filteredRankings.length)} / {filteredRankings.length}件
+              <div className="flex items-center gap-4">
+                <div className="text-sm text-qiita-text dark:text-dark-text">
+                  {(currentPage - 1) * ITEMS_PER_PAGE + 1} - {Math.min(currentPage * ITEMS_PER_PAGE, filteredRankings.length)} / {filteredRankings.length}件
+                </div>
+                <div className="px-3 py-1 bg-qiita-green/10 dark:bg-dark-green/20 border border-qiita-green/30 dark:border-dark-green/50 rounded-lg">
+                  <span className="text-sm font-bold text-qiita-green dark:text-dark-green">
+                    全 {filteredRankings.length} 件
+                  </span>
+                </div>
               </div>
             </div>
             
@@ -346,38 +353,148 @@ export default function Home() {
               )}
             </div>
             
-            {/* ページネーションボタン */}
+            {/* ページネーション */}
             {totalPages > 1 && (
-              <div className="flex items-center justify-center gap-4 py-8 bg-qiita-card dark:bg-dark-surface rounded-lg shadow-sm border border-qiita-border dark:border-dark-border">
-                <button
-                  onClick={handlePrevPage}
-                  disabled={currentPage === 1}
-                  className={`flex items-center gap-2 px-6 py-3 rounded-lg font-medium transition-all duration-200 ${
-                    currentPage === 1
-                      ? 'bg-qiita-surface dark:bg-dark-surface-light text-qiita-text-light dark:text-dark-text-light cursor-not-allowed opacity-50'
-                      : 'bg-qiita-surface dark:bg-dark-surface-light text-qiita-text dark:text-dark-text hover:bg-qiita-surface-2 dark:hover:bg-dark-border'
-                  }`}
-                >
-                  <i className="ri-arrow-left-line"></i>
-                  前へ
-                </button>
-                
-                <div className="text-qiita-text-dark dark:text-white font-medium px-4">
-                  {currentPage} / {totalPages}
+              <div className="bg-qiita-card dark:bg-dark-surface rounded-lg p-6 shadow-sm border border-qiita-border dark:border-dark-border">
+                <div className="flex flex-col gap-4">
+                  {/* ページネーションボタン */}
+                  <div className="flex items-center justify-center gap-2 flex-wrap">
+                    {/* 最初のページへ */}
+                    <button
+                      onClick={() => setCurrentPage(1)}
+                      disabled={currentPage === 1}
+                      className={`flex items-center justify-center w-10 h-10 rounded-lg font-medium transition-all duration-150 ${
+                        currentPage === 1
+                          ? 'bg-qiita-surface dark:bg-dark-surface-light text-qiita-text-light dark:text-dark-text-light cursor-not-allowed opacity-50'
+                          : 'bg-qiita-surface dark:bg-dark-surface-light text-qiita-text dark:text-dark-text hover:bg-qiita-green/10 dark:hover:bg-qiita-green/20 hover:text-qiita-green dark:hover:text-dark-green'
+                      }`}
+                      title="最初のページ"
+                    >
+                      <i className="ri-skip-back-mini-line text-lg"></i>
+                    </button>
+                    
+                    {/* 前のページへ */}
+                    <button
+                      onClick={handlePrevPage}
+                      disabled={currentPage === 1}
+                      className={`flex items-center gap-1 px-4 h-10 rounded-lg font-medium transition-all duration-150 ${
+                        currentPage === 1
+                          ? 'bg-qiita-surface dark:bg-dark-surface-light text-qiita-text-light dark:text-dark-text-light cursor-not-allowed opacity-50'
+                          : 'bg-qiita-surface dark:bg-dark-surface-light text-qiita-text dark:text-dark-text hover:bg-qiita-green/10 dark:hover:bg-qiita-green/20 hover:text-qiita-green dark:hover:text-dark-green'
+                      }`}
+                    >
+                      <i className="ri-arrow-left-s-line"></i>
+                      前へ
+                    </button>
+                    
+                    {/* ページ番号リスト */}
+                    {(() => {
+                      const pageNumbers: (number | string)[] = [];
+                      const maxVisible = 7; // 表示する最大ページ番号数
+                      
+                      if (totalPages <= maxVisible + 2) {
+                        // 全ページ番号を表示
+                        for (let i = 1; i <= totalPages; i++) {
+                          pageNumbers.push(i);
+                        }
+                      } else {
+                        // 最初のページ
+                        pageNumbers.push(1);
+                        
+                        if (currentPage <= 4) {
+                          // 最初の方のページ
+                          for (let i = 2; i <= Math.min(5, totalPages - 1); i++) {
+                            pageNumbers.push(i);
+                          }
+                          pageNumbers.push('...');
+                        } else if (currentPage >= totalPages - 3) {
+                          // 最後の方のページ
+                          pageNumbers.push('...');
+                          for (let i = Math.max(2, totalPages - 4); i <= totalPages - 1; i++) {
+                            pageNumbers.push(i);
+                          }
+                        } else {
+                          // 中間のページ
+                          pageNumbers.push('...');
+                          for (let i = currentPage - 1; i <= currentPage + 1; i++) {
+                            pageNumbers.push(i);
+                          }
+                          pageNumbers.push('...');
+                        }
+                        
+                        // 最後のページ
+                        pageNumbers.push(totalPages);
+                      }
+                      
+                      return pageNumbers.map((page, index) => (
+                        typeof page === 'number' ? (
+                          <button
+                            key={index}
+                            onClick={() => setCurrentPage(page)}
+                            className={`flex items-center justify-center w-10 h-10 rounded-lg font-medium transition-all duration-150 ${
+                              currentPage === page
+                                ? 'bg-qiita-green dark:bg-dark-green text-white shadow-sm'
+                                : 'bg-qiita-surface dark:bg-dark-surface-light text-qiita-text dark:text-dark-text hover:bg-qiita-green/10 dark:hover:bg-qiita-green/20 hover:text-qiita-green dark:hover:text-dark-green'
+                            }`}
+                          >
+                            {page}
+                          </button>
+                        ) : (
+                          <span key={index} className="flex items-center justify-center w-10 h-10 text-qiita-text-light dark:text-dark-text-light">
+                            {page}
+                          </span>
+                        )
+                      ));
+                    })()}
+                    
+                    {/* 次のページへ */}
+                    <button
+                      onClick={handleNextPage}
+                      disabled={currentPage === totalPages}
+                      className={`flex items-center gap-1 px-4 h-10 rounded-lg font-medium transition-all duration-150 ${
+                        currentPage === totalPages
+                          ? 'bg-qiita-surface dark:bg-dark-surface-light text-qiita-text-light dark:text-dark-text-light cursor-not-allowed opacity-50'
+                          : 'bg-qiita-surface dark:bg-dark-surface-light text-qiita-text dark:text-dark-text hover:bg-qiita-green/10 dark:hover:bg-qiita-green/20 hover:text-qiita-green dark:hover:text-dark-green'
+                      }`}
+                    >
+                      次へ
+                      <i className="ri-arrow-right-s-line"></i>
+                    </button>
+                    
+                    {/* 最後のページへ */}
+                    <button
+                      onClick={() => setCurrentPage(totalPages)}
+                      disabled={currentPage === totalPages}
+                      className={`flex items-center justify-center w-10 h-10 rounded-lg font-medium transition-all duration-150 ${
+                        currentPage === totalPages
+                          ? 'bg-qiita-surface dark:bg-dark-surface-light text-qiita-text-light dark:text-dark-text-light cursor-not-allowed opacity-50'
+                          : 'bg-qiita-surface dark:bg-dark-surface-light text-qiita-text dark:text-dark-text hover:bg-qiita-green/10 dark:hover:bg-qiita-green/20 hover:text-qiita-green dark:hover:text-dark-green'
+                      }`}
+                      title="最後のページ"
+                    >
+                      <i className="ri-skip-forward-mini-line text-lg"></i>
+                    </button>
+                  </div>
+                  
+                  {/* ページ直接入力 */}
+                  <div className="flex items-center justify-center gap-3">
+                    <span className="text-sm text-qiita-text dark:text-dark-text">ページ指定:</span>
+                    <input
+                      type="number"
+                      min="1"
+                      max={totalPages}
+                      value={currentPage}
+                      onChange={(e) => {
+                        const page = parseInt(e.target.value);
+                        if (page >= 1 && page <= totalPages) {
+                          setCurrentPage(page);
+                        }
+                      }}
+                      className="w-20 px-3 py-2 bg-qiita-surface dark:bg-dark-surface-light border border-qiita-border dark:border-dark-border rounded-lg text-center text-qiita-text-dark dark:text-white font-medium focus:outline-none focus:ring-2 focus:ring-qiita-green dark:focus:ring-dark-green"
+                    />
+                    <span className="text-sm text-qiita-text dark:text-dark-text">/ {totalPages}</span>
+                  </div>
                 </div>
-                
-                <button
-                  onClick={handleNextPage}
-                  disabled={currentPage === totalPages}
-                  className={`flex items-center gap-2 px-6 py-3 rounded-lg font-medium transition-all duration-200 ${
-                    currentPage === totalPages
-                      ? 'bg-qiita-surface dark:bg-dark-surface-light text-qiita-text-light dark:text-dark-text-light cursor-not-allowed opacity-50'
-                      : 'bg-qiita-surface dark:bg-dark-surface-light text-qiita-text dark:text-dark-text hover:bg-qiita-surface-2 dark:hover:bg-dark-border'
-                  }`}
-                >
-                  次へ
-                  <i className="ri-arrow-right-line"></i>
-                </button>
               </div>
             )}
           </div>
