@@ -37,9 +37,9 @@ class RankingService:
         
         Args:
             tags: フィルタするタグのリスト（例: ["Python", "JavaScript"]）
-            days: 過去N日間のランキング（latest_mention_at基準、Noneの場合は全期間）
-            year: 特定の年のランキング（例: 2024）
-            month: 特定の月のランキング（1-12、yearと併用）
+            days: 過去N日間のランキング（Qiita記事のpublished_at基準、Noneの場合は全期間）
+            year: 特定の年のランキング（例: 2024、Qiita記事が投稿された年）
+            month: 特定の月のランキング（1-12、yearと併用、Qiita記事が投稿された月）
             limit: 取得件数（Noneの場合は全件）
             scoring_method: スコアリング方式
                 - "simple": シンプル（言及数のみ）
@@ -48,6 +48,10 @@ class RankingService:
         
         Returns:
             ランキングリスト
+        
+        Note:
+            期間フィルタは実際にその期間内に投稿されたQiita記事を基準にします。
+            例：2022年のランキングは、2022年内に投稿されたQiita記事で言及された書籍が対象。
         """
         # 基本クエリ：書籍ごとの言及数を集計
         query = (
@@ -85,10 +89,10 @@ class RankingService:
             else:
                 query = query.filter(func.or_(*tag_conditions))
         
-        # 期間フィルタ（latest_mention_at基準）
+        # 期間フィルタ（Qiita記事のpublished_at基準）
         if days is not None:
             start_date = datetime.now() - timedelta(days=days)
-            query = query.filter(Book.latest_mention_at >= start_date)
+            query = query.filter(QiitaArticle.published_at >= start_date)
         
         # 年別・月別フィルタ
         if year is not None:
@@ -96,21 +100,21 @@ class RankingService:
             import calendar
             
             if month is not None:
-                # 特定の年月
+                # 特定の年月（Qiita記事が当該月に投稿されたもの）
                 month_start = date(year, month, 1)
                 last_day = calendar.monthrange(year, month)[1]
                 month_end = date(year, month, last_day)
                 query = query.filter(
-                    Book.latest_mention_at >= month_start,
-                    Book.latest_mention_at <= month_end
+                    QiitaArticle.published_at >= month_start,
+                    QiitaArticle.published_at <= month_end
                 )
             else:
-                # 年全体
+                # 年全体（Qiita記事が当該年に投稿されたもの）
                 year_start = date(year, 1, 1)
                 year_end = date(year, 12, 31)
                 query = query.filter(
-                    Book.latest_mention_at >= year_start,
-                    Book.latest_mention_at <= year_end
+                    QiitaArticle.published_at >= year_start,
+                    QiitaArticle.published_at <= year_end
                 )
         
         # グループ化
