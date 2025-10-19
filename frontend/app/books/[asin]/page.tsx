@@ -107,7 +107,7 @@ export default function BookDetailPage() {
             
             {/* 書籍情報セクション */}
             <div className="card-primary mb-8">
-              <div className="flex flex-col lg:flex-row-reverse gap-6">
+              <div className="flex flex-col lg:flex-row-reverse lg:items-start gap-6">
                 {/* 右側: 画像 + 統計情報（デスクトップのみ） */}
                 <div className="hidden lg:block flex-shrink-0 lg:w-72">
                   {/* 書籍画像 */}
@@ -231,12 +231,12 @@ export default function BookDetailPage() {
                   
                   {/* 説明文 */}
                   {book.description && (
-                    <div className="bg-white dark:bg-dark-surface rounded-lg p-4 md:p-6 border border-qiita-border dark:border-dark-border shadow-sm lg:flex-1 flex flex-col">
+                    <div className="bg-white dark:bg-dark-surface rounded-lg p-4 md:p-6 border border-qiita-border dark:border-dark-border shadow-sm">
                       <div className="flex items-center gap-2 mb-3 md:mb-4">
                         <i className="ri-book-open-line text-qiita-green dark:text-dark-green text-lg"></i>
                         <span className="text-xs text-secondary font-semibold">書籍説明</span>
                       </div>
-                      <div className="text-xs lg:text-sm text-qiita-text-dark dark:text-dark-text leading-relaxed whitespace-pre-wrap font-medium flex-1">
+                      <div className="text-xs lg:text-sm text-qiita-text-dark dark:text-dark-text leading-relaxed whitespace-pre-wrap font-medium">
                         {book.description}
                       </div>
                     </div>
