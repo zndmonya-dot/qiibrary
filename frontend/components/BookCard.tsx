@@ -30,16 +30,16 @@ function BookCard({ rank, book, stats, onNavigate }: BookCardProps) {
 
   return (
     <div className="card-primary flex flex-col md:flex-row gap-3 md:gap-5 border border-qiita-border relative overflow-hidden">
-      {/* NEWバッジ（左上・目立つデザイン） */}
+      {/* NEWバッジ（スマホ：右上、デスクトップ：左上） */}
       {stats.is_new && (
-        <div className="absolute top-0 left-0 z-10">
+        <div className="absolute top-0 right-0 md:left-0 md:right-auto z-10">
           <div className="relative">
             {/* メインバッジ */}
-            <div className="px-3 md:px-4 py-1 md:py-1.5 bg-gradient-to-r from-red-500 to-orange-500 rounded-br-lg shadow-lg animate-pulse">
+            <div className="px-3 md:px-4 py-1 md:py-1.5 bg-gradient-to-r from-red-500 to-orange-500 rounded-bl-lg md:rounded-bl-none md:rounded-br-lg shadow-lg animate-pulse">
               <span className="text-xs md:text-sm font-black text-white tracking-wider drop-shadow-md">NEW!</span>
             </div>
             {/* グロー効果 */}
-            <div className="absolute inset-0 bg-gradient-to-r from-red-500/30 to-orange-500/30 blur-md rounded-br-lg -z-10"></div>
+            <div className="absolute inset-0 bg-gradient-to-r from-red-500/30 to-orange-500/30 blur-md rounded-bl-lg md:rounded-bl-none md:rounded-br-lg -z-10"></div>
           </div>
         </div>
       )}
@@ -47,8 +47,9 @@ function BookCard({ rank, book, stats, onNavigate }: BookCardProps) {
       {/* ランク表示 */}
       <div className="flex-shrink-0 w-12 md:w-14 flex items-center justify-center">
         <div className="flex flex-col items-center">
+          {/* メダルアイコン：デスクトップのみ表示 */}
           {getRankIcon() && (
-            <i className={`${getRankIcon()} text-2xl ${getRankStyle()}`}></i>
+            <i className={`hidden md:inline ${getRankIcon()} text-2xl ${getRankStyle()}`}></i>
           )}
           <span className={`text-3xl font-bold ${getRankStyle()}`}>
             {rank}

@@ -110,8 +110,8 @@ export default function BookDetailPage() {
               <div className="flex flex-col lg:flex-row-reverse gap-6">
                 {/* 右側: 画像 + 統計情報 */}
                 <div className="flex-shrink-0 lg:w-72">
-                  {/* 書籍画像 */}
-                  <div className="mb-4 flex justify-center">
+                  {/* 書籍画像（デスクトップのみ） */}
+                  <div className="mb-4 hidden lg:flex justify-center">
                     {book.thumbnail_url ? (
                       <div className="relative w-[200px] h-[300px]">
                         <Image
@@ -133,18 +133,18 @@ export default function BookDetailPage() {
                     )}
                   </div>
                   
-                  {/* 統計情報（目立たせる） */}
+                  {/* 統計情報 */}
                   <div className="grid grid-cols-2 gap-3">
-                    <div className="flex flex-col items-center justify-center p-4 bg-qiita-green/10 dark:bg-qiita-green/20 rounded-lg border-2 border-qiita-green/30 dark:border-qiita-green/40">
-                      <i className="ri-article-line text-qiita-green dark:text-dark-green text-3xl mb-2"></i>
-                      <div className="text-2xl font-bold text-qiita-text-dark dark:text-white">
+                    <div className="flex flex-col items-center justify-center p-3 md:p-4 bg-qiita-green/10 dark:bg-qiita-green/20 rounded-lg border-2 border-qiita-green/30 dark:border-qiita-green/40">
+                      <i className="ri-article-line text-qiita-green dark:text-dark-green text-xl md:text-2xl mb-1 md:mb-2"></i>
+                      <div className="text-lg md:text-xl font-bold text-qiita-text-dark dark:text-white">
                         {book.qiita_articles?.length || 0}
                       </div>
                       <div className="text-xs text-qiita-text dark:text-dark-text font-semibold">記事</div>
                     </div>
-                    <div className="flex flex-col items-center justify-center p-4 bg-pink-50 dark:bg-pink-900/20 rounded-lg border-2 border-pink-200 dark:border-pink-800/40">
-                      <i className="ri-heart-fill text-pink-500 dark:text-pink-400 text-3xl mb-2"></i>
-                      <div className="text-2xl font-bold text-qiita-text-dark dark:text-white">
+                    <div className="flex flex-col items-center justify-center p-3 md:p-4 bg-pink-50 dark:bg-pink-900/20 rounded-lg border-2 border-pink-200 dark:border-pink-800/40">
+                      <i className="ri-heart-fill text-pink-500 dark:text-pink-400 text-xl md:text-2xl mb-1 md:mb-2"></i>
+                      <div className="text-lg md:text-xl font-bold text-qiita-text-dark dark:text-white">
                         {formatNumber(book.qiita_articles?.reduce((sum, a) => sum + a.likes_count, 0) || 0)}
                       </div>
                       <div className="text-xs text-qiita-text dark:text-dark-text font-semibold">いいね</div>
@@ -219,10 +219,10 @@ export default function BookDetailPage() {
                   {/* 説明文 */}
                   {book.description && (
                     <div className="bg-white dark:bg-dark-surface rounded-lg p-4 md:p-6 border border-qiita-border dark:border-dark-border shadow-sm">
-                      <h3 className="text-sm md:text-base font-bold mb-3 md:mb-4 flex items-center gap-2 text-qiita-text-dark dark:text-white">
-                        <i className="ri-book-open-line text-qiita-green dark:text-dark-green text-base md:text-lg"></i>
-                        <span>書籍説明</span>
-                      </h3>
+                      <div className="flex items-center gap-2 mb-3 md:mb-4">
+                        <i className="ri-book-open-line text-qiita-green dark:text-dark-green text-lg"></i>
+                        <span className="text-xs text-secondary font-semibold">書籍説明</span>
+                      </div>
                       <div className="text-xs md:text-sm text-qiita-text-dark dark:text-dark-text leading-relaxed whitespace-pre-wrap font-medium max-h-64 overflow-y-auto">
                         {book.description}
                       </div>
