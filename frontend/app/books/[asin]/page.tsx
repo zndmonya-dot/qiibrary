@@ -231,12 +231,12 @@ export default function BookDetailPage() {
                   
                   {/* 説明文 */}
                   {book.description && (
-                    <div className="bg-white dark:bg-dark-surface rounded-lg p-4 md:p-6 border border-qiita-border dark:border-dark-border shadow-sm">
+                    <div className="bg-white dark:bg-dark-surface rounded-lg p-4 md:p-6 border border-qiita-border dark:border-dark-border shadow-sm lg:flex-1 flex flex-col">
                       <div className="flex items-center gap-2 mb-3 md:mb-4">
                         <i className="ri-book-open-line text-qiita-green dark:text-dark-green text-lg"></i>
                         <span className="text-xs text-secondary font-semibold">書籍説明</span>
                       </div>
-                      <div className="text-xs lg:text-sm text-qiita-text-dark dark:text-dark-text leading-relaxed whitespace-pre-wrap font-medium">
+                      <div className="text-xs lg:text-sm text-qiita-text-dark dark:text-dark-text leading-relaxed whitespace-pre-wrap font-medium flex-1">
                         {book.description}
                       </div>
                     </div>
