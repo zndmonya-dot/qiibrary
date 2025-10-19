@@ -399,7 +399,10 @@ export default function Home() {
                   <div className="flex items-center justify-center gap-2 flex-wrap">
                     {/* 最初のページへ */}
                     <button
-                      onClick={() => setCurrentPage(1)}
+                      onClick={() => {
+                        setCurrentPage(1);
+                        window.scrollTo({ top: 0, behavior: 'smooth' });
+                      }}
                       disabled={currentPage === 1}
                       className={`flex items-center justify-center w-10 h-10 rounded-lg font-medium transition-all duration-150 ${
                         currentPage === 1
@@ -468,7 +471,10 @@ export default function Home() {
                         typeof page === 'number' ? (
                           <button
                             key={index}
-                            onClick={() => setCurrentPage(page)}
+                            onClick={() => {
+                              setCurrentPage(page);
+                              window.scrollTo({ top: 0, behavior: 'smooth' });
+                            }}
                             className={`flex items-center justify-center w-10 h-10 rounded-lg font-medium transition-all duration-150 ${
                               currentPage === page
                                 ? 'bg-qiita-green dark:bg-dark-green text-white shadow-sm'
@@ -501,7 +507,10 @@ export default function Home() {
                     
                     {/* 最後のページへ */}
                     <button
-                      onClick={() => setCurrentPage(totalPages)}
+                      onClick={() => {
+                        setCurrentPage(totalPages);
+                        window.scrollTo({ top: 0, behavior: 'smooth' });
+                      }}
                       disabled={currentPage === totalPages}
                       className={`flex items-center justify-center w-10 h-10 rounded-lg font-medium transition-all duration-150 ${
                         currentPage === totalPages
@@ -526,6 +535,7 @@ export default function Home() {
                         const page = parseInt(e.target.value);
                         if (page >= 1 && page <= totalPages) {
                           setCurrentPage(page);
+                          window.scrollTo({ top: 0, behavior: 'smooth' });
                         }
                       }}
                       className="w-20 px-3 py-2 bg-qiita-surface dark:bg-dark-surface-light border border-qiita-border dark:border-dark-border rounded-lg text-center text-qiita-text-dark dark:text-white font-medium focus:outline-none focus:ring-2 focus:ring-qiita-green dark:focus:ring-dark-green"
