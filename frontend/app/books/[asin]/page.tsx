@@ -108,8 +108,8 @@ export default function BookDetailPage() {
             {/* 書籍情報セクション */}
             <div className="card-primary mb-8">
               <div className="flex flex-col lg:flex-row-reverse gap-6">
-                {/* 右側: 画像 + 統計情報 */}
-                <div className="flex-shrink-0 lg:w-72">
+                {/* 右側: 画像 + 統計情報（スマホでは統計情報が最後） */}
+                <div className="flex-shrink-0 lg:w-72 order-last lg:order-first">
                   {/* 書籍画像（デスクトップのみ） */}
                   <div className="mb-4 hidden lg:flex justify-center">
                     {book.thumbnail_url ? (
