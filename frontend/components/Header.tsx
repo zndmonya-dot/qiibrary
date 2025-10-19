@@ -7,24 +7,28 @@ import type { Theme } from '@/lib/constants';
 
 export default function Header() {
   // 初期値をlocalStorageから取得（SSR時は'system'にフォールバック）
-  const [theme, setThemeState] = useState<Theme>(() => {
-    if (typeof window !== 'undefined') {
-      // 1. DOMのクラスをチェック（最優先）
+  const [theme, setThemeState] = useState<Theme>('system');
+
+  useEffect(() => {
+    // マウント時に正確なテーマを取得して設定
+    const detectTheme = (): Theme => {
+      // 1. localStorageをチェック（最優先）
+      const stored = localStorage.getItem('theme');
+      if (stored === 'dark') {
+        return 'dark';
+      }
+      
+      // 2. DOMのクラスをチェック
       const hasDarkClass = document.documentElement.classList.contains('dark');
       if (hasDarkClass) {
         return 'dark';
       }
       
-      // 2. localStorageをチェック
-      const stored = localStorage.getItem('theme');
-      if (stored === 'dark') {
-        return 'dark';
-      }
-    }
-    return 'system';
-  });
-
-  useEffect(() => {
+      return 'system';
+    };
+    
+    setThemeState(detectTheme());
+    
     // テーマ変更イベントをリッスン
     const handleThemeChangeEvent = () => {
       setThemeState(getTheme());

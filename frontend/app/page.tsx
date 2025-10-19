@@ -235,7 +235,7 @@ export default function Home() {
                 analytics.changeRankingPeriod('daily');
               }}
               className={`px-4 py-2 rounded-lg font-semibold transition-all duration-150 ${
-                period === 'daily' 
+                period === 'daily' && selectedYear === null
                   ? 'bg-qiita-green dark:bg-dark-green text-white shadow-sm' 
                   : 'bg-qiita-surface dark:bg-dark-surface-light text-qiita-text-dark dark:text-dark-text hover:bg-qiita-green/10 dark:hover:bg-qiita-green/20'
               }`}
@@ -250,7 +250,7 @@ export default function Home() {
                 analytics.changeRankingPeriod('monthly');
               }}
               className={`px-4 py-2 rounded-lg font-semibold transition-all duration-150 ${
-                period === 'monthly'
+                period === 'monthly' && selectedYear === null
                   ? 'bg-qiita-green dark:bg-dark-green text-white shadow-sm'
                   : 'bg-qiita-surface dark:bg-dark-surface-light text-qiita-text-dark dark:text-dark-text hover:bg-qiita-green/10 dark:hover:bg-qiita-green/20'
               }`}
@@ -265,7 +265,7 @@ export default function Home() {
                 analytics.changeRankingPeriod('yearly');
               }}
               className={`px-4 py-2 rounded-lg font-semibold transition-all duration-150 ${
-                period === 'yearly'
+                period === 'yearly' && selectedYear === null
                   ? 'bg-qiita-green dark:bg-dark-green text-white shadow-sm'
                   : 'bg-qiita-surface dark:bg-dark-surface-light text-qiita-text-dark dark:text-dark-text hover:bg-qiita-green/10 dark:hover:bg-qiita-green/20'
               }`}
@@ -280,7 +280,7 @@ export default function Home() {
                 analytics.changeRankingPeriod('all');
               }}
               className={`px-4 py-2 rounded-lg font-semibold transition-all duration-150 ${
-                period === 'all'
+                period === 'all' && selectedYear === null
                   ? 'bg-qiita-green dark:bg-dark-green text-white shadow-sm'
                   : 'bg-qiita-surface dark:bg-dark-surface-light text-qiita-text-dark dark:text-dark-text hover:bg-qiita-green/10 dark:hover:bg-qiita-green/20'
               }`}
@@ -308,7 +308,7 @@ export default function Home() {
               }}
               disabled={availableYears.length === 0}
               className={`px-4 py-2 rounded-lg font-semibold transition-all duration-150 border ${
-                period === 'year'
+                period === 'year' && selectedYear !== null
                   ? 'bg-qiita-green dark:bg-dark-green text-white border-qiita-green dark:border-dark-green shadow-sm'
                   : 'bg-qiita-surface dark:bg-dark-surface-light text-qiita-text-dark dark:text-dark-text border-qiita-border dark:border-dark-border hover:bg-qiita-green/10 dark:hover:bg-qiita-green/20'
               } ${availableYears.length === 0 ? 'opacity-50 cursor-not-allowed' : ''}`}
