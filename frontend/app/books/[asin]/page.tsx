@@ -273,16 +273,20 @@ export default function BookDetailPage() {
                   </div>
                 </div>
                 
-                <div key={displayedArticlesCount} className="grid grid-cols-1 gap-4">
+                <div className="grid grid-cols-1 gap-4">
                   {book.qiita_articles.slice(0, displayedArticlesCount).map((article, index) => {
-                    // トップページのランキングと同じように、最初の6件に順次アニメーションを適用
+                    // 初回表示時のみ、最初の6件に順次アニメーションを適用
+                    // それ以降の記事（もっと見る等で追加される分）はアニメーションなし
                     let animationClass = '';
-                    if (index === 0) animationClass = 'animate-fade-in-up';
-                    else if (index === 1) animationClass = 'animate-fade-in-up animate-delay-100';
-                    else if (index === 2) animationClass = 'animate-fade-in-up animate-delay-200';
-                    else if (index === 3) animationClass = 'animate-fade-in-up animate-delay-300';
-                    else if (index === 4) animationClass = 'animate-fade-in-up animate-delay-400';
-                    else if (index === 5) animationClass = 'animate-fade-in-up animate-delay-500';
+                    if (index < 6 && displayedArticlesCount === 10) {
+                      // 初回表示時のみアニメーション
+                      if (index === 0) animationClass = 'animate-fade-in-up';
+                      else if (index === 1) animationClass = 'animate-fade-in-up animate-delay-100';
+                      else if (index === 2) animationClass = 'animate-fade-in-up animate-delay-200';
+                      else if (index === 3) animationClass = 'animate-fade-in-up animate-delay-300';
+                      else if (index === 4) animationClass = 'animate-fade-in-up animate-delay-400';
+                      else if (index === 5) animationClass = 'animate-fade-in-up animate-delay-500';
+                    }
                     
                     return (
                     <a
