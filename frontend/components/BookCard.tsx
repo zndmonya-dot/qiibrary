@@ -97,7 +97,7 @@ function BookCard({ rank, book, stats }: BookCardProps) {
             <Link 
               href={`/books/${book.isbn}`} 
               prefetch={true} 
-              className="inline-block text-qiita-text-dark dark:text-white"
+              className="inline-block text-qiita-text-dark dark:text-white hover:text-qiita-green dark:hover:text-dark-green transition-colors duration-200"
               onClick={() => analytics.clickBook(book.isbn || '', book.title, rank)}
             >
               <h3 className="text-lg font-bold mb-2 line-clamp-2">
