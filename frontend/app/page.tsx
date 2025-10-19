@@ -19,6 +19,29 @@ export default function Home() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
+  const [searchQuery, setSearchQuery] = useState('');
+
+  // 期間選択オプションを生成
+  const generatePeriodOptions = () => {
+    const options: { label: string; value: string; year?: number; month?: number }[] = [];
+    
+    availableYears.forEach(year => {
+      // 年のオプション
+      options.push({ label: `${year}年`, value: `year-${year}`, year });
+      
+      // 月のオプション（最新の年のみ、または全年）
+      for (let month = 12; month >= 1; month--) {
+        options.push({ 
+          label: `${year}年${month}月`, 
+          value: `month-${year}-${month}`, 
+          year, 
+          month 
+        });
+      }
+    });
+    
+    return options;
+  };
 
   // 利用可能な年のリストを取得
   useEffect(() => {
@@ -69,13 +92,25 @@ export default function Home() {
     fetchRankings();
   }, [period, selectedYear, selectedMonth]);
 
+  // 検索フィルタリング
+  const filteredRankings = rankings ? rankings.rankings.filter(item => {
+    if (!searchQuery) return true;
+    const query = searchQuery.toLowerCase();
+    return (
+      item.book.title?.toLowerCase().includes(query) ||
+      item.book.author?.toLowerCase().includes(query) ||
+      item.book.publisher?.toLowerCase().includes(query) ||
+      item.book.isbn?.toLowerCase().includes(query)
+    );
+  }) : [];
+
   // ページネーション用の計算
-  const paginatedRankings = rankings ? rankings.rankings.slice(
+  const paginatedRankings = filteredRankings.slice(
     (currentPage - 1) * ITEMS_PER_PAGE,
     currentPage * ITEMS_PER_PAGE
-  ) : [];
+  );
   
-  const totalPages = rankings ? Math.ceil(rankings.rankings.length / ITEMS_PER_PAGE) : 0;
+  const totalPages = Math.ceil(filteredRankings.length / ITEMS_PER_PAGE);
   
   const handleNextPage = () => {
     if (currentPage < totalPages) {
@@ -119,6 +154,49 @@ export default function Home() {
               </div>
             </div>
           </div>
+        </div>
+        
+        {/* 検索バー */}
+        <div className="mb-6 bg-qiita-card dark:bg-dark-surface rounded-lg border border-qiita-border dark:border-dark-border p-4">
+          <div className="relative">
+            <i className="ri-search-line absolute left-4 top-1/2 -translate-y-1/2 text-qiita-text dark:text-dark-text text-xl"></i>
+            <input
+              type="text"
+              placeholder="書籍名、著者、出版社、ISBNで検索..."
+              value={searchQuery}
+              onChange={(e) => {
+                setSearchQuery(e.target.value);
+                setCurrentPage(1); // 検索時はページをリセット
+                if (e.target.value) {
+                  analytics.search(e.target.value, filteredRankings.length);
+                }
+              }}
+              className="w-full pl-12 pr-4 py-3 bg-qiita-surface dark:bg-dark-surface-light text-qiita-text-dark dark:text-white rounded-lg border border-qiita-border dark:border-dark-border focus:outline-none focus:ring-2 focus:ring-qiita-green dark:focus:ring-dark-green focus:border-transparent font-medium transition-all duration-150"
+            />
+            {searchQuery && (
+              <button
+                onClick={() => {
+                  setSearchQuery('');
+                  setCurrentPage(1);
+                }}
+                className="absolute right-4 top-1/2 -translate-y-1/2 text-qiita-text dark:text-dark-text hover:text-qiita-green dark:hover:text-dark-green transition-colors duration-150"
+              >
+                <i className="ri-close-circle-line text-xl"></i>
+              </button>
+            )}
+          </div>
+          {searchQuery && filteredRankings.length > 0 && (
+            <div className="mt-3 text-sm text-qiita-text dark:text-dark-text font-medium">
+              <i className="ri-information-line text-qiita-green dark:text-dark-green mr-1"></i>
+              {filteredRankings.length}件の書籍が見つかりました
+            </div>
+          )}
+          {searchQuery && filteredRankings.length === 0 && !loading && (
+            <div className="mt-3 text-sm text-red-600 dark:text-red-400 font-medium">
+              <i className="ri-error-warning-line mr-1"></i>
+              該当する書籍が見つかりませんでした
+            </div>
+          )}
         </div>
         
         {/* タブ - スライドアニメーション付き */}
@@ -182,79 +260,47 @@ export default function Home() {
               全期間
             </button>
             
-            {/* 年別ドロップダウン */}
+            {/* 期間を指定ドロップダウン（年別・月別統合） */}
             {availableYears.length > 0 && (
               <select
-                value={period === 'year' && selectedYear ? selectedYear : ''}
+                value={
+                  period === 'year' && selectedYear 
+                    ? `year-${selectedYear}` 
+                    : period === 'month' && selectedYear && selectedMonth 
+                    ? `month-${selectedYear}-${selectedMonth}` 
+                    : ''
+                }
                 onChange={(e) => {
-                  const year = parseInt(e.target.value);
-                  if (year) {
+                  const value = e.target.value;
+                  if (value.startsWith('year-')) {
+                    const year = parseInt(value.replace('year-', ''));
                     setSelectedYear(year);
+                    setSelectedMonth(null);
                     setPeriod('year');
                     analytics.changeRankingPeriod(`year-${year}`);
+                  } else if (value.startsWith('month-')) {
+                    const [, yearStr, monthStr] = value.split('-');
+                    const year = parseInt(yearStr);
+                    const month = parseInt(monthStr);
+                    setSelectedYear(year);
+                    setSelectedMonth(month);
+                    setPeriod('month');
+                    analytics.changeRankingPeriod(`month-${year}-${month}`);
                   }
                 }}
                 className={`px-4 py-2 rounded-lg font-semibold transition-all duration-150 border ${
-                  period === 'year'
+                  period === 'year' || period === 'month'
                     ? 'bg-qiita-green dark:bg-dark-green text-white border-qiita-green dark:border-dark-green shadow-sm'
                     : 'bg-qiita-surface dark:bg-dark-surface-light text-qiita-text-dark dark:text-dark-text border-qiita-border dark:border-dark-border hover:bg-qiita-green/10 dark:hover:bg-qiita-green/20'
                 }`}
               >
-                <option value="">年別ランキング</option>
-                {availableYears.map(year => (
-                  <option key={year} value={year}>{year}年</option>
+                <option value="">期間を指定</option>
+                {generatePeriodOptions().map(option => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
                 ))}
               </select>
-            )}
-            
-            {/* 月別ドロップダウン */}
-            {availableYears.length > 0 && (
-              <div className="flex gap-2">
-                <select
-                  value={period === 'month' && selectedYear ? selectedYear : ''}
-                  onChange={(e) => {
-                    const year = parseInt(e.target.value);
-                    if (year) {
-                      setSelectedYear(year);
-                      if (selectedMonth) {
-                        setPeriod('month');
-                        analytics.changeRankingPeriod(`month-${year}-${selectedMonth}`);
-                      }
-                    }
-                  }}
-                  className={`px-4 py-2 rounded-lg font-semibold transition-all duration-150 border ${
-                    period === 'month'
-                      ? 'bg-qiita-green dark:bg-dark-green text-white border-qiita-green dark:border-dark-green shadow-sm'
-                      : 'bg-qiita-surface dark:bg-dark-surface-light text-qiita-text-dark dark:text-dark-text border-qiita-border dark:border-dark-border hover:bg-qiita-green/10 dark:hover:bg-qiita-green/20'
-                  }`}
-                >
-                  <option value="">年</option>
-                  {availableYears.map(year => (
-                    <option key={year} value={year}>{year}</option>
-                  ))}
-                </select>
-                <select
-                  value={period === 'month' && selectedMonth ? selectedMonth : ''}
-                  onChange={(e) => {
-                    const month = parseInt(e.target.value);
-                    if (month && selectedYear) {
-                      setSelectedMonth(month);
-                      setPeriod('month');
-                      analytics.changeRankingPeriod(`month-${selectedYear}-${month}`);
-                    }
-                  }}
-                  className={`px-4 py-2 rounded-lg font-semibold transition-all duration-150 border ${
-                    period === 'month'
-                      ? 'bg-qiita-green dark:bg-dark-green text-white border-qiita-green dark:border-dark-green shadow-sm'
-                      : 'bg-qiita-surface dark:bg-dark-surface-light text-qiita-text-dark dark:text-dark-text border-qiita-border dark:border-dark-border hover:bg-qiita-green/10 dark:hover:bg-qiita-green/20'
-                  }`}
-                >
-                  <option value="">月</option>
-                  {Array.from({ length: 12 }, (_, i) => i + 1).map(month => (
-                    <option key={month} value={month}>{month}月</option>
-                  ))}
-                </select>
-              </div>
             )}
           </div>
         </div>
