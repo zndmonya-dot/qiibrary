@@ -6,12 +6,9 @@ import { getTheme, setTheme } from '@/lib/theme';
 import type { Theme } from '@/lib/constants';
 
 export default function Header() {
-  // 初期値はSSR対応でsystemにしておく
-  const [theme, setThemeState] = useState<Theme>('system');
-
-  useEffect(() => {
-    // マウント時にDOMとlocalStorageから正確なテーマを取得
-    const detectTheme = (): Theme => {
+  // 初期値をlocalStorageから取得（SSR時は'system'にフォールバック）
+  const [theme, setThemeState] = useState<Theme>(() => {
+    if (typeof window !== 'undefined') {
       // 1. DOMのクラスをチェック（最優先）
       const hasDarkClass = document.documentElement.classList.contains('dark');
       if (hasDarkClass) {
@@ -23,13 +20,11 @@ export default function Header() {
       if (stored === 'dark') {
         return 'dark';
       }
-      
-      return 'system';
-    };
-    
-    const currentTheme = detectTheme();
-    setThemeState(currentTheme);
-    
+    }
+    return 'system';
+  });
+
+  useEffect(() => {
     // テーマ変更イベントをリッスン
     const handleThemeChangeEvent = () => {
       setThemeState(getTheme());

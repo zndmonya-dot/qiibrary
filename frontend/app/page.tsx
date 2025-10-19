@@ -11,8 +11,28 @@ import { ITEMS_PER_PAGE } from '@/lib/constants';
 type PeriodType = 'daily' | 'monthly' | 'yearly' | 'all' | 'year';
 
 export default function Home() {
-  const [period, setPeriod] = useState<PeriodType>('yearly');
-  const [selectedYear, setSelectedYear] = useState<number | null>(null);
+  // localStorageから状態を復元
+  const [period, setPeriod] = useState<PeriodType>(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('ranking_period');
+      if (saved && ['daily', 'monthly', 'yearly', 'all', 'year'].includes(saved)) {
+        return saved as PeriodType;
+      }
+    }
+    return 'yearly';
+  });
+  
+  const [selectedYear, setSelectedYear] = useState<number | null>(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('ranking_selected_year');
+      if (saved) {
+        const year = parseInt(saved);
+        return isNaN(year) ? null : year;
+      }
+    }
+    return null;
+  });
+  
   const [selectedMonth, setSelectedMonth] = useState<number | null>(null);
   const [availableYears, setAvailableYears] = useState<number[]>([]);
   const [rankings, setRankings] = useState<RankingResponse | null>(null);
@@ -45,6 +65,23 @@ export default function Home() {
     };
     fetchYears();
   }, []);
+
+  // 状態をlocalStorageに保存
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('ranking_period', period);
+    }
+  }, [period]);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      if (selectedYear !== null) {
+        localStorage.setItem('ranking_selected_year', selectedYear.toString());
+      } else {
+        localStorage.removeItem('ranking_selected_year');
+      }
+    }
+  }, [selectedYear]);
 
   useEffect(() => {
     const fetchRankings = async () => {
@@ -194,6 +231,7 @@ export default function Home() {
             <button
               onClick={() => {
                 setPeriod('daily');
+                setSelectedYear(null);
                 analytics.changeRankingPeriod('daily');
               }}
               className={`px-4 py-2 rounded-lg font-semibold transition-all duration-150 ${
@@ -208,6 +246,7 @@ export default function Home() {
             <button
               onClick={() => {
                 setPeriod('monthly');
+                setSelectedYear(null);
                 analytics.changeRankingPeriod('monthly');
               }}
               className={`px-4 py-2 rounded-lg font-semibold transition-all duration-150 ${
@@ -222,6 +261,7 @@ export default function Home() {
             <button
               onClick={() => {
                 setPeriod('yearly');
+                setSelectedYear(null);
                 analytics.changeRankingPeriod('yearly');
               }}
               className={`px-4 py-2 rounded-lg font-semibold transition-all duration-150 ${
@@ -236,6 +276,7 @@ export default function Home() {
             <button
               onClick={() => {
                 setPeriod('all');
+                setSelectedYear(null);
                 analytics.changeRankingPeriod('all');
               }}
               className={`px-4 py-2 rounded-lg font-semibold transition-all duration-150 ${
@@ -254,7 +295,12 @@ export default function Home() {
                 value={period === 'year' && selectedYear ? `year-${selectedYear}` : ''}
                 onChange={(e) => {
                   const value = e.target.value;
-                  if (value.startsWith('year-')) {
+                  if (value === '') {
+                    // 空の値が選択された場合は年別ランキングを解除して365日間に戻す
+                    setSelectedYear(null);
+                    setPeriod('yearly');
+                    analytics.changeRankingPeriod('yearly');
+                  } else if (value.startsWith('year-')) {
                     const year = parseInt(value.replace('year-', ''));
                     setSelectedYear(year);
                     setPeriod('year');
