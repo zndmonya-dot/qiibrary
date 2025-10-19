@@ -28,6 +28,7 @@ class RankingService:
         tags: Optional[List[str]] = None,
         days: Optional[int] = None,
         year: Optional[int] = None,
+        month: Optional[int] = None,
         limit: int = 50,
         scoring_method: str = "weighted"
     ) -> List[Dict]:
@@ -38,6 +39,7 @@ class RankingService:
             tags: フィルタするタグのリスト（例: ["Python", "JavaScript"]）
             days: 過去N日間のランキング（latest_mention_at基準、Noneの場合は全期間）
             year: 特定の年のランキング（例: 2024）
+            month: 特定の月のランキング（1-12、yearと併用）
             limit: 取得件数
             scoring_method: スコアリング方式
                 - "simple": シンプル（言及数のみ）
@@ -88,15 +90,28 @@ class RankingService:
             start_date = datetime.now() - timedelta(days=days)
             query = query.filter(Book.latest_mention_at >= start_date)
         
-        # 年別フィルタ
+        # 年別・月別フィルタ
         if year is not None:
             from datetime import date
-            year_start = date(year, 1, 1)
-            year_end = date(year, 12, 31)
-            query = query.filter(
-                Book.latest_mention_at >= year_start,
-                Book.latest_mention_at <= year_end
-            )
+            import calendar
+            
+            if month is not None:
+                # 特定の年月
+                month_start = date(year, month, 1)
+                last_day = calendar.monthrange(year, month)[1]
+                month_end = date(year, month, last_day)
+                query = query.filter(
+                    Book.latest_mention_at >= month_start,
+                    Book.latest_mention_at <= month_end
+                )
+            else:
+                # 年全体
+                year_start = date(year, 1, 1)
+                year_end = date(year, 12, 31)
+                query = query.filter(
+                    Book.latest_mention_at >= year_start,
+                    Book.latest_mention_at <= year_end
+                )
         
         # グループ化
         query = query.group_by(

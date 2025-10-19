@@ -27,16 +27,18 @@ async def get_rankings(
     tags: Optional[str] = Query(None, description="カンマ区切りのタグリスト（例: Python,JavaScript）"),
     days: Optional[int] = Query(None, ge=1, le=365, description="過去N日間（指定なし=全期間）"),
     year: Optional[int] = Query(None, ge=2015, le=2030, description="特定の年（例: 2024）"),
+    month: Optional[int] = Query(None, ge=1, le=12, description="特定の月（1-12、yearと併用）"),
     limit: int = Query(50, ge=1, le=100),
     db: Session = Depends(get_db)
 ):
     """
-    書籍ランキング取得（タグ、期間、年でフィルタ可能）
+    書籍ランキング取得（タグ、期間、年、月でフィルタ可能）
     
     Args:
         tags: フィルタするタグ（カンマ区切り）
         days: 過去N日間（latest_mention_at基準、Noneの場合は全期間）
         year: 特定の年（例: 2024）
+        month: 特定の月（1-12、yearと併用、例: 10）
         limit: 取得件数 (1-100)
     
     Returns:
@@ -53,12 +55,15 @@ async def get_rankings(
             tags=tag_list,
             days=days,
             year=year,
+            month=month,
             limit=limit,
             scoring_method="quality"  # 品質重視方式を使用
         )
         
         # 期間ラベルを生成
-        if year:
+        if year and month:
+            period_label = f"{year}年{month}月"
+        elif year:
             period_label = f"{year}年"
         elif days:
             period_label = f"過去{days}日間"
@@ -73,6 +78,7 @@ async def get_rankings(
                 "tags": tag_list,
                 "days": days,
                 "year": year,
+                "month": month,
                 "label": period_label
             },
             "rankings": rankings,

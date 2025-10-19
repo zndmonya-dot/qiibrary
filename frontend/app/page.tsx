@@ -8,11 +8,12 @@ import { getRankings, getAvailableYears, RankingResponse } from '@/lib/api';
 import { analytics, trackPageView } from '@/lib/analytics';
 import { ITEMS_PER_PAGE } from '@/lib/constants';
 
-type PeriodType = 'daily' | 'monthly' | 'yearly' | 'all' | 'year';
+type PeriodType = 'daily' | 'monthly' | 'yearly' | 'all' | 'year' | 'month';
 
 export default function Home() {
   const [period, setPeriod] = useState<PeriodType>('daily');
   const [selectedYear, setSelectedYear] = useState<number | null>(null);
+  const [selectedMonth, setSelectedMonth] = useState<number | null>(null);
   const [availableYears, setAvailableYears] = useState<number[]>([]);
   const [rankings, setRankings] = useState<RankingResponse | null>(null);
   const [loading, setLoading] = useState(true);
@@ -49,6 +50,8 @@ export default function Home() {
           data = await getRankings.yearly();
         } else if (period === 'year' && selectedYear) {
           data = await getRankings.byYear(selectedYear);
+        } else if (period === 'month' && selectedYear && selectedMonth) {
+          data = await getRankings.byMonth(selectedYear, selectedMonth);
         } else {
           // all
           data = await getRankings.all();
@@ -64,7 +67,7 @@ export default function Home() {
     };
     
     fetchRankings();
-  }, [period, selectedYear]);
+  }, [period, selectedYear, selectedMonth]);
 
   // ページネーション用の計算
   const paginatedRankings = rankings ? rankings.rankings.slice(
@@ -202,6 +205,56 @@ export default function Home() {
                   <option key={year} value={year}>{year}年</option>
                 ))}
               </select>
+            )}
+            
+            {/* 月別ドロップダウン */}
+            {availableYears.length > 0 && (
+              <div className="flex gap-2">
+                <select
+                  value={period === 'month' && selectedYear ? selectedYear : ''}
+                  onChange={(e) => {
+                    const year = parseInt(e.target.value);
+                    if (year) {
+                      setSelectedYear(year);
+                      if (selectedMonth) {
+                        setPeriod('month');
+                        analytics.changeRankingPeriod(`month-${year}-${selectedMonth}`);
+                      }
+                    }
+                  }}
+                  className={`px-4 py-2 rounded-lg font-semibold transition-all duration-150 border ${
+                    period === 'month'
+                      ? 'bg-qiita-green dark:bg-dark-green text-white border-qiita-green dark:border-dark-green shadow-sm'
+                      : 'bg-qiita-surface dark:bg-dark-surface-light text-qiita-text-dark dark:text-dark-text border-qiita-border dark:border-dark-border hover:bg-qiita-green/10 dark:hover:bg-qiita-green/20'
+                  }`}
+                >
+                  <option value="">年</option>
+                  {availableYears.map(year => (
+                    <option key={year} value={year}>{year}</option>
+                  ))}
+                </select>
+                <select
+                  value={period === 'month' && selectedMonth ? selectedMonth : ''}
+                  onChange={(e) => {
+                    const month = parseInt(e.target.value);
+                    if (month && selectedYear) {
+                      setSelectedMonth(month);
+                      setPeriod('month');
+                      analytics.changeRankingPeriod(`month-${selectedYear}-${month}`);
+                    }
+                  }}
+                  className={`px-4 py-2 rounded-lg font-semibold transition-all duration-150 border ${
+                    period === 'month'
+                      ? 'bg-qiita-green dark:bg-dark-green text-white border-qiita-green dark:border-dark-green shadow-sm'
+                      : 'bg-qiita-surface dark:bg-dark-surface-light text-qiita-text-dark dark:text-dark-text border-qiita-border dark:border-dark-border hover:bg-qiita-green/10 dark:hover:bg-qiita-green/20'
+                  }`}
+                >
+                  <option value="">月</option>
+                  {Array.from({ length: 12 }, (_, i) => i + 1).map(month => (
+                    <option key={month} value={month}>{month}月</option>
+                  ))}
+                </select>
+              </div>
             )}
           </div>
         </div>
