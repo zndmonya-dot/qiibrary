@@ -141,7 +141,7 @@ function BookCard({ rank, book, stats }: BookCardProps) {
               </div>
             </>
           ) : (
-            // Qiita記事の場合: 言及数、記事数、いいね数
+            // Qiita記事の場合: 言及数、ユニークユーザー数、いいね数
             <>
               <Link 
                 href={`/books/${book.isbn}#qiita-articles`}
@@ -152,6 +152,13 @@ function BookCard({ rank, book, stats }: BookCardProps) {
                 <span className="text-base font-bold text-qiita-text-dark dark:text-white">{formatNumber(stats.mention_count)}</span>
                 <span className="text-sm text-qiita-green dark:text-dark-green font-medium">件の記事で言及</span>
               </Link>
+              
+              {/* ユニークユーザー数 */}
+              <div className="flex items-center gap-2 bg-blue-50 dark:bg-blue-900/20 px-4 py-2 rounded-lg border border-blue-200 dark:border-blue-700">
+                <i className="ri-user-line text-blue-600 dark:text-blue-400 text-lg"></i>
+                <span className="text-base font-bold text-blue-900 dark:text-blue-100">{formatNumber(stats.unique_user_count)}</span>
+                <span className="text-sm text-blue-700 dark:text-blue-300 font-medium">人が言及</span>
+              </div>
               
               {/* 総いいね数 */}
               {stats.total_likes > 0 && (

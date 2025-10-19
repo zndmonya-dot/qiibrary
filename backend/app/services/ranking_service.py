@@ -53,7 +53,7 @@ class RankingService:
             期間フィルタは実際にその期間内に投稿されたQiita記事を基準にします。
             例：2022年のランキングは、2022年内に投稿されたQiita記事で言及された書籍が対象。
         """
-        # 基本クエリ：書籍ごとの言及数を集計
+        # 基本クエリ：書籍ごとの言及数とユニークユーザー数を集計
         query = (
             self.db.query(
                 Book.id,
@@ -70,6 +70,7 @@ class RankingService:
                 Book.first_mentioned_at,
                 func.count(BookQiitaMention.id).label('mention_count'),
                 func.count(func.distinct(QiitaArticle.id)).label('article_count'),
+                func.count(func.distinct(QiitaArticle.author_id)).label('unique_user_count'),  # ユニークユーザー数
                 func.sum(QiitaArticle.likes_count).label('total_likes'),
                 func.max(BookQiitaMention.mentioned_at).label('latest_mention_at'),
             )
@@ -141,25 +142,28 @@ class RankingService:
         for row in results:
             mention_count = int(row.mention_count) if row.mention_count else 0
             article_count = int(row.article_count) if row.article_count else 0
+            unique_user_count = int(row.unique_user_count) if row.unique_user_count else 0
             total_likes = int(row.total_likes) if row.total_likes else 0
             avg_likes = total_likes / article_count if article_count > 0 else 0
             
             # スコアリング方式に応じて計算
+            # 【重要】ユニークユーザー数を基準にすることで、1人が大量投稿しても高スコアにならない
             score: float
             if scoring_method == "simple":
-                # シンプル：言及数のみ
-                score = float(mention_count)
+                # シンプル：ユニークユーザー数のみ
+                score = float(unique_user_count)
             elif scoring_method == "weighted":
-                # 加重スコア（推奨）
-                # スコア = (メンション数 × 10) + (総いいね数 × 0.5) + (平均いいね数 × 3)
-                score = (mention_count * 10) + (total_likes * 0.5) + (avg_likes * 3)
+                # 加重スコア
+                # スコア = (ユニークユーザー数 × 10) + (総いいね数 × 0.5) + (平均いいね数 × 3)
+                score = (unique_user_count * 10) + (total_likes * 0.5) + (avg_likes * 3)
             elif scoring_method == "quality":
-                # 品質重視
-                # スコア = メンション数 × (1 + log(平均いいね数 + 1))
-                score = mention_count * (1 + math.log(avg_likes + 1))
+                # 品質重視（デフォルト）
+                # スコア = ユニークユーザー数 × (1 + log(平均いいね数 + 1))
+                # 多くのユーザーに支持され、かついいね数も多い書籍を上位に
+                score = unique_user_count * (1 + math.log(avg_likes + 1))
             else:
-                # デフォルトは加重スコア
-                score = (mention_count * 10) + (total_likes * 0.5) + (avg_likes * 3)
+                # デフォルトは品質重視
+                score = unique_user_count * (1 + math.log(avg_likes + 1))
             
             scored_results.append((score, row, avg_likes))
         
@@ -176,6 +180,7 @@ class RankingService:
             # スコアと統計情報を再計算
             mention_count = int(row.mention_count) if row.mention_count else 0
             article_count = int(row.article_count) if row.article_count else 0
+            unique_user_count = int(row.unique_user_count) if row.unique_user_count else 0
             total_likes = int(row.total_likes) if row.total_likes else 0
             avg_likes = total_likes / article_count if article_count > 0 else 0
             
@@ -206,6 +211,7 @@ class RankingService:
                 "stats": {
                     "mention_count": mention_count,
                     "article_count": article_count,
+                    "unique_user_count": unique_user_count,  # ユニークユーザー数
                     "total_likes": total_likes,
                     "avg_likes": round(avg_likes, 2),  # 平均いいね数
                     "score": round(calculated_score, 2),  # スコア

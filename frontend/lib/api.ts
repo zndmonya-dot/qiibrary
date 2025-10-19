@@ -41,6 +41,7 @@ export interface Book {
 export interface BookStats {
   mention_count: number;
   article_count: number;
+  unique_user_count: number; // ユニークユーザー数
   total_likes: number;
   avg_likes: number;
   score: number;
