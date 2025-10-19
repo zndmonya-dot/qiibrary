@@ -8,10 +8,10 @@ import { getRankings, getAvailableYears, RankingResponse } from '@/lib/api';
 import { analytics, trackPageView } from '@/lib/analytics';
 import { ITEMS_PER_PAGE } from '@/lib/constants';
 
-type PeriodType = 'daily' | 'monthly' | 'yearly' | 'all' | 'year' | 'month';
+type PeriodType = 'daily' | 'monthly' | 'yearly' | 'all' | 'year';
 
 export default function Home() {
-  const [period, setPeriod] = useState<PeriodType>('daily');
+  const [period, setPeriod] = useState<PeriodType>('yearly');
   const [selectedYear, setSelectedYear] = useState<number | null>(null);
   const [selectedMonth, setSelectedMonth] = useState<number | null>(null);
   const [availableYears, setAvailableYears] = useState<number[]>([]);
@@ -21,23 +21,13 @@ export default function Home() {
   const [currentPage, setCurrentPage] = useState(1);
   const [searchQuery, setSearchQuery] = useState('');
 
-  // 期間選択オプションを生成
+  // 期間選択オプションを生成（年のみ）
   const generatePeriodOptions = () => {
-    const options: { label: string; value: string; year?: number; month?: number }[] = [];
+    const options: { label: string; value: string; year?: number }[] = [];
     
     availableYears.forEach(year => {
       // 年のオプション
       options.push({ label: `${year}年`, value: `year-${year}`, year });
-      
-      // 月のオプション（最新の年のみ、または全年）
-      for (let month = 12; month >= 1; month--) {
-        options.push({ 
-          label: `${year}年${month}月`, 
-          value: `month-${year}-${month}`, 
-          year, 
-          month 
-        });
-      }
     });
     
     return options;
@@ -73,8 +63,6 @@ export default function Home() {
           data = await getRankings.yearly();
         } else if (period === 'year' && selectedYear) {
           data = await getRankings.byYear(selectedYear);
-        } else if (period === 'month' && selectedYear && selectedMonth) {
-          data = await getRankings.byMonth(selectedYear, selectedMonth);
         } else {
           // all
           data = await getRankings.all();
@@ -90,7 +78,7 @@ export default function Home() {
     };
     
     fetchRankings();
-  }, [period, selectedYear, selectedMonth]);
+  }, [period, selectedYear]);
 
   // 検索フィルタリング
   const filteredRankings = rankings ? rankings.rankings.filter(item => {
@@ -260,41 +248,26 @@ export default function Home() {
               全期間
             </button>
             
-            {/* 期間を指定ドロップダウン（年別・月別統合） */}
+            {/* 年別ドロップダウン */}
             {availableYears.length > 0 && (
               <select
-                value={
-                  period === 'year' && selectedYear 
-                    ? `year-${selectedYear}` 
-                    : period === 'month' && selectedYear && selectedMonth 
-                    ? `month-${selectedYear}-${selectedMonth}` 
-                    : ''
-                }
+                value={period === 'year' && selectedYear ? `year-${selectedYear}` : ''}
                 onChange={(e) => {
                   const value = e.target.value;
                   if (value.startsWith('year-')) {
                     const year = parseInt(value.replace('year-', ''));
                     setSelectedYear(year);
-                    setSelectedMonth(null);
                     setPeriod('year');
                     analytics.changeRankingPeriod(`year-${year}`);
-                  } else if (value.startsWith('month-')) {
-                    const [, yearStr, monthStr] = value.split('-');
-                    const year = parseInt(yearStr);
-                    const month = parseInt(monthStr);
-                    setSelectedYear(year);
-                    setSelectedMonth(month);
-                    setPeriod('month');
-                    analytics.changeRankingPeriod(`month-${year}-${month}`);
                   }
                 }}
                 className={`px-4 py-2 rounded-lg font-semibold transition-all duration-150 border ${
-                  period === 'year' || period === 'month'
+                  period === 'year'
                     ? 'bg-qiita-green dark:bg-dark-green text-white border-qiita-green dark:border-dark-green shadow-sm'
                     : 'bg-qiita-surface dark:bg-dark-surface-light text-qiita-text-dark dark:text-dark-text border-qiita-border dark:border-dark-border hover:bg-qiita-green/10 dark:hover:bg-qiita-green/20'
                 }`}
               >
-                <option value="">期間を指定</option>
+                <option value="">年別ランキング</option>
                 {generatePeriodOptions().map(option => (
                   <option key={option.value} value={option.value}>
                     {option.label}
@@ -307,9 +280,11 @@ export default function Home() {
         
         {/* ランキング表示 */}
         {loading && !rankings && (
-          <div className="flex flex-col justify-center items-center py-20 animate-fade-in">
-            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-qiita-green dark:border-dark-green mb-4"></div>
-            <p className="text-secondary text-sm animate-pulse">読み込み中...</p>
+          <div className="bg-qiita-card dark:bg-dark-surface rounded-lg p-12 border border-qiita-border dark:border-dark-border shadow-sm">
+            <div className="flex flex-col justify-center items-center">
+              <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-qiita-green dark:border-dark-green mb-4"></div>
+              <p className="text-qiita-text dark:text-dark-text text-sm font-medium animate-pulse">読み込み中...</p>
+            </div>
           </div>
         )}
         
