@@ -22,6 +22,45 @@ export default function Home() {
   const [currentPage, setCurrentPage] = useState(1);
   const [searchQuery, setSearchQuery] = useState('');
   const [showAllYears, setShowAllYears] = useState(false);
+  const [isRestored, setIsRestored] = useState(false);
+
+  // ページ状態をsessionStorageに保存
+  const savePageState = () => {
+    if (typeof window !== 'undefined') {
+      const state = {
+        scrollY: window.scrollY,
+        currentPage,
+        period,
+        selectedYear,
+        searchQuery,
+      };
+      sessionStorage.setItem('rankingPageState', JSON.stringify(state));
+    }
+  };
+
+  // ページ状態をsessionStorageから復元
+  useEffect(() => {
+    if (typeof window !== 'undefined' && !isRestored) {
+      const savedState = sessionStorage.getItem('rankingPageState');
+      if (savedState) {
+        try {
+          const state = JSON.parse(savedState);
+          setCurrentPage(state.currentPage || 1);
+          setPeriod(state.period || 'yearly');
+          setSelectedYear(state.selectedYear || null);
+          setSearchQuery(state.searchQuery || '');
+          
+          // スクロール位置の復元はデータ取得後に行う
+          setTimeout(() => {
+            window.scrollTo({ top: state.scrollY || 0, behavior: 'instant' });
+          }, 100);
+        } catch (e) {
+          console.error('Failed to restore page state:', e);
+        }
+      }
+      setIsRestored(true);
+    }
+  }, [isRestored]);
 
   // 年を最新順にソート
   const sortedYears = [...availableYears].sort((a, b) => b - a);
@@ -379,6 +418,7 @@ export default function Home() {
                       rank={item.rank}
                       book={item.book}
                       stats={item.stats}
+                      onNavigate={savePageState}
                     />
                   </div>
                 ))

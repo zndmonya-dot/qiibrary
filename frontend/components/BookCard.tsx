@@ -11,9 +11,10 @@ interface BookCardProps {
   rank: number;
   book: Book;
   stats: BookStats;
+  onNavigate?: () => void;
 }
 
-function BookCard({ rank, book, stats }: BookCardProps) {
+function BookCard({ rank, book, stats, onNavigate }: BookCardProps) {
   // ランクに応じた色を決定
   const getRankStyle = () => {
     if (rank === 1) return 'text-yellow-500 drop-shadow-[0_0_8px_rgba(234,179,8,0.5)]'; // 金
@@ -61,7 +62,10 @@ function BookCard({ rank, book, stats }: BookCardProps) {
           href={`/books/${book.isbn}`} 
           prefetch={true} 
           className="block transition-opacity duration-200 hover:opacity-90"
-          onClick={() => analytics.clickBook(book.isbn || '', book.title, rank)}
+          onClick={() => {
+            onNavigate?.();
+            analytics.clickBook(book.isbn || '', book.title, rank);
+          }}
         >
               {book.thumbnail_url ? (
                 <div className="relative w-[160px] h-[240px]">
@@ -98,7 +102,10 @@ function BookCard({ rank, book, stats }: BookCardProps) {
               href={`/books/${book.isbn}`} 
               prefetch={true} 
               className="inline-block text-qiita-text-dark dark:text-white hover:text-qiita-green dark:hover:text-dark-green transition-colors duration-200"
-              onClick={() => analytics.clickBook(book.isbn || '', book.title, rank)}
+              onClick={() => {
+                onNavigate?.();
+                analytics.clickBook(book.isbn || '', book.title, rank);
+              }}
             >
               <h3 className="text-lg font-bold mb-2 line-clamp-2">
                 {book.title || `ISBN: ${book.isbn} の書籍`}
@@ -152,6 +159,7 @@ function BookCard({ rank, book, stats }: BookCardProps) {
                 href={`/books/${book.isbn}#qiita-articles`}
                 prefetch={true}
                 className="flex items-center gap-2 bg-qiita-green/10 dark:bg-qiita-green/20 px-4 py-2 rounded-lg border border-qiita-green/30 dark:border-qiita-green/50 hover:bg-qiita-green/20 dark:hover:bg-qiita-green/30 transition-colors duration-150 cursor-pointer"
+                onClick={() => onNavigate?.()}
               >
                 <i className="ri-article-line text-qiita-green dark:text-dark-green text-lg"></i>
                 <span className="text-base font-bold text-qiita-text-dark dark:text-white">{formatNumber(stats.mention_count)}</span>
@@ -179,7 +187,10 @@ function BookCard({ rank, book, stats }: BookCardProps) {
             href={`/books/${book.isbn}`}
             prefetch={true}
             className="flex-1 flex flex-col cursor-pointer hover:opacity-80 transition-opacity duration-150"
-            onClick={() => analytics.clickBook(book.isbn || '', book.title, rank)}
+            onClick={() => {
+              onNavigate?.();
+              analytics.clickBook(book.isbn || '', book.title, rank);
+            }}
           >
             <h4 className="text-sm font-bold text-qiita-text-dark dark:text-white mb-3 flex items-center gap-1.5">
               <i className="ri-book-open-line text-qiita-green"></i>
