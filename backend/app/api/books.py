@@ -44,13 +44,12 @@ async def get_book_detail(
         if not book:
             raise HTTPException(status_code=404, detail=f"書籍が見つかりません: {isbn}")
         
-        # 関連するQiita記事を取得
+        # 関連するQiita記事を取得（すべて表示）
         qiita_articles = (
             db.query(QiitaArticle)
             .join(BookQiitaMention, QiitaArticle.id == BookQiitaMention.article_id)
             .filter(BookQiitaMention.book_id == book.id)
             .order_by(QiitaArticle.likes_count.desc())
-            .limit(10)
             .all()
         )
         

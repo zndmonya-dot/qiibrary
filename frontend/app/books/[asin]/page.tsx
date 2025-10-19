@@ -20,11 +20,13 @@ export default function BookDetailPage() {
   const [book, setBook] = useState<BookDetail | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [displayedArticlesCount, setDisplayedArticlesCount] = useState(10); // 初期表示件数
 
   useEffect(() => {
     const fetchBook = async () => {
       setLoading(true);
       setError(null);
+      setDisplayedArticlesCount(10); // 表示件数をリセット
       
       try {
         const data = await getBookDetail(asin);
@@ -268,7 +270,7 @@ export default function BookDetailPage() {
                 </div>
                 
                 <div className="grid grid-cols-1 gap-4">
-                  {book.qiita_articles.map((article) => (
+                  {book.qiita_articles.slice(0, displayedArticlesCount).map((article) => (
                     <a
                       key={article.id}
                       href={article.url}
@@ -334,6 +336,26 @@ export default function BookDetailPage() {
                     </a>
                   ))}
                 </div>
+                
+                {/* もっと見る / すべて表示ボタン */}
+                {book.qiita_articles.length > displayedArticlesCount && (
+                  <div className="mt-6 flex gap-4 justify-center">
+                    <button
+                      onClick={() => setDisplayedArticlesCount(prev => Math.min(prev + 10, book.qiita_articles.length))}
+                      className="px-6 py-3 bg-qiita-green dark:bg-dark-green text-white rounded-lg hover:opacity-90 transition-opacity font-semibold flex items-center gap-2"
+                    >
+                      <i className="ri-arrow-down-line text-lg"></i>
+                      もっと見る（+10件）
+                    </button>
+                    <button
+                      onClick={() => setDisplayedArticlesCount(book.qiita_articles.length)}
+                      className="px-6 py-3 bg-qiita-surface dark:bg-dark-surface-light text-qiita-text-dark dark:text-white rounded-lg hover:bg-qiita-green/10 dark:hover:bg-qiita-green/20 transition-colors font-semibold border border-qiita-border dark:border-dark-border flex items-center gap-2"
+                    >
+                      <i className="ri-list-check text-lg"></i>
+                      すべて表示（全{book.qiita_articles.length}件）
+                    </button>
+                  </div>
+                )}
               </div>
             )}
         

@@ -35,6 +35,11 @@ const nextConfig = {
         protocol: 'https',
         hostname: 'books.google.com',
       },
+      // openBD API画像ホスト
+      {
+        protocol: 'https',
+        hostname: 'cover.openbd.jp',
+      },
     ],
     dangerouslyAllowSVG: true,
     contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",

@@ -5,8 +5,6 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { Book, BookStats } from '@/lib/api';
 import { formatNumber, formatPublicationDate } from '@/lib/utils';
-import StarRating from './StarRating';
-import PriceDisplay from './PriceDisplay';
 import { analytics } from '@/lib/analytics';
 
 interface BookCardProps {
@@ -51,10 +49,10 @@ function BookCard({ rank, book, stats }: BookCardProps) {
           className="block transition-opacity duration-200 hover:opacity-90"
           onClick={() => analytics.clickBook(book.isbn || '', book.title, rank)}
         >
-              {(book.thumbnail_url || book.image_url) ? (
+              {book.thumbnail_url ? (
                 <div className="relative w-[160px] h-[240px]">
                   <Image
-                    src={book.thumbnail_url || book.image_url || ''}
+                    src={book.thumbnail_url}
                     alt={book.title}
                     width={160}
                     height={240}
@@ -114,39 +112,16 @@ function BookCard({ rank, book, stats }: BookCardProps) {
               <span>{formatPublicationDate(book.publication_date)}</span>
             </p>
           )}
-          
-          {/* 星評価（クリック可能） */}
-          {book.rating && (
-            <StarRating
-              rating={book.rating}
-              reviewCount={book.review_count || undefined}
-              bookUrl={book.affiliate_url}
-              size="sm"
-            />
-          )}
-          
-          {/* 価格・セール情報 */}
-          {book.price && (
-            <div className="flex items-center gap-2">
-              <i className="ri-price-tag-3-line"></i>
-              <PriceDisplay
-                price={book.price}
-                salePrice={book.sale_price}
-                discountRate={book.discount_rate}
-                size="sm"
-              />
-            </div>
-          )}
         </div>
         
         {/* 統計情報 - フラットデザイン */}
-        <div className="flex items-center gap-3">
-          {stats.total_views > 0 ? (
+        <div className="flex items-center gap-3 flex-wrap">
+          {(stats.total_views ?? 0) > 0 ? (
             // YouTube動画がある場合: 再生数と動画数
             <>
               <div className="flex items-center gap-2 bg-blue-50 dark:bg-blue-900/20 px-4 py-2 rounded-lg border border-blue-200 dark:border-blue-700">
                 <i className="ri-eye-line text-blue-600 dark:text-blue-400 text-lg"></i>
-                <span className="text-base font-bold text-blue-900 dark:text-blue-100">{formatNumber(stats.total_views)}</span>
+                <span className="text-base font-bold text-blue-900 dark:text-blue-100">{formatNumber(stats.total_views ?? 0)}</span>
                 <span className="text-sm text-blue-700 dark:text-blue-300 font-medium">回再生</span>
               </div>
               <div className="flex items-center gap-2 bg-red-50 dark:bg-red-900/20 px-4 py-2 rounded-lg border border-red-200 dark:border-red-700">
@@ -156,16 +131,27 @@ function BookCard({ rank, book, stats }: BookCardProps) {
               </div>
             </>
           ) : (
-            // Qiita記事の場合: 言及数
-            <Link 
-              href={`/books/${book.isbn}#qiita-articles`}
-              prefetch={true}
-              className="flex items-center gap-2 bg-qiita-green/10 dark:bg-qiita-green/20 px-4 py-2 rounded-lg border border-qiita-green/30 dark:border-qiita-green/50 hover:bg-qiita-green/20 dark:hover:bg-qiita-green/30 transition-colors duration-150 cursor-pointer"
-            >
-              <i className="ri-article-line text-qiita-green dark:text-dark-green text-lg"></i>
-              <span className="text-base font-bold text-qiita-text-dark dark:text-white">{formatNumber(stats.mention_count)}</span>
-              <span className="text-sm text-qiita-green dark:text-dark-green font-medium">件の記事で言及</span>
-            </Link>
+            // Qiita記事の場合: 言及数、記事数、いいね数
+            <>
+              <Link 
+                href={`/books/${book.isbn}#qiita-articles`}
+                prefetch={true}
+                className="flex items-center gap-2 bg-qiita-green/10 dark:bg-qiita-green/20 px-4 py-2 rounded-lg border border-qiita-green/30 dark:border-qiita-green/50 hover:bg-qiita-green/20 dark:hover:bg-qiita-green/30 transition-colors duration-150 cursor-pointer"
+              >
+                <i className="ri-article-line text-qiita-green dark:text-dark-green text-lg"></i>
+                <span className="text-base font-bold text-qiita-text-dark dark:text-white">{formatNumber(stats.mention_count)}</span>
+                <span className="text-sm text-qiita-green dark:text-dark-green font-medium">件の記事で言及</span>
+              </Link>
+              
+              {/* 総いいね数 */}
+              {stats.total_likes > 0 && (
+                <div className="flex items-center gap-2 bg-pink-50 dark:bg-pink-900/20 px-4 py-2 rounded-lg border border-pink-200 dark:border-pink-700">
+                  <i className="ri-heart-line text-pink-600 dark:text-pink-400 text-lg"></i>
+                  <span className="text-base font-bold text-pink-900 dark:text-pink-100">{formatNumber(stats.total_likes)}</span>
+                  <span className="text-sm text-pink-700 dark:text-pink-300 font-medium">いいね</span>
+                </div>
+              )}
+            </>
           )}
         </div>
       </div>
@@ -184,7 +170,7 @@ function BookCard({ rank, book, stats }: BookCardProps) {
               <i className="ri-book-open-line text-qiita-green"></i>
               書籍説明
             </h4>
-            <p className="text-sm text-qiita-text-dark dark:text-dark-text line-clamp-5 leading-relaxed font-medium">
+            <p className="text-sm text-qiita-text-dark dark:text-dark-text line-clamp-6 leading-relaxed font-medium whitespace-pre-line">
               {book.description}
             </p>
           </Link>

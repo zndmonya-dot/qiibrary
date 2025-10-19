@@ -50,7 +50,8 @@ async def get_rankings(
         rankings = ranking_service.get_ranking(
             tags=tag_list,
             days=days,
-            limit=limit
+            limit=limit,
+            scoring_method="quality"  # 品質重視方式を使用
         )
         
         # 期間ラベルを生成

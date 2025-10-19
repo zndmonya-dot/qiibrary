@@ -3,10 +3,11 @@
 """
 
 import logging
+import math
 from typing import List, Dict, Optional
-from datetime import datetime, date, timedelta
+from datetime import datetime, timedelta
 from sqlalchemy.orm import Session
-from sqlalchemy import func, and_, desc
+from sqlalchemy import func
 
 from ..models.book import Book, BookQiitaMention
 from ..models.qiita_article import QiitaArticle
@@ -26,7 +27,8 @@ class RankingService:
         self,
         tags: Optional[List[str]] = None,
         days: Optional[int] = None,
-        limit: int = 50
+        limit: int = 50,
+        scoring_method: str = "weighted"
     ) -> List[Dict]:
         """
         書籍ランキングを取得
@@ -35,6 +37,10 @@ class RankingService:
             tags: フィルタするタグのリスト（例: ["Python", "JavaScript"]）
             days: 過去N日間のランキング（Noneの場合は全期間）
             limit: 取得件数
+            scoring_method: スコアリング方式
+                - "simple": シンプル（言及数のみ）
+                - "weighted": 加重スコア（推奨）
+                - "quality": 品質重視
         
         Returns:
             ランキングリスト
@@ -80,33 +86,65 @@ class RankingService:
             start_date = datetime.now() - timedelta(days=days)
             query = query.filter(BookQiitaMention.mentioned_at >= start_date)
         
-        # グループ化とソート
-        query = (
-            query.group_by(
-                Book.id,
-                Book.isbn,
-                Book.title,
-                Book.author,
-                Book.publisher,
-                Book.publication_date,
-                Book.description,
-                Book.thumbnail_url,
-                Book.amazon_url,
-                Book.amazon_affiliate_url,
-                Book.total_mentions,
-            )
-            .order_by(
-                func.count(BookQiitaMention.id).desc(),  # 言及数でソート
-                func.sum(QiitaArticle.likes_count).desc(),  # いいね数でソート
-            )
-            .limit(limit)
+        # グループ化
+        query = query.group_by(
+            Book.id,
+            Book.isbn,
+            Book.title,
+            Book.author,
+            Book.publisher,
+            Book.publication_date,
+            Book.description,
+            Book.thumbnail_url,
+            Book.amazon_url,
+            Book.amazon_affiliate_url,
+            Book.total_mentions,
         )
         
         results = query.all()
         
+        # スコア計算とソート
+        scored_results = []
+        for row in results:
+            mention_count = int(row.mention_count) if row.mention_count else 0
+            article_count = int(row.article_count) if row.article_count else 0
+            total_likes = int(row.total_likes) if row.total_likes else 0
+            avg_likes = total_likes / article_count if article_count > 0 else 0
+            
+            # スコアリング方式に応じて計算
+            score: float
+            if scoring_method == "simple":
+                # シンプル：言及数のみ
+                score = float(mention_count)
+            elif scoring_method == "weighted":
+                # 加重スコア（推奨）
+                # スコア = (メンション数 × 10) + (総いいね数 × 0.5) + (平均いいね数 × 3)
+                score = (mention_count * 10) + (total_likes * 0.5) + (avg_likes * 3)
+            elif scoring_method == "quality":
+                # 品質重視
+                # スコア = メンション数 × (1 + log(平均いいね数 + 1))
+                score = mention_count * (1 + math.log(avg_likes + 1))
+            else:
+                # デフォルトは加重スコア
+                score = (mention_count * 10) + (total_likes * 0.5) + (avg_likes * 3)
+            
+            scored_results.append((score, row, avg_likes))
+        
+        # スコアでソート
+        scored_results.sort(key=lambda x: x[0], reverse=True)
+        
+        # 上位N件を取得とスコアを保持
+        top_results = scored_results[:limit]
+        
         # ランキング形式に整形
         rankings = []
-        for rank, row in enumerate(results, start=1):
+        for rank, (calculated_score, row, _) in enumerate(top_results, start=1):
+            # スコアと統計情報を再計算
+            mention_count = int(row.mention_count) if row.mention_count else 0
+            article_count = int(row.article_count) if row.article_count else 0
+            total_likes = int(row.total_likes) if row.total_likes else 0
+            avg_likes = total_likes / article_count if article_count > 0 else 0
+            
             # 動的にAmazonアフィリエイトURLを生成
             amazon_affiliate_url = self.openbd_service.generate_amazon_affiliate_url(row.isbn)
             
@@ -126,9 +164,11 @@ class RankingService:
                     "total_mentions": row.total_mentions,
                 },
                 "stats": {
-                    "mention_count": int(row.mention_count) if row.mention_count else 0,
-                    "article_count": int(row.article_count) if row.article_count else 0,
-                    "total_likes": int(row.total_likes) if row.total_likes else 0,
+                    "mention_count": mention_count,
+                    "article_count": article_count,
+                    "total_likes": total_likes,
+                    "avg_likes": round(avg_likes, 2),  # 平均いいね数
+                    "score": round(calculated_score, 2),  # スコア
                     "latest_mention_at": row.latest_mention_at.isoformat() if row.latest_mention_at else None,
                 }
             })
@@ -139,7 +179,7 @@ class RankingService:
         
         return rankings
     
-    def get_all_tags(self) -> List[Dict[str, any]]:
+    def get_all_tags(self) -> List[Dict]:
         """
         すべてのタグとその書籍数を取得
         

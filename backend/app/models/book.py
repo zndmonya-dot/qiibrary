@@ -42,11 +42,12 @@ class Book(Base):
     
     # 統計情報（キャッシュ）
     total_mentions = Column(Integer, default=0, index=True)  # Qiita記事での言及数
-    latest_mention_at = Column(DateTime, index=True)
+    first_mentioned_at = Column(DateTime, index=True)  # 初回言及日時（最も古い記事の公開日）
+    latest_mention_at = Column(DateTime, index=True)  # 最終言及日時（最も新しい記事の公開日）
     
     # タイムスタンプ
-    created_at = Column(DateTime, default=func.now(), nullable=False)
-    updated_at = Column(DateTime, default=func.now(), onupdate=func.now(), nullable=False)
+    created_at = Column(DateTime, default=func.now(), nullable=False)  # レコード作成日時
+    updated_at = Column(DateTime, default=func.now(), onupdate=func.now(), nullable=False)  # レコード更新日時
     
     # リレーション
     qiita_mentions = relationship('BookQiitaMention', back_populates='book', cascade='all, delete-orphan')
@@ -55,6 +56,7 @@ class Book(Base):
     # インデックス
     __table_args__ = (
         Index('idx_books_mentions', 'total_mentions'),
+        Index('idx_books_first_mention', 'first_mentioned_at'),
         Index('idx_books_latest_mention', 'latest_mention_at'),
     )
     
@@ -76,6 +78,7 @@ class Book(Base):
             'description': self.description,
             'thumbnail_url': self.thumbnail_url,
             'total_mentions': self.total_mentions,
+            'first_mentioned_at': self.first_mentioned_at.isoformat() if self.first_mentioned_at else None,
             'latest_mention_at': self.latest_mention_at.isoformat() if self.latest_mention_at else None,
             'created_at': self.created_at.isoformat() if self.created_at else None,
             'updated_at': self.updated_at.isoformat() if self.updated_at else None,

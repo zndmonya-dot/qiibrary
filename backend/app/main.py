@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from .config import settings
 from .api import rankings, books, admin
+import os
 
 app = FastAPI(
     title="BookTuber API",
@@ -10,12 +10,17 @@ app = FastAPI(
 )
 
 # CORS設定
+frontend_url = os.getenv("FRONTEND_URL", "http://localhost:3000")
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
-        settings.FRONTEND_URL, 
+        frontend_url,
         "http://localhost:3000",
-        "http://localhost:3001",  # Next.jsがポート3000使用中の場合
+        "http://localhost:3001",
+        "http://localhost:3002",
+        "http://127.0.0.1:3000",
+        "http://127.0.0.1:3001",
+        "http://127.0.0.1:3002",
     ],
     allow_credentials=True,
     allow_methods=["*"],
