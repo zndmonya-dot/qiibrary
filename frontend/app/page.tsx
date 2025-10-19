@@ -178,7 +178,7 @@ export default function Home() {
     <div className="min-h-screen bg-qiita-bg dark:bg-dark-bg">
       <Header />
       
-      <main className="container mx-auto px-4 py-8">
+      <main className="container mx-auto px-4 py-8 min-h-[calc(100vh-200px)]">
         {/* ヘッダー */}
         <div className="mb-6 md:mb-8 bg-qiita-card dark:bg-dark-surface rounded-xl p-4 md:p-8 border-l-4 border-qiita-green dark:border-dark-green shadow-sm animate-fade-in-up">
           <div className="flex items-start justify-between">
