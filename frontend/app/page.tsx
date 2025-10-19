@@ -22,7 +22,8 @@ export default function Home() {
   const [currentPage, setCurrentPage] = useState(1);
   const [searchQuery, setSearchQuery] = useState('');
   const [showAllYears, setShowAllYears] = useState(false);
-  const [isRestored, setIsRestored] = useState(false);
+  const [isRestoring, setIsRestoring] = useState(false);
+  const [savedScrollY, setSavedScrollY] = useState<number | null>(null);
 
   // ページ状態をsessionStorageに保存
   const savePageState = () => {
@@ -38,29 +39,40 @@ export default function Home() {
     }
   };
 
-  // ページ状態をsessionStorageから復元
+  // ページ状態をsessionStorageから復元（初回のみ）
   useEffect(() => {
-    if (typeof window !== 'undefined' && !isRestored) {
+    if (typeof window !== 'undefined') {
       const savedState = sessionStorage.getItem('rankingPageState');
       if (savedState) {
         try {
           const state = JSON.parse(savedState);
+          setIsRestoring(true);
           setCurrentPage(state.currentPage || 1);
           setPeriod(state.period || 'yearly');
           setSelectedYear(state.selectedYear || null);
           setSearchQuery(state.searchQuery || '');
+          setSavedScrollY(state.scrollY || 0);
           
-          // スクロール位置の復元はデータ取得後に行う
-          setTimeout(() => {
-            window.scrollTo({ top: state.scrollY || 0, behavior: 'instant' });
-          }, 100);
+          // 復元後は保存データをクリア（次回は通常動作）
+          sessionStorage.removeItem('rankingPageState');
         } catch (e) {
           console.error('Failed to restore page state:', e);
+          setIsRestoring(false);
         }
       }
-      setIsRestored(true);
     }
-  }, [isRestored]);
+  }, []);
+
+  // データ読み込み完了後にスクロール位置を復元
+  useEffect(() => {
+    if (isRestoring && !loading && savedScrollY !== null) {
+      setTimeout(() => {
+        window.scrollTo({ top: savedScrollY, behavior: 'instant' });
+        setSavedScrollY(null);
+        setIsRestoring(false);
+      }, 50);
+    }
+  }, [isRestoring, loading, savedScrollY]);
 
   // 年を最新順にソート
   const sortedYears = [...availableYears].sort((a, b) => b - a);
@@ -86,7 +98,10 @@ export default function Home() {
     const fetchRankings = async () => {
       setLoading(true);
       setError(null);
-      setCurrentPage(1); // 期間変更時はページをリセット
+      // 復元中でない場合のみページをリセット
+      if (!isRestoring) {
+        setCurrentPage(1);
+      }
       
       try {
         let data: RankingResponse;
