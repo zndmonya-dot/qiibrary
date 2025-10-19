@@ -48,8 +48,8 @@ export default function BookDetailPage() {
     return (
       <div className="min-h-screen bg-qiita-bg dark:bg-dark-bg">
         <Header />
-        <main className="container mx-auto px-4 min-h-[calc(100vh-120px)]">
-          <LoadingSpinner message="書籍情報を読み込み中..." size="lg" />
+        <main className="container mx-auto px-4 min-h-[calc(100vh-120px)] flex items-center justify-center">
+          <LoadingSpinner message="書籍情報を読み込み中..." />
         </main>
       </div>
     );
@@ -274,13 +274,20 @@ export default function BookDetailPage() {
                 </div>
                 
                 <div className="grid grid-cols-1 gap-4">
-                  {book.qiita_articles.slice(0, displayedArticlesCount).map((article) => (
+                  {book.qiita_articles.slice(0, displayedArticlesCount).map((article, index) => {
+                    // 最初の3つの記事にアニメーション遅延を適用
+                    let animationClass = 'animate-fade-in-up';
+                    if (index === 0) animationClass = 'animate-fade-in-up';
+                    else if (index === 1) animationClass = 'animate-fade-in-up animate-delay-100';
+                    else if (index === 2) animationClass = 'animate-fade-in-up animate-delay-200';
+                    
+                    return (
                     <a
                       key={article.id}
                       href={article.url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="group bg-white dark:bg-dark-surface rounded-lg p-3 md:p-5 border border-qiita-border dark:border-dark-border hover:border-qiita-green/50 dark:hover:border-qiita-green/50 transition-colors duration-200"
+                      className={`group bg-white dark:bg-dark-surface rounded-lg p-3 md:p-5 border border-qiita-border dark:border-dark-border hover:border-qiita-green/50 dark:hover:border-qiita-green/50 transition-colors duration-200 ${animationClass}`}
                     >
                       <div className="flex items-start gap-3 md:gap-4">
                         <div className="flex-shrink-0">
@@ -338,7 +345,8 @@ export default function BookDetailPage() {
                         </div>
                       </div>
                     </a>
-                  ))}
+                    );
+                  })}
                 </div>
                 
                 {/* もっと見る / すべて表示ボタン */}
