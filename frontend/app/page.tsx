@@ -21,18 +21,14 @@ export default function Home() {
   const [error, setError] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [searchQuery, setSearchQuery] = useState('');
+  const [showAllYears, setShowAllYears] = useState(false);
 
-  // 期間選択オプションを生成（年のみ）
-  const generatePeriodOptions = () => {
-    const options: { label: string; value: string; year?: number }[] = [];
-    
-    availableYears.forEach(year => {
-      // 年のオプション
-      options.push({ label: `${year}年`, value: `year-${year}`, year });
-    });
-    
-    return options;
-  };
+  // 年を最新順にソート
+  const sortedYears = [...availableYears].sort((a, b) => b - a);
+  
+  // 最近の年（デフォルト表示）と古い年（展開で表示）に分ける
+  const recentYears = sortedYears.slice(0, 5);
+  const olderYears = sortedYears.slice(5);
 
   // 利用可能な年のリストを取得
   useEffect(() => {
@@ -256,40 +252,75 @@ export default function Home() {
               全期間
             </button>
             
-            {/* 年別ドロップダウン */}
-            <select
-              value={period === 'year' && selectedYear ? `year-${selectedYear}` : ''}
-              onChange={(e) => {
-                const value = e.target.value;
-                if (value === '') {
-                  // 空の値が選択された場合は年別ランキングを解除して365日間に戻す
-                  setSelectedYear(null);
-                  setPeriod('yearly');
-                  analytics.changeRankingPeriod('yearly');
-                } else if (value.startsWith('year-')) {
-                  const year = parseInt(value.replace('year-', ''));
+            {/* 年別セパレーター */}
+            {recentYears.length > 0 && (
+              <div className="w-px h-8 bg-qiita-border dark:bg-dark-border"></div>
+            )}
+            
+            {/* 最近の年をボタン表示 */}
+            {recentYears.map(year => (
+              <button
+                key={year}
+                onClick={() => {
                   setSelectedYear(year);
                   setPeriod('year');
                   analytics.changeRankingPeriod(`year-${year}`);
-                }
-              }}
-              disabled={availableYears.length === 0}
-              className={`px-4 py-2 rounded-lg font-semibold transition-all duration-150 border ${
-                period === 'year'
-                  ? 'bg-qiita-green dark:bg-dark-green text-white border-qiita-green dark:border-dark-green shadow-sm'
-                  : 'bg-qiita-surface dark:bg-dark-surface-light text-qiita-text-dark dark:text-dark-text border-qiita-border dark:border-dark-border hover:bg-qiita-green/10 dark:hover:bg-qiita-green/20'
-              } ${availableYears.length === 0 ? 'opacity-50 cursor-not-allowed' : ''}`}
-            >
-              <option value="">
-                {availableYears.length === 0 ? '読み込み中...' : '年別ランキング'}
-              </option>
-              {generatePeriodOptions().map(option => (
-                <option key={option.value} value={option.value}>
-                  {option.label}
-                </option>
-              ))}
-            </select>
+                }}
+                className={`px-4 py-2 rounded-lg font-semibold transition-all duration-150 ${
+                  period === 'year' && selectedYear === year
+                    ? 'bg-qiita-green dark:bg-dark-green text-white shadow-sm'
+                    : 'bg-qiita-surface dark:bg-dark-surface-light text-qiita-text-dark dark:text-dark-text hover:bg-qiita-green/10 dark:hover:bg-qiita-green/20'
+                }`}
+              >
+                <i className="ri-calendar-2-line mr-1"></i>
+                {year}年
+              </button>
+            ))}
+            
+            {/* もっと見る/閉じるボタン（古い年がある場合のみ） */}
+            {olderYears.length > 0 && (
+              <button
+                onClick={() => setShowAllYears(!showAllYears)}
+                className="px-4 py-2 rounded-lg font-semibold transition-all duration-150 bg-qiita-surface dark:bg-dark-surface-light text-qiita-text-dark dark:text-dark-text hover:bg-qiita-green/10 dark:hover:bg-qiita-green/20 border border-qiita-border dark:border-dark-border"
+              >
+                {showAllYears ? (
+                  <>
+                    <i className="ri-arrow-up-s-line mr-1"></i>
+                    閉じる
+                  </>
+                ) : (
+                  <>
+                    <i className="ri-arrow-down-s-line mr-1"></i>
+                    もっと見る（{olderYears.length}年）
+                  </>
+                )}
+              </button>
+            )}
           </div>
+          
+          {/* 古い年の展開エリア */}
+          {showAllYears && olderYears.length > 0 && (
+            <div className="flex flex-wrap gap-2 mt-3 pt-3 border-t border-qiita-border dark:border-dark-border">
+              {olderYears.map(year => (
+                <button
+                  key={year}
+                  onClick={() => {
+                    setSelectedYear(year);
+                    setPeriod('year');
+                    analytics.changeRankingPeriod(`year-${year}`);
+                  }}
+                  className={`px-4 py-2 rounded-lg font-semibold transition-all duration-150 ${
+                    period === 'year' && selectedYear === year
+                      ? 'bg-qiita-green dark:bg-dark-green text-white shadow-sm'
+                      : 'bg-qiita-surface dark:bg-dark-surface-light text-qiita-text-dark dark:text-dark-text hover:bg-qiita-green/10 dark:hover:bg-qiita-green/20'
+                  }`}
+                >
+                  <i className="ri-calendar-2-line mr-1"></i>
+                  {year}年
+                </button>
+              ))}
+            </div>
+          )}
         </div>
         
         {/* ランキング表示 */}
