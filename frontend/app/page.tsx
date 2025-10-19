@@ -242,8 +242,8 @@ export default function Home() {
         </div>
         
         {/* タブ - スライドアニメーション付き */}
-        <div className="relative mb-6 bg-qiita-card dark:bg-dark-surface rounded-lg border border-qiita-border dark:border-dark-border p-4">
-          <div className="flex flex-wrap gap-2">
+        <div className="relative mb-6 bg-qiita-card dark:bg-dark-surface rounded-lg border border-qiita-border dark:border-dark-border p-3 md:p-4 overflow-x-auto">
+          <div className="flex flex-nowrap md:flex-wrap gap-2 min-w-max md:min-w-0">
             {/* 期間タブ */}
             <button
               onClick={() => {
@@ -251,14 +251,15 @@ export default function Home() {
                 setSelectedYear(null);
                 analytics.changeRankingPeriod('daily');
               }}
-              className={`px-4 py-2 rounded-lg font-semibold transition-all duration-150 ${
+              className={`px-3 md:px-4 py-1.5 md:py-2 text-sm md:text-base rounded-lg font-semibold transition-all duration-150 whitespace-nowrap ${
                 period === 'daily'
                   ? 'bg-qiita-green dark:bg-dark-green text-white shadow-sm' 
                   : 'bg-qiita-surface dark:bg-dark-surface-light text-qiita-text-dark dark:text-dark-text hover:bg-qiita-green/10 dark:hover:bg-qiita-green/20'
               }`}
             >
-              <i className="ri-time-line mr-1"></i>
-              24時間
+              <i className="ri-time-line mr-0.5 md:mr-1 text-sm md:text-base"></i>
+              <span className="hidden sm:inline">24時間</span>
+              <span className="inline sm:hidden">24h</span>
             </button>
             <button
               onClick={() => {

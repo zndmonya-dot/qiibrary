@@ -29,14 +29,14 @@ function BookCard({ rank, book, stats, onNavigate }: BookCardProps) {
   };
 
   return (
-    <div className="card-primary flex gap-5 border border-qiita-border relative overflow-hidden">
+    <div className="card-primary flex flex-col md:flex-row gap-3 md:gap-5 border border-qiita-border relative overflow-hidden">
       {/* NEWバッジ（左上・目立つデザイン） */}
       {stats.is_new && (
         <div className="absolute top-0 left-0 z-10">
           <div className="relative">
             {/* メインバッジ */}
-            <div className="px-4 py-1.5 bg-gradient-to-r from-red-500 to-orange-500 rounded-br-lg shadow-lg animate-pulse">
-              <span className="text-sm font-black text-white tracking-wider drop-shadow-md">NEW!</span>
+            <div className="px-3 md:px-4 py-1 md:py-1.5 bg-gradient-to-r from-red-500 to-orange-500 rounded-br-lg shadow-lg animate-pulse">
+              <span className="text-xs md:text-sm font-black text-white tracking-wider drop-shadow-md">NEW!</span>
             </div>
             {/* グロー効果 */}
             <div className="absolute inset-0 bg-gradient-to-r from-red-500/30 to-orange-500/30 blur-md rounded-br-lg -z-10"></div>
@@ -45,7 +45,7 @@ function BookCard({ rank, book, stats, onNavigate }: BookCardProps) {
       )}
       
       {/* ランク表示 */}
-      <div className="flex-shrink-0 w-14 flex items-center justify-center">
+      <div className="flex-shrink-0 w-12 md:w-14 flex items-center justify-center">
         <div className="flex flex-col items-center">
           {getRankIcon() && (
             <i className={`${getRankIcon()} text-2xl ${getRankStyle()}`}></i>
@@ -68,14 +68,14 @@ function BookCard({ rank, book, stats, onNavigate }: BookCardProps) {
           }}
         >
               {book.thumbnail_url ? (
-                <div className="relative w-[160px] h-[240px]">
+                <div className="relative w-[120px] h-[180px] md:w-[160px] md:h-[240px]">
                   <Image
                     src={book.thumbnail_url}
                     alt={book.title}
                     width={160}
                     height={240}
-                    className="rounded shadow-lg"
-                    style={{ width: '160px', height: 'auto', maxHeight: '240px', objectFit: 'cover' }}
+                    className="rounded shadow-lg w-full h-auto"
+                    style={{ maxHeight: '180px', objectFit: 'cover' }}
                     loading={rank > 10 ? "lazy" : "eager"}
                     priority={rank <= 5}
                 onError={(e) => {
@@ -88,8 +88,8 @@ function BookCard({ rank, book, stats, onNavigate }: BookCardProps) {
               />
             </div>
           ) : (
-            <div className="w-[160px] h-[240px] bg-qiita-surface dark:bg-dark-surface-light rounded shadow-sm flex flex-col items-center justify-center gap-3 border border-qiita-border dark:border-dark-border">
-              <i className="ri-book-2-line text-6xl text-qiita-text-light dark:text-dark-text-light"></i>
+            <div className="w-[120px] h-[180px] md:w-[160px] md:h-[240px] bg-qiita-surface dark:bg-dark-surface-light rounded shadow-sm flex flex-col items-center justify-center gap-3 border border-qiita-border dark:border-dark-border">
+              <i className="ri-book-2-line text-5xl md:text-6xl text-qiita-text-light dark:text-dark-text-light"></i>
               <span className="text-xs text-qiita-text dark:text-dark-text font-medium px-2 text-center">画像なし</span>
             </div>
           )}
@@ -97,7 +97,7 @@ function BookCard({ rank, book, stats, onNavigate }: BookCardProps) {
       </div>
       
           {/* 書籍情報（左側） */}
-          <div className="flex-1 min-w-0 max-w-md">
+          <div className="flex-1 min-w-0 w-full md:max-w-md">
             <Link 
               href={`/books/${book.isbn}`} 
               prefetch={true} 
@@ -107,7 +107,7 @@ function BookCard({ rank, book, stats, onNavigate }: BookCardProps) {
                 analytics.clickBook(book.isbn || '', book.title, rank);
               }}
             >
-              <h3 className="text-lg font-bold mb-2 line-clamp-2">
+              <h3 className="text-base md:text-lg font-bold mb-2 line-clamp-2">
                 {book.title || `ISBN: ${book.isbn} の書籍`}
               </h3>
             </Link>
@@ -137,19 +137,19 @@ function BookCard({ rank, book, stats, onNavigate }: BookCardProps) {
         </div>
         
         {/* 統計情報 - フラットデザイン */}
-        <div className="flex items-center gap-3 flex-wrap">
+        <div className="flex items-center gap-2 md:gap-3 flex-wrap">
           {(stats.total_views ?? 0) > 0 ? (
             // YouTube動画がある場合: 再生数と動画数
             <>
-              <div className="flex items-center gap-2 bg-blue-50 dark:bg-blue-900/20 px-4 py-2 rounded-lg border border-blue-200 dark:border-blue-700">
-                <i className="ri-eye-line text-blue-600 dark:text-blue-400 text-lg"></i>
-                <span className="text-base font-bold text-blue-900 dark:text-blue-100">{formatNumber(stats.total_views ?? 0)}</span>
-                <span className="text-sm text-blue-700 dark:text-blue-300 font-medium">回再生</span>
+              <div className="flex items-center gap-1.5 md:gap-2 bg-blue-50 dark:bg-blue-900/20 px-3 md:px-4 py-1.5 md:py-2 rounded-lg border border-blue-200 dark:border-blue-700">
+                <i className="ri-eye-line text-blue-600 dark:text-blue-400 text-base md:text-lg"></i>
+                <span className="text-sm md:text-base font-bold text-blue-900 dark:text-blue-100">{formatNumber(stats.total_views ?? 0)}</span>
+                <span className="text-xs md:text-sm text-blue-700 dark:text-blue-300 font-medium">回再生</span>
               </div>
-              <div className="flex items-center gap-2 bg-red-50 dark:bg-red-900/20 px-4 py-2 rounded-lg border border-red-200 dark:border-red-700">
-                <i className="ri-youtube-line text-youtube-red text-lg"></i>
-                <span className="text-base font-bold text-red-900 dark:text-red-100">{stats.mention_count}</span>
-                <span className="text-sm text-red-700 dark:text-red-300 font-medium">動画</span>
+              <div className="flex items-center gap-1.5 md:gap-2 bg-red-50 dark:bg-red-900/20 px-3 md:px-4 py-1.5 md:py-2 rounded-lg border border-red-200 dark:border-red-700">
+                <i className="ri-youtube-line text-youtube-red text-base md:text-lg"></i>
+                <span className="text-sm md:text-base font-bold text-red-900 dark:text-red-100">{stats.mention_count}</span>
+                <span className="text-xs md:text-sm text-red-700 dark:text-red-300 font-medium">動画</span>
               </div>
             </>
           ) : (
@@ -158,20 +158,20 @@ function BookCard({ rank, book, stats, onNavigate }: BookCardProps) {
               <Link 
                 href={`/books/${book.isbn}#qiita-articles`}
                 prefetch={true}
-                className="flex items-center gap-2 bg-qiita-green/10 dark:bg-qiita-green/20 px-4 py-2 rounded-lg border border-qiita-green/30 dark:border-qiita-green/50 hover:bg-qiita-green/20 dark:hover:bg-qiita-green/30 transition-colors duration-150 cursor-pointer"
+                className="flex items-center gap-1.5 md:gap-2 bg-qiita-green/10 dark:bg-qiita-green/20 px-3 md:px-4 py-1.5 md:py-2 rounded-lg border border-qiita-green/30 dark:border-qiita-green/50 hover:bg-qiita-green/20 dark:hover:bg-qiita-green/30 transition-colors duration-150 cursor-pointer"
                 onClick={() => onNavigate?.()}
               >
-                <i className="ri-article-line text-qiita-green dark:text-dark-green text-lg"></i>
-                <span className="text-base font-bold text-qiita-text-dark dark:text-white">{formatNumber(stats.mention_count)}</span>
-                <span className="text-sm text-qiita-green dark:text-dark-green font-medium">件の記事で言及</span>
+                <i className="ri-article-line text-qiita-green dark:text-dark-green text-base md:text-lg"></i>
+                <span className="text-sm md:text-base font-bold text-qiita-text-dark dark:text-white">{formatNumber(stats.mention_count)}</span>
+                <span className="text-xs md:text-sm text-qiita-green dark:text-dark-green font-medium">件の記事で言及</span>
               </Link>
               
               {/* 総いいね数 */}
               {stats.total_likes > 0 && (
-                <div className="flex items-center gap-2 bg-pink-50 dark:bg-pink-900/20 px-4 py-2 rounded-lg border border-pink-200 dark:border-pink-700">
-                  <i className="ri-heart-line text-pink-600 dark:text-pink-400 text-lg"></i>
-                  <span className="text-base font-bold text-pink-900 dark:text-pink-100">{formatNumber(stats.total_likes)}</span>
-                  <span className="text-sm text-pink-700 dark:text-pink-300 font-medium">いいね</span>
+                <div className="flex items-center gap-1.5 md:gap-2 bg-pink-50 dark:bg-pink-900/20 px-3 md:px-4 py-1.5 md:py-2 rounded-lg border border-pink-200 dark:border-pink-700">
+                  <i className="ri-heart-line text-pink-600 dark:text-pink-400 text-base md:text-lg"></i>
+                  <span className="text-sm md:text-base font-bold text-pink-900 dark:text-pink-100">{formatNumber(stats.total_likes)}</span>
+                  <span className="text-xs md:text-sm text-pink-700 dark:text-pink-300 font-medium">いいね</span>
                 </div>
               )}
             </>
@@ -181,7 +181,7 @@ function BookCard({ rank, book, stats, onNavigate }: BookCardProps) {
       
       {/* 書籍概要とアクションボタン（右側） */}
       {book.description && (
-        <div className="flex-1 min-w-0 pl-4 border-l-2 border-qiita-border dark:border-dark-border flex flex-col justify-between">
+        <div className="flex-1 min-w-0 w-full md:pl-4 md:border-l-2 border-qiita-border dark:border-dark-border flex flex-col justify-between pt-3 md:pt-0">
           {/* 概要 - クリック可能 */}
           <Link 
             href={`/books/${book.isbn}`}
