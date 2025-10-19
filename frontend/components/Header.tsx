@@ -80,7 +80,6 @@ export default function Header() {
               className={`absolute top-1 bottom-1 left-1 w-[calc(50%-0.125rem)] bg-qiita-green dark:bg-dark-green rounded-full transition-transform duration-150 ease-out shadow-md ${
                 theme === 'dark' ? 'translate-x-full' : 'translate-x-0'
               }`}
-              style={{ willChange: 'transform' }}
             />
             
             {/* Buttons */}

@@ -11,28 +11,9 @@ import { ITEMS_PER_PAGE } from '@/lib/constants';
 type PeriodType = 'daily' | 'monthly' | 'yearly' | 'all' | 'year';
 
 export default function Home() {
-  // localStorageから状態を復元
-  const [period, setPeriod] = useState<PeriodType>(() => {
-    if (typeof window !== 'undefined') {
-      const saved = localStorage.getItem('ranking_period');
-      if (saved && ['daily', 'monthly', 'yearly', 'all', 'year'].includes(saved)) {
-        return saved as PeriodType;
-      }
-    }
-    return 'yearly';
-  });
-  
-  const [selectedYear, setSelectedYear] = useState<number | null>(() => {
-    if (typeof window !== 'undefined') {
-      const saved = localStorage.getItem('ranking_selected_year');
-      if (saved) {
-        const year = parseInt(saved);
-        return isNaN(year) ? null : year;
-      }
-    }
-    return null;
-  });
-  
+  // SSRハイドレーションエラーを防ぐため、初期値は固定
+  const [period, setPeriod] = useState<PeriodType>('yearly');
+  const [selectedYear, setSelectedYear] = useState<number | null>(null);
   const [selectedMonth, setSelectedMonth] = useState<number | null>(null);
   const [availableYears, setAvailableYears] = useState<number[]>([]);
   const [rankings, setRankings] = useState<RankingResponse | null>(null);
@@ -40,6 +21,28 @@ export default function Home() {
   const [error, setError] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [searchQuery, setSearchQuery] = useState('');
+  const [mounted, setMounted] = useState(false);
+  
+  // クライアントサイドでlocalStorageから復元
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const savedPeriod = localStorage.getItem('ranking_period');
+      const savedYear = localStorage.getItem('ranking_selected_year');
+      
+      if (savedPeriod && ['daily', 'monthly', 'yearly', 'all', 'year'].includes(savedPeriod)) {
+        setPeriod(savedPeriod as PeriodType);
+      }
+      
+      if (savedYear) {
+        const year = parseInt(savedYear);
+        if (!isNaN(year)) {
+          setSelectedYear(year);
+        }
+      }
+      
+      setMounted(true);
+    }
+  }, []);
 
   // 期間選択オプションを生成（年のみ）
   const generatePeriodOptions = () => {
@@ -66,26 +69,22 @@ export default function Home() {
     fetchYears();
   }, []);
 
-  // 状態をlocalStorageに保存（デバウンス付き）
+  // 状態をlocalStorageに保存（mountedの場合のみ）
   useEffect(() => {
-    if (typeof window !== 'undefined') {
-      // 状態が変更されたら即座に保存
+    if (mounted && typeof window !== 'undefined') {
       localStorage.setItem('ranking_period', period);
-      console.log('Period saved to localStorage:', period);
     }
-  }, [period]);
+  }, [period, mounted]);
 
   useEffect(() => {
-    if (typeof window !== 'undefined') {
+    if (mounted && typeof window !== 'undefined') {
       if (selectedYear !== null) {
         localStorage.setItem('ranking_selected_year', selectedYear.toString());
-        console.log('Year saved to localStorage:', selectedYear);
       } else {
         localStorage.removeItem('ranking_selected_year');
-        console.log('Year removed from localStorage');
       }
     }
-  }, [selectedYear]);
+  }, [selectedYear, mounted]);
 
   useEffect(() => {
     const fetchRankings = async () => {
@@ -237,7 +236,6 @@ export default function Home() {
             {/* 期間タブ */}
             <button
               onClick={() => {
-                console.log('24時間 clicked, current period:', period, 'selectedYear:', selectedYear);
                 setPeriod('daily');
                 setSelectedYear(null);
                 analytics.changeRankingPeriod('daily');
