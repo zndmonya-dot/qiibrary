@@ -182,7 +182,7 @@ export default function Home() {
         </div>
         
         {/* 検索バー */}
-        <div className={`mb-3 md:mb-6 bg-qiita-card dark:bg-dark-surface rounded-lg border border-qiita-border dark:border-dark-border p-2 md:p-4 ${!isRestoring ? 'animate-fade-in-up' : ''}`}>
+        <div className={`mb-3 md:mb-6 bg-qiita-card dark:bg-[#494b4b] rounded-lg border border-qiita-border dark:border-dark-border p-2 md:p-4 ${!isRestoring ? 'animate-fade-in-up' : ''}`}>
           <div className="relative">
             <i className="ri-search-line absolute left-2.5 md:left-4 top-1/2 -translate-y-1/2 text-qiita-text dark:text-dark-text text-base md:text-xl"></i>
             <input
