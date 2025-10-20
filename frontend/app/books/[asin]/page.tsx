@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Image from 'next/image';
 import Header from '@/components/Header';
@@ -13,23 +13,27 @@ import { formatNumber, formatPublicationDate } from '@/lib/utils';
 export default function BookDetailPage() {
   const params = useParams();
   const router = useRouter();
-  // URLパラメータ名は互換性のため'asin'のままだが、実際にはISBNとして扱う
-  const asin = params.asin as string;
+  const asin = params.asin as string; // URLパラメータ（互換性のため'asin'だが実際はISBN）
   
+  // 状態管理
   const [book, setBook] = useState<BookDetail | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [displayedArticlesCount, setDisplayedArticlesCount] = useState(10); // 初期表示件数
+  const [displayedArticlesCount, setDisplayedArticlesCount] = useState(10);
+  const previousCountRef = useRef(10);
+  const [newlyAddedStart, setNewlyAddedStart] = useState<number | null>(null);
 
+  // 書籍データの取得
   useEffect(() => {
     const fetchBook = async () => {
       setLoading(true);
       setError(null);
-      setDisplayedArticlesCount(10); // 表示件数をリセット
+      setDisplayedArticlesCount(10);
+      previousCountRef.current = 10;
+      setNewlyAddedStart(null);
       
       try {
         const data = await getBookDetail(asin);
-        // 最小表示時間を設けて急な表示変化を防ぐ
         const minDelay = new Promise(resolve => setTimeout(resolve, 300));
         await Promise.all([data, minDelay]);
         setBook(data);
@@ -40,9 +44,35 @@ export default function BookDetailPage() {
         setLoading(false);
       }
     };
-    
+
     fetchBook();
   }, [asin]);
+
+  // 記事を追加表示（「もっと見る」ボタン）
+  const handleShowMore = (increment: number) => {
+    const currentCount = displayedArticlesCount;
+    const newCount = Math.min(currentCount + increment, book?.qiita_articles.length || currentCount);
+    
+    setNewlyAddedStart(currentCount);
+    setDisplayedArticlesCount(newCount);
+    previousCountRef.current = newCount;
+    
+    setTimeout(() => setNewlyAddedStart(null), 1200);
+  };
+
+  // すべての記事を表示（「すべて表示」ボタン）
+  const handleShowAll = () => {
+    if (!book?.qiita_articles) return;
+    
+    const currentCount = displayedArticlesCount;
+    const totalCount = book.qiita_articles.length;
+    
+    setNewlyAddedStart(currentCount);
+    setDisplayedArticlesCount(totalCount);
+    previousCountRef.current = totalCount;
+    
+    setTimeout(() => setNewlyAddedStart(null), 2000);
+  };
 
   if (loading) {
     return (
@@ -275,17 +305,26 @@ export default function BookDetailPage() {
                 
                 <div className="grid grid-cols-1 gap-4">
                   {book.qiita_articles.slice(0, displayedArticlesCount).map((article, index) => {
-                    // 初回表示時のみ、最初の6件に順次アニメーションを適用
-                    // それ以降の記事（もっと見る等で追加される分）はアニメーションなし
-                    let animationClass = '';
-                    if (index < 6 && displayedArticlesCount === 10) {
-                      // 初回表示時のみアニメーション
-                      if (index === 0) animationClass = 'animate-fade-in-up';
-                      else if (index === 1) animationClass = 'animate-fade-in-up animate-delay-100';
-                      else if (index === 2) animationClass = 'animate-fade-in-up animate-delay-200';
-                      else if (index === 3) animationClass = 'animate-fade-in-up animate-delay-300';
-                      else if (index === 4) animationClass = 'animate-fade-in-up animate-delay-400';
-                      else if (index === 5) animationClass = 'animate-fade-in-up animate-delay-500';
+                    // アニメーションスタイルを決定
+                    let style: React.CSSProperties = {};
+                    
+                    if (newlyAddedStart !== null && index >= newlyAddedStart) {
+                      // 「もっと見る」で新しく追加された記事
+                      const relativeIndex = index - newlyAddedStart;
+                      const delayMs = Math.min(relativeIndex, 9) * 100;
+                      style = {
+                        animation: `fadeInUp 0.5s ease-out ${delayMs}ms forwards`,
+                        opacity: 0,
+                        transform: 'translateY(20px)'
+                      };
+                    } else if (index < 10 && displayedArticlesCount === 10) {
+                      // 初回表示時のアニメーション（最初の10件）
+                      const delayMs = index * 100;
+                      style = {
+                        animation: `fadeInUp 0.5s ease-out ${delayMs}ms forwards`,
+                        opacity: 0,
+                        transform: 'translateY(20px)'
+                      };
                     }
                     
                     return (
@@ -294,7 +333,8 @@ export default function BookDetailPage() {
                       href={article.url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className={`group bg-white dark:bg-dark-surface rounded-lg p-3 md:p-5 border border-qiita-border dark:border-dark-border transition-colors duration-200 ${animationClass}`}
+                      className="group bg-white dark:bg-dark-surface rounded-lg p-3 md:p-5 border border-qiita-border dark:border-dark-border transition-colors duration-200"
+                      style={style}
                     >
                       <div className="flex items-start gap-3 md:gap-4">
                         <div className="flex-shrink-0">
@@ -360,14 +400,14 @@ export default function BookDetailPage() {
                 {book.qiita_articles.length > displayedArticlesCount && (
                   <div className="mt-6 flex gap-2 md:gap-4 justify-center flex-wrap">
                     <button
-                      onClick={() => setDisplayedArticlesCount(prev => Math.min(prev + 10, book.qiita_articles.length))}
+                      onClick={() => handleShowMore(10)}
                       className="px-4 md:px-6 py-2 md:py-3 text-sm md:text-base lg:text-lg bg-qiita-green dark:bg-dark-green text-white rounded-lg hover:opacity-90 transition-opacity duration-200 font-semibold lg:font-bold flex items-center justify-center gap-1.5 md:gap-2"
                     >
                       <i className="ri-arrow-down-line text-base md:text-lg lg:text-xl"></i>
                       もっと見る（+10件）
                     </button>
                     <button
-                      onClick={() => setDisplayedArticlesCount(book.qiita_articles.length)}
+                      onClick={handleShowAll}
                       className="px-4 md:px-6 py-2 md:py-3 text-sm md:text-base lg:text-lg bg-qiita-surface dark:bg-dark-surface-light text-qiita-text-dark dark:text-white rounded-lg hover:bg-qiita-green/10 dark:hover:bg-qiita-green/20 transition-colors duration-200 font-semibold lg:font-bold border border-qiita-border dark:border-dark-border flex items-center justify-center gap-1.5 md:gap-2"
                     >
                       <i className="ri-list-check text-base md:text-lg lg:text-xl"></i>
