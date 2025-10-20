@@ -224,7 +224,6 @@ html {
   /* 共通ホバー効果 */
   .hover-primary {
     @apply hover:bg-qiita-green/10 dark:hover:bg-qiita-green/20 
-           hover:border-qiita-green/40 dark:hover:border-qiita-green/40 
            transition-all duration-200;
   }
   
@@ -239,7 +238,6 @@ html {
   
   .hover-card {
     @apply hover:bg-qiita-green/10 dark:hover:bg-qiita-green/20 
-           hover:border-qiita-green/40 dark:hover:border-qiita-green/40 
            transition-all duration-200;
   }
 }
