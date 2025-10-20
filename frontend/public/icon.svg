@@ -1,45 +1,40 @@
 <svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
   <defs>
-    <!-- Main gradient -->
     <linearGradient id="mainGrad" x1="0%" y1="0%" x2="100%" y2="100%">
       <stop offset="0%" style="stop-color:#60d760;stop-opacity:1" />
       <stop offset="100%" style="stop-color:#45b845;stop-opacity:1" />
     </linearGradient>
-    <!-- Book gradient -->
-    <linearGradient id="bookGrad" x1="0%" y1="0%" x2="0%" y2="100%">
-      <stop offset="0%" style="stop-color:#ffffff;stop-opacity:0.35" />
-      <stop offset="100%" style="stop-color:#ffffff;stop-opacity:0.15" />
-    </linearGradient>
-    <!-- Shadow filter -->
-    <filter id="dropShadow">
-      <feGaussianBlur in="SourceAlpha" stdDeviation="8"/>
-      <feOffset dx="0" dy="4" result="offsetblur"/>
-      <feComponentTransfer>
-        <feFuncA type="linear" slope="0.3"/>
-      </feComponentTransfer>
-      <feMerge>
-        <feMergeNode/>
-        <feMergeNode in="SourceGraphic"/>
-      </feMerge>
+    <filter id="shadow">
+      <feDropShadow dx="0" dy="8" stdDeviation="12" flood-opacity="0.25"/>
     </filter>
   </defs>
   
-  <!-- Background with gradient -->
+  <!-- Background -->
   <rect width="512" height="512" rx="110" fill="url(#mainGrad)"/>
   
-  <!-- Book shape modern and clean -->
-  <g filter="url(#dropShadow)">
-    <!-- Book base -->
-    <rect x="140" y="130" width="232" height="280" rx="12" fill="url(#bookGrad)"/>
-    <!-- Book spine -->
-    <rect x="252" y="130" width="8" height="280" fill="#ffffff" opacity="0.2"/>
-    <!-- Book pages lines -->
-    <line x1="260" y1="150" x2="360" y2="150" stroke="#ffffff" stroke-width="3" opacity="0.15"/>
-    <line x1="260" y1="170" x2="360" y2="170" stroke="#ffffff" stroke-width="3" opacity="0.15"/>
-    <line x1="260" y1="190" x2="360" y2="190" stroke="#ffffff" stroke-width="3" opacity="0.15"/>
+  <!-- Open book with shadow -->
+  <g filter="url(#shadow)">
+    <!-- Left page -->
+    <path d="M 100 120 L 100 400 L 252 380 L 252 100 Z" fill="#ffffff" stroke="#d0d0d0" stroke-width="3"/>
+    <!-- Right page -->
+    <path d="M 260 100 L 260 380 L 412 400 L 412 120 Z" fill="#ffffff" stroke="#d0d0d0" stroke-width="3"/>
+    <!-- Book spine/center line -->
+    <line x1="256" y1="100" x2="256" y2="380" stroke="#45b845" stroke-width="6"/>
+    
+    <!-- Page lines left page -->
+    <line x1="120" y1="150" x2="240" y2="140" stroke="#cccccc" stroke-width="4"/>
+    <line x1="120" y1="180" x2="240" y2="170" stroke="#cccccc" stroke-width="4"/>
+    <line x1="120" y1="210" x2="240" y2="200" stroke="#cccccc" stroke-width="4"/>
+    <line x1="120" y1="240" x2="240" y2="230" stroke="#cccccc" stroke-width="4"/>
+    
+    <!-- Page lines right page -->
+    <line x1="272" y1="140" x2="392" y2="150" stroke="#cccccc" stroke-width="4"/>
+    <line x1="272" y1="170" x2="392" y2="180" stroke="#cccccc" stroke-width="4"/>
+    <line x1="272" y1="200" x2="392" y2="210" stroke="#cccccc" stroke-width="4"/>
+    <line x1="272" y1="230" x2="392" y2="240" stroke="#cccccc" stroke-width="4"/>
   </g>
   
-  <!-- Q letter modern and bold -->
-  <text x="256" y="330" font-family="system-ui, -apple-system, sans-serif" font-size="200" font-weight="900" fill="#ffffff" text-anchor="middle" filter="url(#dropShadow)">Q</text>
+  <!-- Q letter on book -->
+  <text x="256" y="340" font-family="system-ui, -apple-system, sans-serif" font-size="140" font-weight="900" fill="#45b845" text-anchor="middle">Q</text>
 </svg>
 
