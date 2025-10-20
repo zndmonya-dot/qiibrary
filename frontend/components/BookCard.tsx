@@ -30,7 +30,7 @@ function BookCard({ rank, book, stats, topArticles, onNavigate }: BookCardProps)
   };
 
   return (
-    <div className="card-primary flex flex-col md:flex-row gap-4 md:gap-6 border border-qiita-border relative overflow-hidden">
+    <div className="card-primary flex flex-col md:flex-row md:items-center gap-4 md:gap-6 border border-qiita-border relative overflow-hidden">
       {/* NEWバッジ（スマホ：右上、デスクトップ：左上） */}
       {stats.is_new && (
         <div className="absolute top-0 right-0 md:left-0 md:right-auto z-10">
@@ -58,43 +58,85 @@ function BookCard({ rank, book, stats, topArticles, onNavigate }: BookCardProps)
         </div>
       </div>
       
-      {/* 書籍画像（大きく・中央配置） */}
-      <div className="flex-shrink-0 flex items-center justify-center">
-        <Link 
-          href={`/books/${book.isbn}`} 
-          prefetch={true} 
-          className="block transition-opacity duration-200 hover:opacity-90"
-          onClick={() => {
-            onNavigate?.();
-            analytics.clickBook(book.isbn || '', book.title, rank);
-          }}
-        >
-              {book.thumbnail_url ? (
-                <div className="relative w-[120px] h-[180px] md:w-[160px] md:h-[240px]">
-                  <Image
-                    src={book.thumbnail_url}
-                    alt={book.title}
-                    width={160}
-                    height={240}
-                    className="rounded shadow-lg w-full h-full object-cover"
-                    loading={rank > 10 ? "lazy" : "eager"}
-                    priority={rank <= 5}
-                onError={(e) => {
-                  const target = e.target as HTMLImageElement;
-                  target.style.display = 'none';
-                  if (target.parentElement) {
-                    target.parentElement.innerHTML = '<div class="w-[120px] h-[180px] md:w-[160px] md:h-[240px] bg-qiita-surface dark:bg-dark-surface-light rounded shadow-sm flex flex-col items-center justify-center gap-3 border border-qiita-border dark:border-dark-border"><i class="ri-image-2-line text-4xl md:text-6xl text-qiita-text-light dark:text-dark-text-light"></i><span class="text-xs text-qiita-text dark:text-dark-text font-medium px-2 text-center">画像読込失敗</span></div>';
-                  }
-                }}
-              />
-            </div>
-          ) : (
-            <div className="w-[120px] h-[180px] md:w-[160px] md:h-[240px] bg-qiita-surface dark:bg-dark-surface-light rounded shadow-sm flex flex-col items-center justify-center gap-3 border border-qiita-border dark:border-dark-border">
-              <i className="ri-book-2-line text-5xl md:text-6xl text-qiita-text-light dark:text-dark-text-light"></i>
-              <span className="text-xs text-qiita-text dark:text-dark-text font-medium px-2 text-center">画像なし</span>
-            </div>
-          )}
-        </Link>
+      {/* 書籍画像と詳細ボタン */}
+      <div className="flex-shrink-0 flex flex-col gap-2">
+        {book.amazon_affiliate_url ? (
+          <a
+            href={book.amazon_affiliate_url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="block transition-opacity duration-200 hover:opacity-80"
+            onClick={() => analytics.clickAmazonLink(book.isbn || '', book.title)}
+          >
+            {book.thumbnail_url ? (
+              <div className="relative w-[120px] h-[180px] md:w-[160px] md:h-[240px]">
+                <Image
+                  src={book.thumbnail_url}
+                  alt={book.title}
+                  width={160}
+                  height={240}
+                  className="rounded shadow-lg w-full h-full object-cover"
+                  loading={rank > 10 ? "lazy" : "eager"}
+                  priority={rank <= 5}
+                  onError={(e) => {
+                    const target = e.target as HTMLImageElement;
+                    target.style.display = 'none';
+                    if (target.parentElement) {
+                      target.parentElement.innerHTML = '<div class="w-[120px] h-[180px] md:w-[160px] md:h-[240px] bg-qiita-surface dark:bg-dark-surface-light rounded shadow-sm flex flex-col items-center justify-center gap-3 border border-qiita-border dark:border-dark-border"><i class="ri-image-2-line text-4xl md:text-6xl text-qiita-text-light dark:text-dark-text-light"></i><span class="text-xs text-qiita-text dark:text-dark-text font-medium px-2 text-center">画像読込失敗</span></div>';
+                    }
+                  }}
+                />
+              </div>
+            ) : (
+              <div className="w-[120px] h-[180px] md:w-[160px] md:h-[240px] bg-qiita-surface dark:bg-dark-surface-light rounded shadow-sm flex flex-col items-center justify-center gap-3 border border-qiita-border dark:border-dark-border">
+                <i className="ri-book-2-line text-5xl md:text-6xl text-qiita-text-light dark:text-dark-text-light"></i>
+                <span className="text-xs text-qiita-text dark:text-dark-text font-medium px-2 text-center">画像なし</span>
+              </div>
+            )}
+          </a>
+        ) : (
+          <>
+            {book.thumbnail_url ? (
+              <div className="relative w-[120px] h-[180px] md:w-[160px] md:h-[240px]">
+                <Image
+                  src={book.thumbnail_url}
+                  alt={book.title}
+                  width={160}
+                  height={240}
+                  className="rounded shadow-lg w-full h-full object-cover"
+                  loading={rank > 10 ? "lazy" : "eager"}
+                  priority={rank <= 5}
+                  onError={(e) => {
+                    const target = e.target as HTMLImageElement;
+                    target.style.display = 'none';
+                    if (target.parentElement) {
+                      target.parentElement.innerHTML = '<div class="w-[120px] h-[180px] md:w-[160px] md:h-[240px] bg-qiita-surface dark:bg-dark-surface-light rounded shadow-sm flex flex-col items-center justify-center gap-3 border border-qiita-border dark:border-dark-border"><i class="ri-image-2-line text-4xl md:text-6xl text-qiita-text-light dark:text-dark-text-light"></i><span class="text-xs text-qiita-text dark:text-dark-text font-medium px-2 text-center">画像読込失敗</span></div>';
+                    }
+                  }}
+                />
+              </div>
+            ) : (
+              <div className="w-[120px] h-[180px] md:w-[160px] md:h-[240px] bg-qiita-surface dark:bg-dark-surface-light rounded shadow-sm flex flex-col items-center justify-center gap-3 border border-qiita-border dark:border-dark-border">
+                <i className="ri-book-2-line text-5xl md:text-6xl text-qiita-text-light dark:text-dark-text-light"></i>
+                <span className="text-xs text-qiita-text dark:text-dark-text font-medium px-2 text-center">画像なし</span>
+              </div>
+            )}
+          </>
+        )}
+        
+        {/* Amazon書籍詳細ボタン */}
+        {book.amazon_affiliate_url && (
+          <a
+            href={book.amazon_affiliate_url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="w-[120px] md:w-[160px] inline-flex items-center justify-center gap-1 px-2 py-2 bg-[#FF9900] hover:bg-[#ff8800] text-white rounded-lg font-semibold text-xs transition-all duration-150 shadow-sm"
+            onClick={() => analytics.clickAmazonLink(book.isbn || '', book.title)}
+          >
+            <i className="ri-amazon-line text-sm"></i>
+            <span>書籍詳細</span>
+          </a>
+        )}
       </div>
       
       {/* 上部：タイトルと著者情報 */}
