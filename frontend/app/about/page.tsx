@@ -15,7 +15,7 @@ export default function AboutPage() {
             <>
               <h1 className="text-3xl font-bold mb-6 flex items-center gap-2 text-qiita-text-dark">
                 <i className="ri-information-line text-qiita-green"></i>
-                BookTuberについて
+                Qiibraryについて
               </h1>
 
               <div className="space-y-8 text-secondary leading-relaxed">
@@ -26,11 +26,11 @@ export default function AboutPage() {
                     サイトの目的
                   </h2>
                   <p className="mb-3">
-                    BookTuberは、Qiita記事で言及されたIT技術書をランキング形式で表示するサービスです。
+                    Qiibraryは、Qiita記事で言及されたIT技術書をランキング形式で表示するサービスです。
                   </p>
                   <p className="mb-3">
                     技術書選びに迷ったとき、「Qiitaで人気の本は何だろう？」と思ったことはありませんか？
-                    BookTuberは、そんな疑問を解決するために生まれました。
+                    Qiibraryは、そんな疑問を解決するために生まれました。
                   </p>
                   <p>
                     Qiitaの技術記事で紹介・言及された技術書を集計し、
@@ -223,7 +223,7 @@ export default function AboutPage() {
             <>
               <h1 className="text-3xl font-bold mb-6 flex items-center gap-2 text-qiita-text-dark">
                 <i className="ri-information-line text-qiita-green"></i>
-                About BookTuber
+                About Qiibrary
               </h1>
 
               <div className="space-y-8 text-secondary leading-relaxed">
@@ -234,11 +234,11 @@ export default function AboutPage() {
                     Our Purpose
                   </h2>
                   <p className="mb-3">
-                    BookTuber is a service that displays IT technical books mentioned in Qiita articles in a ranking format.
+                    Qiibrary is a service that displays IT technical books mentioned in Qiita articles in a ranking format.
                   </p>
                   <p className="mb-3">
                     Ever wondered "What books are popular on Qiita?" when choosing technical books?
-                    BookTuber was created to answer that question.
+                    Qiibrary was created to answer that question.
                   </p>
                   <p>
                     We aggregate technical books mentioned in Qiita articles

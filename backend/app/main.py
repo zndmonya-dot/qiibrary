@@ -4,7 +4,7 @@ from .api import rankings, books, admin
 import os
 
 app = FastAPI(
-    title="BookTuber API",
+    title="Qiibrary API",
     description="Qiita記事で言及されたIT技術書ランキングAPI",
     version="0.1.0"
 )
@@ -36,7 +36,7 @@ app.include_router(admin.router, prefix="/api/admin", tags=["admin"])
 @app.get("/")
 async def root():
     return {
-        "message": "BookTuber API",
+        "message": "Qiibrary API",
         "version": "0.1.0",
         "docs": "/docs"
     }

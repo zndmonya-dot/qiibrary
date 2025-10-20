@@ -4,14 +4,14 @@ import PageTransition from '@/components/PageTransition'
 
 export const metadata: Metadata = {
   title: {
-    default: 'BookTuber - IT技術書ランキング',
-    template: '%s | BookTuber'
+    default: 'Qiibrary - Qiitaで選ばれる技術書ランキング',
+    template: '%s | Qiibrary'
   },
-  description: 'YouTubeで紹介されたIT技術書をランキング形式で表示。日次・月次・年次のランキングで、今注目の技術書をチェックしよう。',
-  keywords: ['IT技術書', 'プログラミング', 'YouTube', 'ランキング', '書籍', 'エンジニア', '技術書'],
-  authors: [{ name: 'BookTuber' }],
-  creator: 'BookTuber',
-  publisher: 'BookTuber',
+  description: 'Qiita記事で実際に紹介されたIT技術書をランキング形式で表示。エンジニアのリアルな声と評価を反映した、現場で選ばれる技術書をチェックしよう。',
+  keywords: ['IT技術書', 'プログラミング', 'Qiita', 'ランキング', '書籍', 'エンジニア', '技術書', '開発者'],
+  authors: [{ name: 'Qiibrary' }],
+  creator: 'Qiibrary',
+  publisher: 'Qiibrary',
   formatDetection: {
     email: false,
     address: false,
@@ -21,23 +21,23 @@ export const metadata: Metadata = {
     type: 'website',
     locale: 'ja_JP',
     alternateLocale: ['en_US'],
-    url: 'https://booktuber.example.com',
-    siteName: 'BookTuber',
-    title: 'BookTuber - IT技術書ランキング',
-    description: 'YouTubeで紹介されたIT技術書をランキング形式で表示',
+    url: 'https://qiibrary.example.com',
+    siteName: 'Qiibrary',
+    title: 'Qiibrary - Qiitaで選ばれる技術書ランキング',
+    description: 'Qiita記事で実際に紹介されたIT技術書をランキング形式で表示',
     images: [
       {
         url: '/og-image.png',
         width: 1200,
         height: 630,
-        alt: 'BookTuber - IT技術書ランキング',
+        alt: 'Qiibrary - Qiitaで選ばれる技術書ランキング',
       },
     ],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'BookTuber - IT技術書ランキング',
-    description: 'YouTubeで紹介されたIT技術書をランキング形式で表示',
+    title: 'Qiibrary - Qiitaで選ばれる技術書ランキング',
+    description: 'Qiita記事で実際に紹介されたIT技術書をランキング形式で表示',
     creator: '@your_account',
     images: ['/og-image.png'],
   },

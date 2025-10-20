@@ -24,8 +24,8 @@ export default function Header() {
             <Link href="/" prefetch={true} className="flex items-center space-x-1.5 md:space-x-2 transition-opacity duration-150 hover:opacity-90">
               <i className="ri-book-2-line text-xl md:text-2xl text-qiita-green dark:text-dark-green"></i>
               <h1 className="text-lg md:text-xl font-bold">
-                <span className="text-qiita-green dark:text-dark-green">Book</span>
-                <span className="text-qiita-text dark:text-dark-text">Tuber</span>
+                <span className="text-qiita-green dark:text-dark-green">Qii</span>
+                <span className="text-qiita-text dark:text-dark-text">brary</span>
               </h1>
             </Link>
         

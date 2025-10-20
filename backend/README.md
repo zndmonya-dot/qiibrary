@@ -1,4 +1,4 @@
-# BookTuber Backend (FastAPI)
+# Qiibrary Backend (FastAPI)
 
 ## セットアップ
 

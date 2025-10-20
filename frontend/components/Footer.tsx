@@ -13,7 +13,7 @@ export default function Footer() {
           <div className="md:col-span-2 lg:col-span-1">
             <h3 className="text-xl font-bold mb-4 flex items-center gap-2">
               <i className="ri-book-2-line text-qiita-green dark:text-dark-green text-2xl"></i>
-              <span className="text-white">BookTuber</span>
+              <span className="text-white">Qiibrary</span>
             </h3>
             <p className="text-sm text-gray-300 dark:text-dark-text leading-relaxed">
               Qiita記事で言及されたIT技術書をランキング形式で表示するサービスです。
@@ -115,7 +115,7 @@ export default function Footer() {
         <div className="pt-8 border-t border-gray-600">
           <div className="flex justify-center items-center gap-2 text-xs text-gray-400">
             <i className="ri-copyright-line"></i>
-            <span>{currentYear} BookTuber. All rights reserved.</span>
+            <span>{currentYear} Qiibrary. All rights reserved.</span>
           </div>
         </div>
       </div>

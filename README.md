@@ -1,4 +1,4 @@
-# BookTuber - IT技術書ランキングWebサービス
+# Qiibrary - Qiitaで選ばれる技術書ランキング
 
 Zenn Booksから技術書を収集し、ランキング形式で表示するWebサービス。
 日別・月別・年別のランキングを提供し、将来的には手動でYouTube動画リンクを追加できます。
@@ -174,7 +174,7 @@ MIT License
 
 ## 開発者
 
-BookTuber Development Team
+Qiibrary Development Team
 
 ---
 

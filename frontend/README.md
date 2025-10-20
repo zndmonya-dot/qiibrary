@@ -1,4 +1,4 @@
-# BookTuber Frontend (Next.js)
+# Qiibrary Frontend (Next.js)
 
 ## セットアップ
 
