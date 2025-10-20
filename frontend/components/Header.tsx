@@ -19,7 +19,7 @@ export default function Header() {
   };
 
   return (
-    <header className="sticky top-0 z-50 bg-qiita-card/95 dark:bg-dark-header-footer/95 backdrop-blur-md border-b border-qiita-border dark:border-dark-border shadow-sm transition-colors duration-300">
+    <header className="sticky top-0 z-50 bg-qiita-card/95 dark:bg-[#2f3232]/95 backdrop-blur-md border-b border-qiita-border dark:border-dark-border shadow-sm transition-colors duration-300">
       <div className="container mx-auto px-3 md:px-4 py-2 md:py-3 flex items-center justify-between">
             <Link href="/" prefetch={true} className="flex items-center space-x-1.5 md:space-x-2 transition-opacity duration-150 hover:opacity-90">
               <i className="ri-book-2-line text-xl md:text-2xl text-qiita-green dark:text-dark-green"></i>
