@@ -165,16 +165,16 @@ export default function Home() {
     <div className="min-h-screen bg-qiita-bg dark:bg-dark-bg">
       <Header />
       
-      <main className="container mx-auto px-4 py-4 md:py-8 min-h-[calc(100vh-120px)]">
+      <main className="container mx-auto px-3 md:px-4 py-3 md:py-8 min-h-[calc(100vh-120px)]">
         {/* ヘッダー */}
-        <div className={`mb-4 md:mb-8 bg-qiita-card dark:bg-dark-surface rounded-xl p-4 md:p-8 border-l-4 border-qiita-green dark:border-dark-green shadow-sm ${!isRestoring ? 'animate-fade-in-up' : ''}`}>
+        <div className={`mb-3 md:mb-8 bg-qiita-card dark:bg-dark-surface rounded-xl p-3 md:p-8 border-l-4 border-qiita-green dark:border-dark-green shadow-sm ${!isRestoring ? 'animate-fade-in-up' : ''}`}>
           <div className="flex items-start justify-between">
             <div className="w-full text-center md:text-left">
-              <h2 className="text-xl md:text-3xl font-bold mb-2 md:mb-3 flex items-center justify-center md:justify-start gap-2 md:gap-3 text-qiita-text-dark dark:text-white">
-                <i className="ri-trophy-line text-qiita-green dark:text-dark-green text-2xl md:text-3xl"></i>
+              <h2 className="text-lg md:text-3xl font-bold mb-1.5 md:mb-3 flex items-center justify-center md:justify-start gap-2 md:gap-3 text-qiita-text-dark dark:text-white">
+                <i className="ri-trophy-line text-qiita-green dark:text-dark-green text-xl md:text-3xl"></i>
                 Qiitaで話題の技術書まとめ
               </h2>
-              <p className="text-qiita-text dark:text-dark-text font-medium text-sm md:text-base leading-relaxed">
+              <p className="text-qiita-text dark:text-dark-text font-medium text-xs md:text-base leading-relaxed">
                 おすすめ書籍をランキング形式でわかりやすく紹介！
               </p>
             </div>
@@ -182,9 +182,9 @@ export default function Home() {
         </div>
         
         {/* 検索バー */}
-        <div className={`mb-4 md:mb-6 bg-qiita-card dark:bg-dark-surface rounded-lg border border-qiita-border dark:border-dark-border p-3 md:p-4 ${!isRestoring ? 'animate-fade-in-up' : ''}`}>
+        <div className={`mb-3 md:mb-6 bg-qiita-card dark:bg-dark-surface rounded-lg border border-qiita-border dark:border-dark-border p-2 md:p-4 ${!isRestoring ? 'animate-fade-in-up' : ''}`}>
           <div className="relative">
-            <i className="ri-search-line absolute left-3 md:left-4 top-1/2 -translate-y-1/2 text-qiita-text dark:text-dark-text text-lg md:text-xl"></i>
+            <i className="ri-search-line absolute left-2.5 md:left-4 top-1/2 -translate-y-1/2 text-qiita-text dark:text-dark-text text-base md:text-xl"></i>
             <input
               type="text"
               placeholder="書籍名、著者、出版社、ISBNで検索..."
@@ -196,7 +196,7 @@ export default function Home() {
                   analytics.search(e.target.value, filteredRankings.length);
                 }
               }}
-              className="w-full pl-10 md:pl-12 pr-3 md:pr-4 py-2 md:py-3 text-sm md:text-base bg-qiita-surface dark:bg-dark-surface-light text-qiita-text-dark dark:text-white rounded-lg border border-qiita-border dark:border-dark-border focus:outline-none font-medium"
+              className="w-full pl-8 md:pl-12 pr-3 md:pr-4 py-1.5 md:py-3 text-xs md:text-base bg-qiita-surface dark:bg-dark-surface-light text-qiita-text-dark dark:text-white rounded-lg border border-qiita-border dark:border-dark-border focus:outline-none font-medium"
             />
             {searchQuery && (
               <button
@@ -225,15 +225,15 @@ export default function Home() {
         </div>
         
         {/* タブ */}
-        <div className={`relative mb-4 md:mb-6 bg-qiita-card dark:bg-dark-surface rounded-lg border border-qiita-border dark:border-dark-border p-3 md:p-4 overflow-x-auto ${!isRestoring ? 'animate-fade-in-up animate-delay-50' : ''}`}>
-          <div className="flex flex-nowrap md:flex-wrap gap-2 min-w-max md:min-w-0">
+        <div className={`relative mb-3 md:mb-6 bg-qiita-card dark:bg-dark-surface rounded-lg border border-qiita-border dark:border-dark-border p-2 md:p-4 overflow-x-auto ${!isRestoring ? 'animate-fade-in-up animate-delay-50' : ''}`}>
+          <div className="flex flex-nowrap md:flex-wrap gap-1.5 md:gap-2 min-w-max md:min-w-0">
             <button
               onClick={() => {
                 setPeriod('daily');
                 setSelectedYear(null);
                 analytics.changeRankingPeriod('daily');
               }}
-              className={`px-3 md:px-4 py-1.5 md:py-2 text-sm md:text-base rounded-lg font-semibold whitespace-nowrap ${
+              className={`px-2.5 md:px-4 py-1 md:py-2 text-xs md:text-base rounded-lg font-semibold whitespace-nowrap ${
                 period === 'daily'
                   ? 'bg-qiita-green dark:bg-dark-green text-white shadow-sm' 
                   : 'bg-qiita-surface dark:bg-dark-surface-light text-qiita-text-dark dark:text-dark-text hover-primary'
@@ -249,13 +249,13 @@ export default function Home() {
                 setSelectedYear(null);
                 analytics.changeRankingPeriod('monthly');
               }}
-              className={`px-4 py-2 rounded-lg font-semibold transition-all duration-150 ${
+              className={`px-2.5 md:px-4 py-1 md:py-2 text-xs md:text-base rounded-lg font-semibold transition-all duration-150 ${
                 period === 'monthly'
                   ? 'bg-qiita-green dark:bg-dark-green text-white shadow-sm'
                   : 'bg-qiita-surface dark:bg-dark-surface-light text-qiita-text-dark dark:text-dark-text hover-primary'
               }`}
             >
-              <i className="ri-calendar-line mr-1"></i>
+              <i className="ri-calendar-line mr-0.5 md:mr-1 text-xs md:text-base"></i>
               30日間
             </button>
             <button
@@ -264,13 +264,13 @@ export default function Home() {
                 setSelectedYear(null);
                 analytics.changeRankingPeriod('yearly');
               }}
-              className={`px-4 py-2 rounded-lg font-semibold transition-all duration-150 ${
+              className={`px-2.5 md:px-4 py-1 md:py-2 text-xs md:text-base rounded-lg font-semibold transition-all duration-150 ${
                 period === 'yearly'
                   ? 'bg-qiita-green dark:bg-dark-green text-white shadow-sm'
                   : 'bg-qiita-surface dark:bg-dark-surface-light text-qiita-text-dark dark:text-dark-text hover-primary'
               }`}
             >
-              <i className="ri-calendar-check-line mr-1"></i>
+              <i className="ri-calendar-check-line mr-0.5 md:mr-1 text-xs md:text-base"></i>
               365日間
             </button>
             <button
@@ -279,13 +279,13 @@ export default function Home() {
                 setSelectedYear(null);
                 analytics.changeRankingPeriod('all');
               }}
-              className={`px-4 py-2 rounded-lg font-semibold transition-all duration-150 ${
+              className={`px-2.5 md:px-4 py-1 md:py-2 text-xs md:text-base rounded-lg font-semibold transition-all duration-150 ${
                 period === 'all'
                   ? 'bg-qiita-green dark:bg-dark-green text-white shadow-sm'
                   : 'bg-qiita-surface dark:bg-dark-surface-light text-qiita-text-dark dark:text-dark-text hover-primary'
               }`}
             >
-              <i className="ri-infinity-line mr-1"></i>
+              <i className="ri-infinity-line mr-0.5 md:mr-1 text-xs md:text-base"></i>
               全期間
             </button>
             
@@ -301,13 +301,13 @@ export default function Home() {
                   setPeriod('year');
                   analytics.changeRankingPeriod(`year-${year}`);
                 }}
-                className={`px-4 py-2 rounded-lg font-semibold transition-all duration-150 ${
+                className={`px-2.5 md:px-4 py-1 md:py-2 text-xs md:text-base rounded-lg font-semibold transition-all duration-150 ${
                   period === 'year' && selectedYear === year
                     ? 'bg-qiita-green dark:bg-dark-green text-white shadow-sm'
                     : 'bg-qiita-surface dark:bg-dark-surface-light text-qiita-text-dark dark:text-dark-text hover-primary'
                 }`}
               >
-                <i className="ri-calendar-2-line mr-1"></i>
+                <i className="ri-calendar-2-line mr-0.5 md:mr-1 text-xs md:text-base"></i>
                 {year}年
               </button>
             ))}
@@ -315,16 +315,16 @@ export default function Home() {
             {olderYears.length > 0 && (
               <button
                 onClick={() => setShowAllYears(!showAllYears)}
-                className="px-4 py-2 rounded-lg font-semibold bg-qiita-surface dark:bg-dark-surface-light text-qiita-text-dark dark:text-dark-text hover-primary"
+                className="px-2.5 md:px-4 py-1 md:py-2 text-xs md:text-base rounded-lg font-semibold bg-qiita-surface dark:bg-dark-surface-light text-qiita-text-dark dark:text-dark-text hover-primary"
               >
                 {showAllYears ? (
                   <>
-                    <i className="ri-arrow-up-s-line mr-1"></i>
+                    <i className="ri-arrow-up-s-line mr-0.5 md:mr-1 text-xs md:text-base"></i>
                     閉じる
                   </>
                 ) : (
                   <>
-                    <i className="ri-arrow-down-s-line mr-1"></i>
+                    <i className="ri-arrow-down-s-line mr-0.5 md:mr-1 text-xs md:text-base"></i>
                     もっと見る（{olderYears.length}年）
                   </>
                 )}
@@ -334,7 +334,7 @@ export default function Home() {
           
           {/* 古い年の展開エリア */}
           {showAllYears && olderYears.length > 0 && (
-            <div className="flex flex-wrap gap-2 mt-3 pt-3 border-t border-qiita-border dark:border-dark-border animate-fade-in-up">
+            <div className="flex flex-wrap gap-1.5 md:gap-2 mt-2 md:mt-3 pt-2 md:pt-3 border-t border-qiita-border dark:border-dark-border animate-fade-in-up">
               {olderYears.map(year => (
                 <button
                   key={year}
@@ -343,16 +343,16 @@ export default function Home() {
                     setPeriod('year');
                     analytics.changeRankingPeriod(`year-${year}`);
                   }}
-                  className={`px-4 py-2 rounded-lg font-semibold transition-all duration-150 ${
+                  className={`px-2.5 md:px-4 py-1 md:py-2 text-xs md:text-base rounded-lg font-semibold transition-all duration-150 ${
                     period === 'year' && selectedYear === year
                       ? 'bg-qiita-green dark:bg-dark-green text-white shadow-sm'
                       : 'bg-qiita-surface dark:bg-dark-surface-light text-qiita-text-dark dark:text-dark-text hover-primary'
                   }`}
                 >
-                  <i className="ri-calendar-2-line mr-1"></i>
+                  <i className="ri-calendar-2-line mr-0.5 md:mr-1 text-xs md:text-base"></i>
                   {year}年
                 </button>
-              )              )}
+              ))}
             </div>
           )}
         </div>
@@ -376,19 +376,19 @@ export default function Home() {
 
         {!error && rankings && !loading && (
           <div>
-            <div className={`mb-4 md:mb-6 flex items-center justify-between bg-qiita-card dark:bg-dark-surface p-3 md:p-4 rounded-lg shadow-sm border border-qiita-border dark:border-dark-border ${!isRestoring ? 'animate-fade-in-up animate-delay-100' : ''}`}>
-              <div className="flex items-center gap-2">
-                <i className="ri-trophy-line text-qiita-green dark:text-dark-green text-xl md:text-2xl"></i>
-                <h2 className="text-base md:text-lg font-semibold text-qiita-text-dark dark:text-white">
+            <div className={`mb-3 md:mb-6 flex items-center justify-between bg-qiita-card dark:bg-dark-surface p-2.5 md:p-4 rounded-lg shadow-sm border border-qiita-border dark:border-dark-border ${!isRestoring ? 'animate-fade-in-up animate-delay-100' : ''}`}>
+              <div className="flex items-center gap-1.5 md:gap-2">
+                <i className="ri-trophy-line text-qiita-green dark:text-dark-green text-lg md:text-2xl"></i>
+                <h2 className="text-sm md:text-lg font-semibold text-qiita-text-dark dark:text-white">
                   {getPeriodLabel(period, selectedYear)}
                 </h2>
               </div>
-              <div className="text-xs md:text-sm text-qiita-text dark:text-dark-text">
+              <div className="text-[10px] md:text-sm text-qiita-text dark:text-dark-text">
                 {(currentPage - 1) * ITEMS_PER_PAGE + 1} - {Math.min(currentPage * ITEMS_PER_PAGE, filteredRankings.length)} / {filteredRankings.length}件
               </div>
             </div>
             
-            <div className="space-y-3 md:space-y-4 mb-6 md:mb-8">
+            <div className="space-y-2 md:space-y-4 mb-4 md:mb-8">
               {paginatedRankings.length > 0 ? (
                 paginatedRankings.map((item, index) => {
                   const style = isRestoring ? undefined : getAnimationStyle(index);
