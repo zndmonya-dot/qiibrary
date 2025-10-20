@@ -177,7 +177,7 @@ export default function BookDetailPage() {
                       href={article.url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="group block p-2.5 md:p-3 rounded-lg bg-qiita-surface dark:bg-dark-surface-light dark:hover:bg-[#323434] transition-all duration-200"
+                      className="group block p-2.5 md:p-3 rounded-lg bg-qiita-surface dark:bg-dark-surface-light dark:hover:bg-[#014421] transition-all duration-200"
                       style={style}
                     >
                       <div className="flex gap-3">
