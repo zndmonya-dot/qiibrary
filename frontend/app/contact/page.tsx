@@ -113,9 +113,15 @@ export default function ContactPage() {
                     Q. ランキングはいつ更新されますか？
                   </h3>
                   <p className="text-sm ml-6">
-                    A. 日次ランキングは毎日、月次ランキングは毎月1日、年次ランキングは毎年1月1日に更新されます。
-                    全期間ランキングは常に最新の状態を反映しています。
+                    A. ランキングは以下の期間で表示されます：
                   </p>
+                  <ul className="text-sm ml-10 mt-2 space-y-1 list-disc">
+                    <li><strong>24時間:</strong> 過去24時間のランキング（常に最新）</li>
+                    <li><strong>30日間:</strong> 過去30日間のランキング（常に最新）</li>
+                    <li><strong>365日間:</strong> 過去365日間のランキング（常に最新）</li>
+                    <li><strong>年別:</strong> 特定の年のランキング（2021年以降）</li>
+                    <li><strong>全期間:</strong> すべての期間を含むランキング（常に最新）</li>
+                  </ul>
                 </div>
 
                 <div className="bg-qiita-surface/50 dark:bg-dark-surface-light/50 rounded-lg p-4 border border-qiita-border/50 dark:border-dark-border/50">
