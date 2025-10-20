@@ -380,10 +380,23 @@ export default function Home() {
             <div className="space-y-4 mb-8">
               {paginatedRankings.length > 0 ? (
                 paginatedRankings.map((item, index) => {
-                  const style = !isRestoring ? {
+                  if (isRestoring) {
+                    return (
+                      <div key={item.book.id}>
+                        <BookCard
+                          rank={item.rank}
+                          book={item.book}
+                          stats={item.stats}
+                          onNavigate={savePageState}
+                        />
+                      </div>
+                    );
+                  }
+                  
+                  const style = {
                     animation: `fadeInUp 0.4s ease-out ${0.2 + index * 0.05}s forwards`,
                     opacity: 0
-                  } : {};
+                  };
                   
                   return (
                     <div key={item.book.id} style={style}>
