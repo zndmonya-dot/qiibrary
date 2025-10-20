@@ -4,7 +4,7 @@ import PageTransition from '@/components/PageTransition'
 
 export const metadata: Metadata = {
   title: {
-    default: 'Qiibrary - 現場で選ばれる技術書ライブラリ',
+    default: 'Qiibrary - Qiitaで話題の技術書まとめ',
     template: '%s | Qiibrary'
   },
   description: 'エンジニアが実践で使い、Qiita記事で推薦した技術書ライブラリ。開発者コミュニティの知見を集約し、現場で本当に役立つ技術書を厳選してお届けします。',
@@ -23,20 +23,20 @@ export const metadata: Metadata = {
     alternateLocale: ['en_US'],
     url: 'https://qiibrary.example.com',
     siteName: 'Qiibrary',
-    title: 'Qiibrary - 現場で選ばれる技術書ライブラリ',
+    title: 'Qiibrary - Qiitaで話題の技術書まとめ',
     description: 'エンジニアが実践で使い、Qiita記事で推薦した技術書ライブラリ',
     images: [
       {
         url: '/og-image.png',
         width: 1200,
         height: 630,
-        alt: 'Qiibrary - 現場で選ばれる技術書ライブラリ',
+        alt: 'Qiibrary - Qiitaで話題の技術書まとめ',
       },
     ],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Qiibrary - 現場で選ばれる技術書ライブラリ',
+    title: 'Qiibrary - Qiitaで話題の技術書まとめ',
     description: 'エンジニアが実践で使い、Qiita記事で推薦した技術書ライブラリ',
     creator: '@your_account',
     images: ['/og-image.png'],
