@@ -4,10 +4,10 @@ import PageTransition from '@/components/PageTransition'
 
 export const metadata: Metadata = {
   title: {
-    default: 'Qiibrary - Qiitaで選ばれる技術書ランキング',
+    default: 'Qiibrary - 現場で選ばれる技術書ライブラリ',
     template: '%s | Qiibrary'
   },
-  description: 'Qiita記事で実際に紹介されたIT技術書をランキング形式で表示。エンジニアのリアルな声と評価を反映した、現場で選ばれる技術書をチェックしよう。',
+  description: 'エンジニアが実践で使い、Qiita記事で推薦した技術書ライブラリ。開発者コミュニティの知見を集約し、現場で本当に役立つ技術書を厳選してお届けします。',
   keywords: ['IT技術書', 'プログラミング', 'Qiita', 'ランキング', '書籍', 'エンジニア', '技術書', '開発者'],
   authors: [{ name: 'Qiibrary' }],
   creator: 'Qiibrary',
@@ -23,21 +23,21 @@ export const metadata: Metadata = {
     alternateLocale: ['en_US'],
     url: 'https://qiibrary.example.com',
     siteName: 'Qiibrary',
-    title: 'Qiibrary - Qiitaで選ばれる技術書ランキング',
-    description: 'Qiita記事で実際に紹介されたIT技術書をランキング形式で表示',
+    title: 'Qiibrary - 現場で選ばれる技術書ライブラリ',
+    description: 'エンジニアが実践で使い、Qiita記事で推薦した技術書ライブラリ',
     images: [
       {
         url: '/og-image.png',
         width: 1200,
         height: 630,
-        alt: 'Qiibrary - Qiitaで選ばれる技術書ランキング',
+        alt: 'Qiibrary - 現場で選ばれる技術書ライブラリ',
       },
     ],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Qiibrary - Qiitaで選ばれる技術書ランキング',
-    description: 'Qiita記事で実際に紹介されたIT技術書をランキング形式で表示',
+    title: 'Qiibrary - 現場で選ばれる技術書ライブラリ',
+    description: 'エンジニアが実践で使い、Qiita記事で推薦した技術書ライブラリ',
     creator: '@your_account',
     images: ['/og-image.png'],
   },
