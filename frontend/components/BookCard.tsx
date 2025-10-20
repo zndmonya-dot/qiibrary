@@ -144,19 +144,23 @@ function BookCard({ rank, book, stats, topArticles, onNavigate }: BookCardProps)
         <div className="flex flex-col md:flex-row gap-4 md:gap-6 mb-4">
           {/* タイトル（左） */}
           <div className="flex-1 min-w-0">
-            <Link 
-              href={`/books/${book.isbn}`} 
-              prefetch={true} 
-              className="group inline-block"
-              onClick={() => {
-                onNavigate?.();
-                analytics.clickBook(book.isbn || '', book.title, rank);
-              }}
-            >
-              <h3 className="text-base md:text-lg font-bold line-clamp-2 leading-relaxed text-qiita-text-dark dark:text-white group-hover:text-qiita-green dark:group-hover:text-dark-green transition-colors duration-200">
+            {book.amazon_affiliate_url ? (
+              <a
+                href={book.amazon_affiliate_url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group inline-block"
+                onClick={() => analytics.clickAmazonLink(book.isbn || '', book.title)}
+              >
+                <h3 className="text-base md:text-lg font-bold line-clamp-2 leading-relaxed text-qiita-text-dark dark:text-white group-hover:text-qiita-green dark:group-hover:text-dark-green transition-colors duration-200">
+                  {book.title || `ISBN: ${book.isbn} の書籍`}
+                </h3>
+              </a>
+            ) : (
+              <h3 className="text-base md:text-lg font-bold line-clamp-2 leading-relaxed text-qiita-text-dark dark:text-white">
                 {book.title || `ISBN: ${book.isbn} の書籍`}
               </h3>
-            </Link>
+            )}
             
             {!book.title && (
               <div className="mt-2 px-2 py-1 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-700 rounded text-xs text-yellow-700 dark:text-yellow-300 inline-flex items-center gap-1">
@@ -196,11 +200,16 @@ function BookCard({ rank, book, stats, topArticles, onNavigate }: BookCardProps)
                   <span className="text-xs">記事</span>
                 </Link>
                 {stats.total_likes > 0 && (
-                  <div className="flex items-center gap-1.5 text-pink-600 dark:text-pink-400">
+                  <Link
+                    href={`/books/${book.isbn}#qiita-articles`}
+                    prefetch={true}
+                    className="flex items-center gap-1.5 text-pink-600 dark:text-pink-400 hover:opacity-80 transition-opacity"
+                    onClick={() => onNavigate?.()}
+                  >
                     <i className="ri-heart-fill text-lg"></i>
                     <span className="font-bold text-base">{formatNumber(stats.total_likes)}</span>
                     <span className="text-xs text-qiita-text dark:text-dark-text">いいね</span>
-                  </div>
+                  </Link>
                 )}
               </>
             )}
