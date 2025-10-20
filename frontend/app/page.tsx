@@ -177,13 +177,6 @@ export default function Home() {
               <p className="text-qiita-text dark:text-dark-text font-medium text-xs md:text-base leading-relaxed">
                 エンジニアが実践で使い、記事で推薦した技術書
               </p>
-              <div className="mt-2 md:mt-4 flex items-center gap-2 text-xs md:text-sm text-qiita-text dark:text-dark-text">
-                <i className="ri-refresh-line text-qiita-green dark:text-dark-green text-xs md:text-base"></i>
-                <span>毎日更新</span>
-                <span className="mx-1">•</span>
-                <i className="ri-lightbulb-line text-qiita-green dark:text-dark-green text-xs md:text-base"></i>
-                <span>Qiitaの記事から知見を集約</span>
-              </div>
             </div>
           </div>
         </div>
