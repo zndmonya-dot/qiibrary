@@ -169,13 +169,13 @@ export default function Home() {
         {/* ヘッダー */}
         <div className={`mb-4 md:mb-8 bg-qiita-card dark:bg-dark-surface rounded-xl p-4 md:p-8 border-l-4 border-qiita-green dark:border-dark-green shadow-sm ${!isRestoring ? 'animate-fade-in-up' : ''}`}>
           <div className="flex items-start justify-between">
-            <div>
-              <h2 className="text-xl md:text-3xl font-bold mb-2 md:mb-3 flex items-center gap-2 md:gap-3 text-qiita-text-dark dark:text-white">
+            <div className="w-full text-center md:text-left">
+              <h2 className="text-xl md:text-3xl font-bold mb-2 md:mb-3 flex items-center justify-center md:justify-start gap-2 md:gap-3 text-qiita-text-dark dark:text-white">
                 <i className="ri-trophy-line text-qiita-green dark:text-dark-green text-2xl md:text-3xl"></i>
                 Qiitaで選ばれる技術書ライブラリ
               </h2>
               <p className="text-qiita-text dark:text-dark-text font-medium text-sm md:text-base leading-relaxed">
-                リアルのエンジニアが推奨する技術書をランキング形式に整理しました
+                実際に現場で使われている技術書をランキングで紹介
               </p>
             </div>
           </div>

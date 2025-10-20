@@ -30,7 +30,7 @@ function BookCard({ rank, book, stats, topArticles, onNavigate }: BookCardProps)
   };
 
   return (
-    <div className="card-primary flex flex-col md:flex-row md:items-center gap-3 md:gap-6 border border-qiita-border relative overflow-hidden">
+    <div className="card-primary flex flex-col items-center md:flex-row md:items-center gap-3 md:gap-6 border border-qiita-border relative overflow-hidden">
       {/* NEWバッジ（スマホ：右上、デスクトップ：左上） */}
       {stats.is_new && (
         <div className="absolute top-0 right-0 md:left-0 md:right-auto z-10">
@@ -46,7 +46,7 @@ function BookCard({ rank, book, stats, topArticles, onNavigate }: BookCardProps)
       )}
       
       {/* ランク表示 */}
-      <div className="flex-shrink-0 w-12 md:w-14 flex items-center justify-center">
+      <div className="flex-shrink-0 w-full md:w-14 flex items-center justify-center">
         <div className="flex flex-col items-center">
           {/* メダルアイコン：デスクトップのみ表示 */}
           {getRankIcon() && (
@@ -143,7 +143,7 @@ function BookCard({ rank, book, stats, topArticles, onNavigate }: BookCardProps)
       <div className="flex-1 min-w-0 w-full">
         <div className="flex flex-col md:flex-row gap-3 md:gap-6 mb-3 md:mb-4">
           {/* タイトル（左） */}
-          <div className="flex-1 min-w-0">
+          <div className="flex-1 min-w-0 text-center md:text-left">
             {book.amazon_affiliate_url ? (
               <a
                 href={book.amazon_affiliate_url}
@@ -171,7 +171,7 @@ function BookCard({ rank, book, stats, topArticles, onNavigate }: BookCardProps)
           </div>
           
           {/* 統計情報（右） */}
-          <div className="flex items-center gap-3 md:gap-4 text-sm flex-shrink-0">
+          <div className="flex items-center justify-center md:justify-start gap-3 md:gap-4 text-sm flex-shrink-0">
             {(stats.total_views ?? 0) > 0 ? (
               // YouTube動画がある場合
               <>
@@ -219,7 +219,7 @@ function BookCard({ rank, book, stats, topArticles, onNavigate }: BookCardProps)
         {/* トップ記事一覧（下部） */}
         {topArticles && topArticles.length > 0 && (
           <div>
-            <h4 className="text-xs font-bold text-qiita-text dark:text-dark-text mb-2 md:mb-3 flex items-center gap-1.5">
+            <h4 className="text-xs font-bold text-qiita-text dark:text-dark-text mb-2 md:mb-3 flex items-center justify-center md:justify-start gap-1.5">
               <i className="ri-article-line text-qiita-green dark:text-dark-green text-sm"></i>
               人気記事トップ{topArticles.length}
             </h4>
