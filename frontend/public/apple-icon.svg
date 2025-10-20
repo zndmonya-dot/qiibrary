@@ -1,23 +1,42 @@
 <svg width="180" height="180" viewBox="0 0 180 180" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <!-- Background -->
-  <rect width="180" height="180" rx="40" fill="#55c500"/>
+  <defs>
+    <!-- Gradient -->
+    <linearGradient id="appleGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#60d760;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#45b845;stop-opacity:1" />
+    </linearGradient>
+    <!-- Book gradient -->
+    <linearGradient id="appleBookGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#ffffff;stop-opacity:0.35" />
+      <stop offset="100%" style="stop-color:#ffffff;stop-opacity:0.15" />
+    </linearGradient>
+    <!-- Shadow -->
+    <filter id="appleShadow">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="3"/>
+      <feOffset dx="0" dy="2" result="offsetblur"/>
+      <feComponentTransfer>
+        <feFuncA type="linear" slope="0.3"/>
+      </feComponentTransfer>
+      <feMerge>
+        <feMergeNode/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
   
-  <!-- Book icon -->
-  <g transform="translate(35, 35)">
-    <!-- Book pages -->
-    <rect x="14" y="10" width="82" height="98" rx="3" fill="#ffffff"/>
-    
-    <!-- Book spine -->
-    <rect x="52" y="10" width="3" height="98" fill="#e0e0e0"/>
-    
-    <!-- Book cover left -->
-    <path d="M 18 7 L 18 112 L 55 109 L 55 4 Z" fill="#4CAF50"/>
-    
-    <!-- Book cover right -->
-    <path d="M 55 4 L 55 109 L 92 112 L 92 7 Z" fill="#66D166"/>
-    
-    <!-- Q letter -->
-    <text x="55" y="70" font-family="Arial, sans-serif" font-size="42" font-weight="bold" fill="#ffffff" text-anchor="middle">Q</text>
+  <!-- Background -->
+  <rect width="180" height="180" rx="40" fill="url(#appleGrad)"/>
+  
+  <!-- Book modern -->
+  <g filter="url(#appleShadow)">
+    <rect x="50" y="46" width="80" height="96" rx="4" fill="url(#appleBookGrad)"/>
+    <rect x="88" y="46" width="3" height="96" fill="#ffffff" opacity="0.2"/>
+    <line x1="92" y1="54" x2="124" y2="54" stroke="#ffffff" stroke-width="1.5" opacity="0.15"/>
+    <line x1="92" y1="61" x2="124" y2="61" stroke="#ffffff" stroke-width="1.5" opacity="0.15"/>
+    <line x1="92" y1="68" x2="124" y2="68" stroke="#ffffff" stroke-width="1.5" opacity="0.15"/>
   </g>
+  
+  <!-- Q letter -->
+  <text x="90" y="115" font-family="system-ui, -apple-system, sans-serif" font-size="70" font-weight="900" fill="#ffffff" text-anchor="middle" filter="url(#appleShadow)">Q</text>
 </svg>
 
