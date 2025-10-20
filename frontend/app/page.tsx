@@ -175,7 +175,7 @@ export default function Home() {
                 現場で選ばれる技術書ライブラリ
               </h2>
               <p className="text-qiita-text dark:text-dark-text font-medium text-xs md:text-base leading-relaxed">
-                エンジニアが実践で使い、記事で推薦した技術書
+                リアルのエンジニアが推奨する技術書をランキング形式に整理しました
               </p>
             </div>
           </div>
