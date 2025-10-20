@@ -183,7 +183,7 @@ export default function AboutPage() {
                       href="https://twitter.com/your_account"
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex items-center gap-2 bg-qiita-surface hover:bg-qiita-surface-2 text-qiita-text px-4 py-2 rounded transition-colors duration-200 border border-qiita-border"
+                      className="inline-flex items-center gap-2 bg-qiita-surface dark:bg-dark-surface-light text-qiita-text-dark dark:text-white px-4 py-2 rounded transition-colors duration-200 border border-qiita-border dark:border-dark-border hover-primary"
                     >
                       <i className="ri-twitter-x-line text-xl"></i>
                       <span>X (Twitter)</span>
@@ -192,7 +192,7 @@ export default function AboutPage() {
                       href="https://github.com/your_account"
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex items-center gap-2 bg-qiita-surface hover:bg-qiita-surface-2 text-qiita-text px-4 py-2 rounded transition-colors duration-200 border border-qiita-border"
+                      className="inline-flex items-center gap-2 bg-qiita-surface dark:bg-dark-surface-light text-qiita-text-dark dark:text-white px-4 py-2 rounded transition-colors duration-200 border border-qiita-border dark:border-dark-border hover-primary"
                     >
                       <i className="ri-github-line text-xl"></i>
                       <span>GitHub</span>
@@ -391,7 +391,7 @@ export default function AboutPage() {
                       href="https://twitter.com/your_account"
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex items-center gap-2 bg-qiita-surface hover:bg-qiita-surface-2 text-qiita-text px-4 py-2 rounded transition-colors duration-200 border border-qiita-border"
+                      className="inline-flex items-center gap-2 bg-qiita-surface dark:bg-dark-surface-light text-qiita-text-dark dark:text-white px-4 py-2 rounded transition-colors duration-200 border border-qiita-border dark:border-dark-border hover-primary"
                     >
                       <i className="ri-twitter-x-line text-xl"></i>
                       <span>X (Twitter)</span>
@@ -400,7 +400,7 @@ export default function AboutPage() {
                       href="https://github.com/your_account"
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex items-center gap-2 bg-qiita-surface hover:bg-qiita-surface-2 text-qiita-text px-4 py-2 rounded transition-colors duration-200 border border-qiita-border"
+                      className="inline-flex items-center gap-2 bg-qiita-surface dark:bg-dark-surface-light text-qiita-text-dark dark:text-white px-4 py-2 rounded transition-colors duration-200 border border-qiita-border dark:border-dark-border hover-primary"
                     >
                       <i className="ri-github-line text-xl"></i>
                       <span>GitHub</span>

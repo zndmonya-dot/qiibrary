@@ -177,7 +177,7 @@ export default function BookDetailPage() {
                       href={article.url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="group block p-2 md:p-3 rounded-lg bg-qiita-surface dark:bg-[#2f3232] hover:bg-qiita-green/5 dark:hover:bg-qiita-green/10 transition-all duration-200"
+                      className="group block p-2 md:p-3 rounded-lg bg-qiita-surface dark:bg-[#2f3232] hover-card"
                       style={style}
                     >
                       <div className="flex gap-2 md:gap-3">
@@ -259,7 +259,7 @@ export default function BookDetailPage() {
                     </button>
                     <button
                       onClick={handleShowAll}
-                      className="px-3 md:px-4 py-1.5 md:py-2 text-xs md:text-sm bg-qiita-surface dark:bg-dark-surface-light text-qiita-text-dark dark:text-white rounded-lg hover:bg-qiita-green/10 dark:hover:bg-qiita-green/20 transition-colors font-medium"
+                      className="px-3 md:px-4 py-1.5 md:py-2 text-xs md:text-sm bg-qiita-surface dark:bg-dark-surface-light text-qiita-text-dark dark:text-white rounded-lg hover-primary font-medium"
                     >
                       すべて表示（全{book.qiita_articles.length}件）
                     </button>
