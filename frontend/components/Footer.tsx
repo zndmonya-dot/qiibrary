@@ -16,7 +16,7 @@ export default function Footer() {
               <span className="text-white">Qiibrary</span>
             </h3>
             <p className="text-sm text-gray-300 dark:text-dark-text leading-relaxed">
-              Qiita記事で言及されたIT技術書をランキング形式で表示するサービスです。
+              Qiitaで話題のIT技術書をランキング形式でまとめたサービスです。
             </p>
           </div>
 
