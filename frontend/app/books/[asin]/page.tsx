@@ -150,7 +150,7 @@ export default function BookDetailPage() {
                   </p>
                 </div>
                 
-                <div className="border border-qiita-border dark:border-dark-border rounded-lg overflow-hidden bg-white dark:bg-dark-surface">
+                <div className="space-y-1.5 md:space-y-2">
                   {book.qiita_articles.slice(0, displayedArticlesCount).map((article, index) => {
                     let style: React.CSSProperties = {};
                     
@@ -177,7 +177,7 @@ export default function BookDetailPage() {
                       href={article.url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="group block p-4 hover:bg-qiita-surface/50 dark:hover:bg-dark-surface-light/50 border-b border-qiita-border dark:border-dark-border last:border-b-0 transition-all duration-200"
+                      className="group block p-2.5 md:p-3 rounded-lg bg-qiita-surface/30 dark:bg-dark-surface-light/30 border border-qiita-border/30 dark:border-dark-border/30 hover-card"
                       style={style}
                     >
                       <div className="flex gap-3">
