@@ -182,7 +182,7 @@ export default function Home() {
                 <span>毎日更新</span>
                 <span className="mx-1">•</span>
                 <i className="ri-lightbulb-line text-qiita-green dark:text-dark-green text-xs md:text-base"></i>
-                <span>開発者コミュニティの知見を集約</span>
+                <span>Qiitaの記事から知見を集約</span>
               </div>
             </div>
           </div>
