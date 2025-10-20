@@ -172,7 +172,7 @@ export default function Home() {
             <div>
               <h2 className="text-xl md:text-3xl font-bold mb-2 md:mb-3 flex items-center gap-2 md:gap-3 text-qiita-text-dark dark:text-white">
                 <i className="ri-trophy-line text-qiita-green dark:text-dark-green text-2xl md:text-3xl"></i>
-                現場で選ばれる技術書ライブラリ
+                Qiitaで選ばれる技術書ライブラリ
               </h2>
               <p className="text-qiita-text dark:text-dark-text font-medium text-sm md:text-base leading-relaxed">
                 リアルのエンジニアが推奨する技術書をランキング形式に整理しました

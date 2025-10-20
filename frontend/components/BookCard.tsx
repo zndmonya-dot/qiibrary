@@ -59,7 +59,7 @@ function BookCard({ rank, book, stats, topArticles, onNavigate }: BookCardProps)
       </div>
       
       {/* 書籍画像と詳細ボタン */}
-      <div className="flex-shrink-0 flex flex-col gap-2">
+      <div className="flex-shrink-0 flex flex-col gap-2 items-center md:items-start">
         {book.amazon_affiliate_url ? (
           <a
             href={book.amazon_affiliate_url}
