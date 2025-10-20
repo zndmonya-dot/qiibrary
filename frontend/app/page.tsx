@@ -172,14 +172,14 @@ export default function Home() {
             <div>
               <h2 className="text-lg md:text-3xl font-bold mb-2 md:mb-3 flex items-center gap-2 md:gap-3 text-qiita-text-dark dark:text-white">
                 <i className="ri-fire-line text-qiita-green dark:text-dark-green text-xl md:text-3xl"></i>
-                IT技術書ランキング
+                Qiitaで選ばれる技術書ランキング
               </h2>
               <p className="text-qiita-text dark:text-dark-text font-medium text-xs md:text-base leading-relaxed">
-                Qiita記事で言及されたIT技術書をランキング形式で表示
+                エンジニアが実際の開発で使い、記事で紹介した技術書
               </p>
               <div className="mt-2 md:mt-4 flex items-center gap-2 text-xs md:text-sm text-qiita-text dark:text-dark-text">
                 <i className="ri-information-line text-qiita-green dark:text-dark-green text-xs md:text-base"></i>
-                <span>毎日自動更新 • 実際の開発者が選んだ技術書</span>
+                <span>毎日自動更新 • 記事の言及数でランキング化</span>
               </div>
             </div>
           </div>
