@@ -204,7 +204,7 @@ export default function Home() {
                   setSearchQuery('');
                   setCurrentPage(1);
                 }}
-                className="absolute right-4 top-1/2 -translate-y-1/2 text-qiita-text dark:text-dark-text hover:text-qiita-green dark:hover:text-dark-green transition-colors duration-150"
+                className="absolute right-4 top-1/2 -translate-y-1/2 text-qiita-text dark:text-dark-text hover-link"
               >
                 <i className="ri-close-circle-line text-xl"></i>
               </button>
@@ -233,10 +233,10 @@ export default function Home() {
                 setSelectedYear(null);
                 analytics.changeRankingPeriod('daily');
               }}
-              className={`px-3 md:px-4 py-1.5 md:py-2 text-sm md:text-base rounded-lg font-semibold transition-all duration-150 whitespace-nowrap ${
+              className={`px-3 md:px-4 py-1.5 md:py-2 text-sm md:text-base rounded-lg font-semibold whitespace-nowrap ${
                 period === 'daily'
                   ? 'bg-qiita-green dark:bg-dark-green text-white shadow-sm' 
-                  : 'bg-qiita-surface dark:bg-dark-surface-light text-qiita-text-dark dark:text-dark-text hover:bg-qiita-green/10 dark:hover:bg-qiita-green/20'
+                  : 'bg-qiita-surface dark:bg-dark-surface-light text-qiita-text-dark dark:text-dark-text hover-primary'
               }`}
             >
               <i className="ri-time-line mr-0.5 md:mr-1 text-sm md:text-base"></i>
@@ -252,7 +252,7 @@ export default function Home() {
               className={`px-4 py-2 rounded-lg font-semibold transition-all duration-150 ${
                 period === 'monthly'
                   ? 'bg-qiita-green dark:bg-dark-green text-white shadow-sm'
-                  : 'bg-qiita-surface dark:bg-dark-surface-light text-qiita-text-dark dark:text-dark-text hover:bg-qiita-green/10 dark:hover:bg-qiita-green/20'
+                  : 'bg-qiita-surface dark:bg-dark-surface-light text-qiita-text-dark dark:text-dark-text hover-primary'
               }`}
             >
               <i className="ri-calendar-line mr-1"></i>
@@ -267,7 +267,7 @@ export default function Home() {
               className={`px-4 py-2 rounded-lg font-semibold transition-all duration-150 ${
                 period === 'yearly'
                   ? 'bg-qiita-green dark:bg-dark-green text-white shadow-sm'
-                  : 'bg-qiita-surface dark:bg-dark-surface-light text-qiita-text-dark dark:text-dark-text hover:bg-qiita-green/10 dark:hover:bg-qiita-green/20'
+                  : 'bg-qiita-surface dark:bg-dark-surface-light text-qiita-text-dark dark:text-dark-text hover-primary'
               }`}
             >
               <i className="ri-calendar-check-line mr-1"></i>
@@ -282,7 +282,7 @@ export default function Home() {
               className={`px-4 py-2 rounded-lg font-semibold transition-all duration-150 ${
                 period === 'all'
                   ? 'bg-qiita-green dark:bg-dark-green text-white shadow-sm'
-                  : 'bg-qiita-surface dark:bg-dark-surface-light text-qiita-text-dark dark:text-dark-text hover:bg-qiita-green/10 dark:hover:bg-qiita-green/20'
+                  : 'bg-qiita-surface dark:bg-dark-surface-light text-qiita-text-dark dark:text-dark-text hover-primary'
               }`}
             >
               <i className="ri-infinity-line mr-1"></i>
@@ -304,7 +304,7 @@ export default function Home() {
                 className={`px-4 py-2 rounded-lg font-semibold transition-all duration-150 ${
                   period === 'year' && selectedYear === year
                     ? 'bg-qiita-green dark:bg-dark-green text-white shadow-sm'
-                    : 'bg-qiita-surface dark:bg-dark-surface-light text-qiita-text-dark dark:text-dark-text hover:bg-qiita-green/10 dark:hover:bg-qiita-green/20'
+                    : 'bg-qiita-surface dark:bg-dark-surface-light text-qiita-text-dark dark:text-dark-text hover-primary'
                 }`}
               >
                 <i className="ri-calendar-2-line mr-1"></i>
@@ -315,7 +315,7 @@ export default function Home() {
             {olderYears.length > 0 && (
               <button
                 onClick={() => setShowAllYears(!showAllYears)}
-                className="px-4 py-2 rounded-lg font-semibold transition-all duration-150 bg-qiita-surface dark:bg-dark-surface-light text-qiita-text-dark dark:text-dark-text hover:bg-qiita-green/10 dark:hover:bg-qiita-green/20 border border-qiita-border dark:border-dark-border"
+                className="px-4 py-2 rounded-lg font-semibold bg-qiita-surface dark:bg-dark-surface-light text-qiita-text-dark dark:text-dark-text border border-qiita-border dark:border-dark-border hover-primary"
               >
                 {showAllYears ? (
                   <>
@@ -346,7 +346,7 @@ export default function Home() {
                   className={`px-4 py-2 rounded-lg font-semibold transition-all duration-150 ${
                     period === 'year' && selectedYear === year
                       ? 'bg-qiita-green dark:bg-dark-green text-white shadow-sm'
-                      : 'bg-qiita-surface dark:bg-dark-surface-light text-qiita-text-dark dark:text-dark-text hover:bg-qiita-green/10 dark:hover:bg-qiita-green/20'
+                      : 'bg-qiita-surface dark:bg-dark-surface-light text-qiita-text-dark dark:text-dark-text hover-primary'
                   }`}
                 >
                   <i className="ri-calendar-2-line mr-1"></i>
@@ -427,7 +427,7 @@ export default function Home() {
                       className={`flex items-center justify-center w-8 h-8 md:w-10 md:h-10 rounded-lg font-medium transition-all duration-150 ${
                         currentPage === 1
                           ? 'bg-qiita-surface dark:bg-dark-surface-light text-qiita-text-light dark:text-dark-text-light cursor-not-allowed opacity-50'
-                          : 'bg-qiita-surface dark:bg-dark-surface-light text-qiita-text dark:text-dark-text hover:bg-qiita-green/10 dark:hover:bg-qiita-green/20 hover:text-qiita-green dark:hover:text-dark-green'
+                          : 'bg-qiita-surface dark:bg-dark-surface-light text-qiita-text dark:text-dark-text hover-primary hover-link'
                       }`}
                       title="最初のページ"
                     >
@@ -440,7 +440,7 @@ export default function Home() {
                       className={`flex items-center gap-0.5 md:gap-1 px-2 md:px-4 h-8 md:h-10 rounded-lg font-medium text-sm md:text-base transition-all duration-150 ${
                         currentPage === 1
                           ? 'bg-qiita-surface dark:bg-dark-surface-light text-qiita-text-light dark:text-dark-text-light cursor-not-allowed opacity-50'
-                          : 'bg-qiita-surface dark:bg-dark-surface-light text-qiita-text dark:text-dark-text hover:bg-qiita-green/10 dark:hover:bg-qiita-green/20 hover:text-qiita-green dark:hover:text-dark-green'
+                          : 'bg-qiita-surface dark:bg-dark-surface-light text-qiita-text dark:text-dark-text hover-primary hover-link'
                       }`}
                     >
                       <i className="ri-arrow-left-s-line text-base md:text-lg"></i>
@@ -496,7 +496,7 @@ export default function Home() {
                             className={`flex items-center justify-center w-8 h-8 md:w-10 md:h-10 rounded-lg font-medium text-xs md:text-base transition-all duration-150 ${
                               currentPage === page
                                 ? 'bg-qiita-green dark:bg-dark-green text-white shadow-sm'
-                                : 'bg-qiita-surface dark:bg-dark-surface-light text-qiita-text dark:text-dark-text hover:bg-qiita-green/10 dark:hover:bg-qiita-green/20 hover:text-qiita-green dark:hover:text-dark-green'
+                                : 'bg-qiita-surface dark:bg-dark-surface-light text-qiita-text dark:text-dark-text hover-primary hover-link'
                             }`}
                           >
                             {page}
@@ -515,7 +515,7 @@ export default function Home() {
                       className={`flex items-center gap-0.5 md:gap-1 px-2 md:px-4 h-8 md:h-10 rounded-lg font-medium text-sm md:text-base transition-all duration-150 ${
                         currentPage === totalPages
                           ? 'bg-qiita-surface dark:bg-dark-surface-light text-qiita-text-light dark:text-dark-text-light cursor-not-allowed opacity-50'
-                          : 'bg-qiita-surface dark:bg-dark-surface-light text-qiita-text dark:text-dark-text hover:bg-qiita-green/10 dark:hover:bg-qiita-green/20 hover:text-qiita-green dark:hover:text-dark-green'
+                          : 'bg-qiita-surface dark:bg-dark-surface-light text-qiita-text dark:text-dark-text hover-primary hover-link'
                       }`}
                     >
                       <span className="hidden sm:inline">次へ</span>
@@ -531,7 +531,7 @@ export default function Home() {
                       className={`flex items-center justify-center w-8 h-8 md:w-10 md:h-10 rounded-lg font-medium transition-all duration-150 ${
                         currentPage === totalPages
                           ? 'bg-qiita-surface dark:bg-dark-surface-light text-qiita-text-light dark:text-dark-text-light cursor-not-allowed opacity-50'
-                          : 'bg-qiita-surface dark:bg-dark-surface-light text-qiita-text dark:text-dark-text hover:bg-qiita-green/10 dark:hover:bg-qiita-green/20 hover:text-qiita-green dark:hover:text-dark-green'
+                          : 'bg-qiita-surface dark:bg-dark-surface-light text-qiita-text dark:text-dark-text hover-primary hover-link'
                       }`}
                       title="最後のページ"
                     >

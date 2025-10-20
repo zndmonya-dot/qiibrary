@@ -65,7 +65,7 @@ function BookCard({ rank, book, stats, topArticles, onNavigate }: BookCardProps)
             href={book.amazon_affiliate_url}
             target="_blank"
             rel="noopener noreferrer"
-            className="block transition-opacity duration-200 hover:opacity-80"
+            className="block hover-scale"
             onClick={() => analytics.clickAmazonLink(book.isbn || '', book.title)}
           >
             {book.thumbnail_url ? (
@@ -192,7 +192,7 @@ function BookCard({ rank, book, stats, topArticles, onNavigate }: BookCardProps)
                 <Link
                   href={`/books/${book.isbn}#qiita-articles`}
                   prefetch={true}
-                  className="flex items-center gap-1.5 text-qiita-green dark:text-dark-green hover:opacity-80 transition-opacity"
+                  className="flex items-center gap-1.5 text-qiita-green dark:text-dark-green hover-scale"
                   onClick={() => onNavigate?.()}
                 >
                   <i className="ri-article-line text-lg"></i>
@@ -203,7 +203,7 @@ function BookCard({ rank, book, stats, topArticles, onNavigate }: BookCardProps)
                   <Link
                     href={`/books/${book.isbn}#qiita-articles`}
                     prefetch={true}
-                    className="flex items-center gap-1.5 text-pink-600 dark:text-pink-400 hover:opacity-80 transition-opacity"
+                    className="flex items-center gap-1.5 text-pink-600 dark:text-pink-400 hover-scale"
                     onClick={() => onNavigate?.()}
                   >
                     <i className="ri-heart-fill text-lg"></i>
@@ -230,7 +230,7 @@ function BookCard({ rank, book, stats, topArticles, onNavigate }: BookCardProps)
                   href={article.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="group block p-2.5 md:p-3 rounded-lg bg-qiita-surface/30 dark:bg-dark-surface-light/30 hover:bg-qiita-green/10 dark:hover:bg-qiita-green/20 transition-all duration-200 border border-qiita-border/30 dark:border-dark-border/30 hover:border-qiita-green/40 dark:hover:border-qiita-green/40"
+                  className="group block p-2.5 md:p-3 rounded-lg bg-qiita-surface/30 dark:bg-dark-surface-light/30 border border-qiita-border/30 dark:border-dark-border/30 hover-card"
                 >
                   <div className="flex items-start gap-2.5">
                     <span className="flex-shrink-0 w-6 h-6 flex items-center justify-center rounded-full bg-qiita-green/20 dark:bg-qiita-green/30 text-qiita-green dark:text-dark-green text-xs font-bold">
@@ -254,7 +254,7 @@ function BookCard({ rank, book, stats, topArticles, onNavigate }: BookCardProps)
               <Link
                 href={`/books/${book.isbn}#qiita-articles`}
                 prefetch={true}
-                className="inline-flex items-center gap-1 text-xs text-qiita-green dark:text-dark-green hover:opacity-80 transition-opacity font-medium"
+                className="inline-flex items-center gap-1 text-xs text-qiita-green dark:text-dark-green hover-scale font-medium"
                 onClick={() => {
                   onNavigate?.();
                   analytics.clickBook(book.isbn || '', book.title, rank);
