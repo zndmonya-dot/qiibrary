@@ -58,11 +58,11 @@ export default function Home() {
 
   useEffect(() => {
     if (isRestoring && !loading && savedScrollY !== null) {
-      setTimeout(() => {
-        window.scrollTo({ top: savedScrollY, behavior: 'instant' });
+      requestAnimationFrame(() => {
+        window.scrollTo({ top: savedScrollY, behavior: 'smooth' });
         setSavedScrollY(null);
         setIsRestoring(false);
-      }, 50);
+      });
     }
   }, [isRestoring, loading, savedScrollY]);
 
