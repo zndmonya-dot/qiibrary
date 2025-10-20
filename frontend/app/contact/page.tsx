@@ -119,7 +119,7 @@ export default function ContactPage() {
                     <li><strong>24時間:</strong> 過去24時間のランキング（常に最新）</li>
                     <li><strong>30日間:</strong> 過去30日間のランキング（常に最新）</li>
                     <li><strong>365日間:</strong> 過去365日間のランキング（常に最新）</li>
-                    <li><strong>年別:</strong> 特定の年のランキング（2021年以降）</li>
+                    <li><strong>年別:</strong> 特定の年のランキング（2015年以降）</li>
                     <li><strong>全期間:</strong> すべての期間を含むランキング（常に最新）</li>
                   </ul>
                 </div>
