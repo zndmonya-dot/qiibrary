@@ -2,13 +2,10 @@
   <!-- Background -->
   <rect width="32" height="32" rx="8" fill="#55c500"/>
   
-  <!-- Heroicons book-open icon adapted -->
-  <path d="M6 7.5C6 6.67 6.67 6 7.5 6h6c.83 0 1.5.67 1.5 1.5V24c0 .28-.22.5-.5.5-.83 0-1.5.67-1.5 1.5 0 .28-.22.5-.5.5h-6c-.83 0-1.5-.67-1.5-1.5V7.5z" 
-        fill="#ffffff" fill-opacity="0.95"/>
-  <path d="M17 7.5c0-.83.67-1.5 1.5-1.5h6c.83 0 1.5.67 1.5 1.5v17.5c0 .83-.67 1.5-1.5 1.5h-6c-.28 0-.5-.22-.5-.5 0-.83-.67-1.5-1.5-1.5-.28 0-.5-.22-.5-.5V7.5z" 
-        fill="#ffffff" fill-opacity="0.95"/>
-  
-  <!-- Center line -->
-  <line x1="16" y1="6" x2="16" y2="26" stroke="#ffffff" stroke-width="1" opacity="0.3"/>
+  <!-- Lucide library icon - モダンでシンプル -->
+  <rect x="7" y="5" width="18" height="22" rx="2" fill="none" stroke="#ffffff" stroke-width="2"/>
+  <line x1="11" y1="10" x2="21" y2="10" stroke="#ffffff" stroke-width="1.5" stroke-linecap="round"/>
+  <line x1="11" y1="14" x2="21" y2="14" stroke="#ffffff" stroke-width="1.5" stroke-linecap="round"/>
+  <line x1="11" y1="18" x2="18" y2="18" stroke="#ffffff" stroke-width="1.5" stroke-linecap="round"/>
 </svg>
 

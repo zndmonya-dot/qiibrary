@@ -1,22 +1,11 @@
 <svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <defs>
-    <filter id="shadow">
-      <feDropShadow dx="0" dy="8" stdDeviation="20" flood-opacity="0.12"/>
-    </filter>
-  </defs>
-  
   <!-- Background -->
   <rect width="512" height="512" rx="115" fill="#55c500"/>
   
-  <!-- Heroicons book-open icon scaled up -->
-  <g filter="url(#shadow)">
-    <path d="M90 120c0-13.2 10.8-24 24-24h96c13.2 0 24 10.8 24 24v288c0 4.4-3.6 8-8 8-13.2 0-24 10.8-24 24 0 4.4-3.6 8-8 8h-96c-13.2 0-24-10.8-24-24V120z" 
-          fill="#ffffff" fill-opacity="0.97"/>
-    <path d="M278 120c0-13.2 10.8-24 24-24h96c13.2 0 24 10.8 24 24v280c0 13.2-10.8 24-24 24h-96c-4.4 0-8-3.6-8-8 0-13.2-10.8-24-24-24-4.4 0-8-3.6-8-8V120z" 
-          fill="#ffffff" fill-opacity="0.97"/>
-  </g>
-  
-  <!-- Center spine -->
-  <line x1="256" y1="96" x2="256" y2="416" stroke="#ffffff" stroke-width="6" opacity="0.25" stroke-linecap="round"/>
+  <!-- Lucide library icon style - clean and modern -->
+  <rect x="110" y="80" width="292" height="352" rx="32" fill="none" stroke="#ffffff" stroke-width="32" stroke-linejoin="round"/>
+  <line x1="176" y1="160" x2="336" y2="160" stroke="#ffffff" stroke-width="24" stroke-linecap="round"/>
+  <line x1="176" y1="224" x2="336" y2="224" stroke="#ffffff" stroke-width="24" stroke-linecap="round"/>
+  <line x1="176" y1="288" x2="288" y2="288" stroke="#ffffff" stroke-width="24" stroke-linecap="round"/>
 </svg>
 
