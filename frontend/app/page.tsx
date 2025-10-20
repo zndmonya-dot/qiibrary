@@ -51,6 +51,12 @@ export default function Home() {
   };
 
   useEffect(() => {
+    if (typeof window !== 'undefined' && initialState) {
+      sessionStorage.removeItem('rankingPageState');
+    }
+  }, []);
+
+  useEffect(() => {
     if (isRestoring && !loading && savedScrollY !== null) {
       requestAnimationFrame(() => {
         requestAnimationFrame(() => {
