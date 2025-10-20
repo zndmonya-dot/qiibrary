@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import BookCard from '@/components/BookCard';
@@ -11,19 +11,40 @@ import { ITEMS_PER_PAGE } from '@/lib/constants';
 
 type PeriodType = 'daily' | 'monthly' | 'yearly' | 'all' | 'year';
 
-export default function Home() {
-  // sessionStorageから初期値を取得
-  const getInitialState = () => {
-    if (typeof window === 'undefined') return null;
-    const savedState = sessionStorage.getItem('rankingPageState');
-    if (!savedState) return null;
-    try {
-      return JSON.parse(savedState);
-    } catch {
-      return null;
-    }
-  };
+interface PageState {
+  scrollY: number;
+  currentPage: number;
+  period: PeriodType;
+  selectedYear: number | null;
+  searchQuery: string;
+}
 
+const getInitialState = (): PageState | null => {
+  if (typeof window === 'undefined') return null;
+  const savedState = sessionStorage.getItem('rankingPageState');
+  if (!savedState) return null;
+  try {
+    return JSON.parse(savedState);
+  } catch {
+    return null;
+  }
+};
+
+const getPeriodLabel = (period: PeriodType, selectedYear: number | null): string => {
+  if (period === 'daily') return '24時間';
+  if (period === 'monthly') return '30日間';
+  if (period === 'yearly') return '365日間';
+  if (period === 'year' && selectedYear) return `${selectedYear}年`;
+  if (period === 'all') return '全期間';
+  return '365日間';
+};
+
+const getAnimationStyle = (index: number): React.CSSProperties => ({
+  animation: `fadeInUp 0.4s ease-out ${0.2 + index * 0.05}s forwards`,
+  opacity: 0
+});
+
+export default function Home() {
   const initialState = getInitialState();
 
   const [period, setPeriod] = useState<PeriodType>(initialState?.period || 'yearly');
@@ -57,6 +78,18 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
+    const fetchYears = async () => {
+      try {
+        const years = await getAvailableYears();
+        setAvailableYears(years);
+      } catch (err) {
+        console.error('Failed to fetch available years:', err);
+      }
+    };
+    fetchYears();
+  }, []);
+
+  useEffect(() => {
     if (isRestoring && !loading && savedScrollY !== null) {
       requestAnimationFrame(() => {
         requestAnimationFrame(() => {
@@ -71,17 +104,6 @@ export default function Home() {
   const sortedYears = [...availableYears].sort((a, b) => b - a);
   const recentYears = sortedYears.slice(0, 5);
   const olderYears = sortedYears.slice(5);
-  useEffect(() => {
-    const fetchYears = async () => {
-      try {
-        const years = await getAvailableYears();
-        setAvailableYears(years);
-      } catch (err) {
-        console.error('Failed to fetch available years:', err);
-      }
-    };
-    fetchYears();
-  }, []);
 
   useEffect(() => {
     const fetchRankings = async () => {
@@ -137,15 +159,6 @@ export default function Home() {
       setCurrentPage(currentPage - 1);
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
-  };
-
-  const getPeriodLabel = () => {
-    if (period === 'daily') return '24時間';
-    if (period === 'monthly') return '30日間';
-    if (period === 'yearly') return '365日間';
-    if (period === 'year' && selectedYear) return `${selectedYear}年`;
-    if (period === 'all') return '全期間';
-    return '365日間'; // デフォルト
   };
 
   return (
@@ -371,7 +384,7 @@ export default function Home() {
               <div className="flex items-center gap-2">
                 <i className="ri-trophy-line text-qiita-green dark:text-dark-green text-2xl"></i>
                 <h2 className="text-lg font-semibold text-qiita-text-dark dark:text-white">
-                  {getPeriodLabel()}
+                  {getPeriodLabel(period, selectedYear)}
                 </h2>
               </div>
               <div className="text-sm text-qiita-text dark:text-dark-text">
@@ -382,23 +395,7 @@ export default function Home() {
             <div className="space-y-4 mb-8">
               {paginatedRankings.length > 0 ? (
                 paginatedRankings.map((item, index) => {
-                  if (isRestoring) {
-                    return (
-                      <div key={item.book.id}>
-                        <BookCard
-                          rank={item.rank}
-                          book={item.book}
-                          stats={item.stats}
-                          onNavigate={savePageState}
-                        />
-                      </div>
-                    );
-                  }
-                  
-                  const style = {
-                    animation: `fadeInUp 0.4s ease-out ${0.2 + index * 0.05}s forwards`,
-                    opacity: 0
-                  };
+                  const style = isRestoring ? undefined : getAnimationStyle(index);
                   
                   return (
                     <div key={item.book.id} style={style}>
