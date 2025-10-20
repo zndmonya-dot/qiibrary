@@ -1,14 +1,21 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Image from 'next/image';
+import Link from 'next/link';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import YouTubeEmbed from '@/components/YouTubeEmbed';
 import LoadingSpinner from '@/components/LoadingSpinner';
 import { getBookDetail, BookDetail } from '@/lib/api';
 import { formatNumber, formatPublicationDate } from '@/lib/utils';
+
+const INITIAL_ARTICLES_COUNT = 10;
+const SHOW_MORE_INCREMENT = 10;
+const ANIMATION_TIMEOUT_MORE = 1200;
+const ANIMATION_TIMEOUT_ALL = 2000;
+const MIN_LOADING_DELAY = 300;
 
 export default function BookDetailPage() {
   const params = useParams();
@@ -18,21 +25,21 @@ export default function BookDetailPage() {
   const [book, setBook] = useState<BookDetail | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [displayedArticlesCount, setDisplayedArticlesCount] = useState(10);
-  const previousCountRef = useRef(10);
+  const [displayedArticlesCount, setDisplayedArticlesCount] = useState(INITIAL_ARTICLES_COUNT);
+  const previousCountRef = useRef(INITIAL_ARTICLES_COUNT);
   const [newlyAddedStart, setNewlyAddedStart] = useState<number | null>(null);
 
   useEffect(() => {
     const fetchBook = async () => {
       setLoading(true);
       setError(null);
-      setDisplayedArticlesCount(10);
-      previousCountRef.current = 10;
+      setDisplayedArticlesCount(INITIAL_ARTICLES_COUNT);
+      previousCountRef.current = INITIAL_ARTICLES_COUNT;
       setNewlyAddedStart(null);
       
       try {
         const data = await getBookDetail(asin);
-        const minDelay = new Promise(resolve => setTimeout(resolve, 300));
+        const minDelay = new Promise(resolve => setTimeout(resolve, MIN_LOADING_DELAY));
         await Promise.all([data, minDelay]);
         setBook(data);
       } catch (err) {
@@ -46,7 +53,7 @@ export default function BookDetailPage() {
     fetchBook();
   }, [asin]);
 
-  const handleShowMore = (increment: number) => {
+  const handleShowMore = useCallback((increment: number) => {
     const currentCount = displayedArticlesCount;
     const newCount = Math.min(currentCount + increment, book?.qiita_articles.length || currentCount);
     
@@ -54,10 +61,10 @@ export default function BookDetailPage() {
     setDisplayedArticlesCount(newCount);
     previousCountRef.current = newCount;
     
-    setTimeout(() => setNewlyAddedStart(null), 1200);
-  };
+    setTimeout(() => setNewlyAddedStart(null), ANIMATION_TIMEOUT_MORE);
+  }, [displayedArticlesCount, book?.qiita_articles?.length]);
 
-  const handleShowAll = () => {
+  const handleShowAll = useCallback(() => {
     if (!book?.qiita_articles) return;
     
     const currentCount = displayedArticlesCount;
@@ -67,8 +74,8 @@ export default function BookDetailPage() {
     setDisplayedArticlesCount(totalCount);
     previousCountRef.current = totalCount;
     
-    setTimeout(() => setNewlyAddedStart(null), 2000);
-  };
+    setTimeout(() => setNewlyAddedStart(null), ANIMATION_TIMEOUT_ALL);
+  }, [displayedArticlesCount, book?.qiita_articles]);
 
   if (loading) {
     return (
@@ -301,11 +308,9 @@ export default function BookDetailPage() {
                 
                 <div className="grid grid-cols-1 gap-4">
                   {book.qiita_articles.slice(0, displayedArticlesCount).map((article, index) => {
-                    // アニメーションスタイルを決定
                     let style: React.CSSProperties = {};
                     
                     if (newlyAddedStart !== null && index >= newlyAddedStart) {
-                      // 「もっと見る」で新しく追加された記事
                       const relativeIndex = index - newlyAddedStart;
                       const delayMs = Math.min(relativeIndex, 9) * 100;
                       style = {
@@ -313,8 +318,7 @@ export default function BookDetailPage() {
                         opacity: 0,
                         transform: 'translateY(20px)'
                       };
-                    } else if (index < 10 && displayedArticlesCount === 10) {
-                      // 初回表示時のアニメーション（最初の10件）
+                    } else if (index < INITIAL_ARTICLES_COUNT && displayedArticlesCount === INITIAL_ARTICLES_COUNT) {
                       const delayMs = index * 100;
                       style = {
                         animation: `fadeInUp 0.5s ease-out ${delayMs}ms forwards`,
@@ -396,11 +400,11 @@ export default function BookDetailPage() {
                 {book.qiita_articles.length > displayedArticlesCount && (
                   <div className="mt-6 flex gap-2 md:gap-4 justify-center flex-wrap">
                     <button
-                      onClick={() => handleShowMore(10)}
+                      onClick={() => handleShowMore(SHOW_MORE_INCREMENT)}
                       className="px-4 md:px-6 py-2 md:py-3 text-sm md:text-base lg:text-lg bg-qiita-green dark:bg-dark-green text-white rounded-lg hover:opacity-90 transition-opacity duration-200 font-semibold lg:font-bold flex items-center justify-center gap-1.5 md:gap-2"
                     >
                       <i className="ri-arrow-down-line text-base md:text-lg lg:text-xl"></i>
-                      もっと見る（+10件）
+                      もっと見る（+{SHOW_MORE_INCREMENT}件）
                     </button>
                     <button
                       onClick={handleShowAll}
