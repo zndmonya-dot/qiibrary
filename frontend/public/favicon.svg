@@ -2,11 +2,7 @@
   <!-- Background -->
   <rect width="32" height="32" rx="6" fill="#55c500"/>
   
-  <!-- Book icon simplified -->
-  <path d="M 8 6 L 8 26 L 15.5 25 L 15.5 5 Z" fill="#ffffff" opacity="0.9"/>
-  <path d="M 15.5 5 L 15.5 25 L 24 26 L 24 6 Z" fill="#ffffff"/>
-  
-  <!-- Center line -->
-  <line x1="15.5" y1="5" x2="15.5" y2="25" stroke="#45a500" stroke-width="1"/>
+  <!-- Large Q letter for better visibility -->
+  <text x="16" y="24" font-family="Arial, sans-serif" font-size="22" font-weight="bold" fill="#ffffff" text-anchor="middle">Q</text>
 </svg>
 
