@@ -2,17 +2,13 @@
   <!-- Background -->
   <rect width="32" height="32" rx="8" fill="#55c500"/>
   
-  <!-- Book icon - Material Design inspired -->
-  <path d="M 8 6 C 7.5 6 7 6.5 7 7 L 7 25 C 7 25.5 7.5 26 8 26 L 24 26 C 24.5 26 25 25.5 25 25 L 25 7 C 25 6.5 24.5 6 24 6 L 17 6 L 16 8 L 15 6 Z" 
-        fill="#ffffff" stroke="none"/>
+  <!-- Heroicons book-open icon adapted -->
+  <path d="M6 7.5C6 6.67 6.67 6 7.5 6h6c.83 0 1.5.67 1.5 1.5V24c0 .28-.22.5-.5.5-.83 0-1.5.67-1.5 1.5 0 .28-.22.5-.5.5h-6c-.83 0-1.5-.67-1.5-1.5V7.5z" 
+        fill="#ffffff" fill-opacity="0.95"/>
+  <path d="M17 7.5c0-.83.67-1.5 1.5-1.5h6c.83 0 1.5.67 1.5 1.5v17.5c0 .83-.67 1.5-1.5 1.5h-6c-.28 0-.5-.22-.5-.5 0-.83-.67-1.5-1.5-1.5-.28 0-.5-.22-.5-.5V7.5z" 
+        fill="#ffffff" fill-opacity="0.95"/>
   
-  <!-- Book pages -->
-  <line x1="16" y1="8" x2="16" y2="26" stroke="#55c500" stroke-width="1.5"/>
-  <line x1="10" y1="11" x2="15" y2="11" stroke="#e0e0e0" stroke-width="0.8" stroke-linecap="round"/>
-  <line x1="10" y1="14" x2="15" y2="14" stroke="#e0e0e0" stroke-width="0.8" stroke-linecap="round"/>
-  <line x1="10" y1="17" x2="15" y2="17" stroke="#e0e0e0" stroke-width="0.8" stroke-linecap="round"/>
-  <line x1="17" y1="11" x2="22" y2="11" stroke="#e0e0e0" stroke-width="0.8" stroke-linecap="round"/>
-  <line x1="17" y1="14" x2="22" y2="14" stroke="#e0e0e0" stroke-width="0.8" stroke-linecap="round"/>
-  <line x1="17" y1="17" x2="22" y2="17" stroke="#e0e0e0" stroke-width="0.8" stroke-linecap="round"/>
+  <!-- Center line -->
+  <line x1="16" y1="6" x2="16" y2="26" stroke="#ffffff" stroke-width="1" opacity="0.3"/>
 </svg>
 
