@@ -1,0 +1,24 @@
+{
+  "name": "Qiibrary - 現場で選ばれる技術書ライブラリ",
+  "short_name": "Qiibrary",
+  "description": "エンジニアが実践で使い、Qiita記事で推薦した技術書ライブラリ",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#1d2020",
+  "theme_color": "#55c500",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/apple-icon.svg",
+      "sizes": "180x180",
+      "type": "image/svg+xml"
+    }
+  ]
+}
+
