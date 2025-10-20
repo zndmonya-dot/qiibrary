@@ -30,7 +30,7 @@ function BookCard({ rank, book, stats, topArticles, onNavigate }: BookCardProps)
   };
 
   return (
-    <div className="card-primary flex flex-col md:flex-row md:items-center gap-4 md:gap-6 border border-qiita-border relative overflow-hidden">
+    <div className="card-primary flex flex-col md:flex-row md:items-center gap-3 md:gap-6 border border-qiita-border relative overflow-hidden">
       {/* NEWバッジ（スマホ：右上、デスクトップ：左上） */}
       {stats.is_new && (
         <div className="absolute top-0 right-0 md:left-0 md:right-auto z-10">
@@ -141,7 +141,7 @@ function BookCard({ rank, book, stats, topArticles, onNavigate }: BookCardProps)
       
       {/* 上部：タイトルと著者情報 */}
       <div className="flex-1 min-w-0 w-full">
-        <div className="flex flex-col md:flex-row gap-4 md:gap-6 mb-4">
+        <div className="flex flex-col md:flex-row gap-3 md:gap-6 mb-3 md:mb-4">
           {/* タイトル（左） */}
           <div className="flex-1 min-w-0">
             {book.amazon_affiliate_url ? (
@@ -171,7 +171,7 @@ function BookCard({ rank, book, stats, topArticles, onNavigate }: BookCardProps)
           </div>
           
           {/* 統計情報（右） */}
-          <div className="flex items-center gap-4 text-sm flex-shrink-0">
+          <div className="flex items-center gap-3 md:gap-4 text-sm flex-shrink-0">
             {(stats.total_views ?? 0) > 0 ? (
               // YouTube動画がある場合
               <>
@@ -219,18 +219,18 @@ function BookCard({ rank, book, stats, topArticles, onNavigate }: BookCardProps)
         {/* トップ記事一覧（下部） */}
         {topArticles && topArticles.length > 0 && (
           <div>
-            <h4 className="text-xs font-bold text-qiita-text dark:text-dark-text mb-3 flex items-center gap-1.5">
+            <h4 className="text-xs font-bold text-qiita-text dark:text-dark-text mb-2 md:mb-3 flex items-center gap-1.5">
               <i className="ri-article-line text-qiita-green dark:text-dark-green text-sm"></i>
               人気記事トップ{topArticles.length}
             </h4>
-            <div className="space-y-2">
+            <div className="space-y-1.5 md:space-y-2">
               {topArticles.map((article, index) => (
                 <a
                   key={article.id}
                   href={article.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="group block p-3 rounded-lg bg-qiita-surface/30 dark:bg-dark-surface-light/30 hover:bg-qiita-green/10 dark:hover:bg-qiita-green/20 transition-all duration-200 border border-qiita-border/30 dark:border-dark-border/30 hover:border-qiita-green/40 dark:hover:border-qiita-green/40"
+                  className="group block p-2.5 md:p-3 rounded-lg bg-qiita-surface/30 dark:bg-dark-surface-light/30 hover:bg-qiita-green/10 dark:hover:bg-qiita-green/20 transition-all duration-200 border border-qiita-border/30 dark:border-dark-border/30 hover:border-qiita-green/40 dark:hover:border-qiita-green/40"
                 >
                   <div className="flex items-start gap-2.5">
                     <span className="flex-shrink-0 w-6 h-6 flex items-center justify-center rounded-full bg-qiita-green/20 dark:bg-qiita-green/30 text-qiita-green dark:text-dark-green text-xs font-bold">
@@ -250,7 +250,7 @@ function BookCard({ rank, book, stats, topArticles, onNavigate }: BookCardProps)
                 </a>
               ))}
             </div>
-            <div className="mt-3 flex justify-end">
+            <div className="mt-2 md:mt-3 flex justify-end">
               <Link
                 href={`/books/${book.isbn}#qiita-articles`}
                 prefetch={true}

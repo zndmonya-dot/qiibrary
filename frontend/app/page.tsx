@@ -165,16 +165,16 @@ export default function Home() {
     <div className="min-h-screen bg-qiita-bg dark:bg-dark-bg">
       <Header />
       
-      <main className="container mx-auto px-4 py-8 min-h-[calc(100vh-120px)]">
+      <main className="container mx-auto px-4 py-4 md:py-8 min-h-[calc(100vh-120px)]">
         {/* ヘッダー */}
-        <div className={`mb-6 md:mb-8 bg-qiita-card dark:bg-dark-surface rounded-xl p-4 md:p-8 border-l-4 border-qiita-green dark:border-dark-green shadow-sm ${!isRestoring ? 'animate-fade-in-up' : ''}`}>
+        <div className={`mb-4 md:mb-8 bg-qiita-card dark:bg-dark-surface rounded-xl p-4 md:p-8 border-l-4 border-qiita-green dark:border-dark-green shadow-sm ${!isRestoring ? 'animate-fade-in-up' : ''}`}>
           <div className="flex items-start justify-between">
             <div>
-              <h2 className="text-lg md:text-3xl font-bold mb-2 md:mb-3 flex items-center gap-2 md:gap-3 text-qiita-text-dark dark:text-white">
-                <i className="ri-trophy-line text-qiita-green dark:text-dark-green text-xl md:text-3xl"></i>
+              <h2 className="text-xl md:text-3xl font-bold mb-2 md:mb-3 flex items-center gap-2 md:gap-3 text-qiita-text-dark dark:text-white">
+                <i className="ri-trophy-line text-qiita-green dark:text-dark-green text-2xl md:text-3xl"></i>
                 現場で選ばれる技術書ライブラリ
               </h2>
-              <p className="text-qiita-text dark:text-dark-text font-medium text-xs md:text-base leading-relaxed">
+              <p className="text-qiita-text dark:text-dark-text font-medium text-sm md:text-base leading-relaxed">
                 リアルのエンジニアが推奨する技術書をランキング形式に整理しました
               </p>
             </div>
@@ -182,7 +182,7 @@ export default function Home() {
         </div>
         
         {/* 検索バー */}
-        <div className={`mb-6 bg-qiita-card dark:bg-dark-surface rounded-lg border border-qiita-border dark:border-dark-border p-3 md:p-4 ${!isRestoring ? 'animate-fade-in-up' : ''}`}>
+        <div className={`mb-4 md:mb-6 bg-qiita-card dark:bg-dark-surface rounded-lg border border-qiita-border dark:border-dark-border p-3 md:p-4 ${!isRestoring ? 'animate-fade-in-up' : ''}`}>
           <div className="relative">
             <i className="ri-search-line absolute left-3 md:left-4 top-1/2 -translate-y-1/2 text-qiita-text dark:text-dark-text text-lg md:text-xl"></i>
             <input
@@ -225,7 +225,7 @@ export default function Home() {
         </div>
         
         {/* タブ */}
-        <div className={`relative mb-6 bg-qiita-card dark:bg-dark-surface rounded-lg border border-qiita-border dark:border-dark-border p-3 md:p-4 overflow-x-auto ${!isRestoring ? 'animate-fade-in-up animate-delay-50' : ''}`}>
+        <div className={`relative mb-4 md:mb-6 bg-qiita-card dark:bg-dark-surface rounded-lg border border-qiita-border dark:border-dark-border p-3 md:p-4 overflow-x-auto ${!isRestoring ? 'animate-fade-in-up animate-delay-50' : ''}`}>
           <div className="flex flex-nowrap md:flex-wrap gap-2 min-w-max md:min-w-0">
             <button
               onClick={() => {
@@ -376,19 +376,19 @@ export default function Home() {
 
         {!error && rankings && !loading && (
           <div>
-            <div className={`mb-6 flex items-center justify-between bg-qiita-card dark:bg-dark-surface p-4 rounded-lg shadow-sm border border-qiita-border dark:border-dark-border ${!isRestoring ? 'animate-fade-in-up animate-delay-100' : ''}`}>
+            <div className={`mb-4 md:mb-6 flex items-center justify-between bg-qiita-card dark:bg-dark-surface p-3 md:p-4 rounded-lg shadow-sm border border-qiita-border dark:border-dark-border ${!isRestoring ? 'animate-fade-in-up animate-delay-100' : ''}`}>
               <div className="flex items-center gap-2">
-                <i className="ri-trophy-line text-qiita-green dark:text-dark-green text-2xl"></i>
-                <h2 className="text-lg font-semibold text-qiita-text-dark dark:text-white">
+                <i className="ri-trophy-line text-qiita-green dark:text-dark-green text-xl md:text-2xl"></i>
+                <h2 className="text-base md:text-lg font-semibold text-qiita-text-dark dark:text-white">
                   {getPeriodLabel(period, selectedYear)}
                 </h2>
               </div>
-              <div className="text-sm text-qiita-text dark:text-dark-text">
+              <div className="text-xs md:text-sm text-qiita-text dark:text-dark-text">
                 {(currentPage - 1) * ITEMS_PER_PAGE + 1} - {Math.min(currentPage * ITEMS_PER_PAGE, filteredRankings.length)} / {filteredRankings.length}件
               </div>
             </div>
             
-            <div className="space-y-4 mb-8">
+            <div className="space-y-3 md:space-y-4 mb-6 md:mb-8">
               {paginatedRankings.length > 0 ? (
                 paginatedRankings.map((item, index) => {
                   const style = isRestoring ? undefined : getAnimationStyle(index);
