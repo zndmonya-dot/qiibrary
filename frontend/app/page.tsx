@@ -315,7 +315,7 @@ export default function Home() {
             {olderYears.length > 0 && (
               <button
                 onClick={() => setShowAllYears(!showAllYears)}
-                className="px-4 py-2 rounded-lg font-semibold bg-qiita-surface dark:bg-dark-surface-light text-qiita-text-dark dark:text-dark-text border border-qiita-border dark:border-dark-border hover-primary"
+                className="px-4 py-2 rounded-lg font-semibold bg-qiita-surface dark:bg-dark-surface-light text-qiita-text-dark dark:text-dark-text hover-primary"
               >
                 {showAllYears ? (
                   <>
