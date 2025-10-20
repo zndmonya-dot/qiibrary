@@ -193,6 +193,9 @@ class RankingService:
             # 動的にAmazonアフィリエイトURLを生成
             amazon_affiliate_url = self.openbd_service.generate_amazon_affiliate_url(row.isbn)
             
+            # トップ3記事を取得
+            top_articles = self._get_top_articles(row.id, tags, days, year, month, limit=3)
+            
             rankings.append({
                 "rank": rank,
                 "book": {
@@ -217,7 +220,8 @@ class RankingService:
                     "score": round(calculated_score, 2),  # スコア
                     "latest_mention_at": row.latest_mention_at.isoformat() if row.latest_mention_at else None,
                     "is_new": is_new,  # NEWバッジ表示フラグ
-                }
+                },
+                "top_articles": top_articles,  # トップ3記事
             })
         
         logger.info(
@@ -252,6 +256,89 @@ class RankingService:
         )
         
         return sorted_tags
+    
+    def _get_top_articles(
+        self,
+        book_id: int,
+        tags: Optional[List[str]] = None,
+        days: Optional[int] = None,
+        year: Optional[int] = None,
+        month: Optional[int] = None,
+        limit: int = 3
+    ) -> List[Dict]:
+        """
+        指定された書籍のトップN記事を取得（いいね数順）
+        
+        Args:
+            book_id: 書籍ID
+            tags: タグフィルタ
+            days: 期間フィルタ（日数）
+            year: 年フィルタ
+            month: 月フィルタ
+            limit: 取得件数
+        
+        Returns:
+            トップN記事のリスト
+        """
+        query = (
+            self.db.query(QiitaArticle)
+            .join(BookQiitaMention, BookQiitaMention.article_id == QiitaArticle.id)
+            .filter(BookQiitaMention.book_id == book_id)
+        )
+        
+        # タグフィルタ
+        if tags:
+            tag_conditions = []
+            for tag in tags:
+                tag_conditions.append(func.jsonb_exists(QiitaArticle.tags, tag))
+            if len(tag_conditions) == 1:
+                query = query.filter(tag_conditions[0])
+            else:
+                query = query.filter(func.or_(*tag_conditions))
+        
+        # 期間フィルタ
+        if days is not None:
+            start_date = datetime.now() - timedelta(days=days)
+            query = query.filter(QiitaArticle.published_at >= start_date)
+        
+        # 年別・月別フィルタ
+        if year is not None:
+            from datetime import date
+            import calendar
+            
+            if month is not None:
+                month_start = date(year, month, 1)
+                last_day = calendar.monthrange(year, month)[1]
+                month_end = date(year, month, last_day)
+                query = query.filter(
+                    QiitaArticle.published_at >= month_start,
+                    QiitaArticle.published_at <= month_end
+                )
+            else:
+                year_start = date(year, 1, 1)
+                year_end = date(year, 12, 31)
+                query = query.filter(
+                    QiitaArticle.published_at >= year_start,
+                    QiitaArticle.published_at <= year_end
+                )
+        
+        # いいね数順でソートして上位N件を取得
+        articles = query.order_by(QiitaArticle.likes_count.desc()).limit(limit).all()
+        
+        # 結果を整形
+        result = []
+        for article in articles:
+            result.append({
+                "id": article.id,
+                "title": article.title,
+                "url": article.url,
+                "author_id": article.author_id,
+                "author_name": article.author_name,
+                "likes_count": article.likes_count,
+                "published_at": article.published_at.isoformat() if article.published_at else None,
+            })
+        
+        return result
     
     def get_available_years(self) -> List[int]:
         """

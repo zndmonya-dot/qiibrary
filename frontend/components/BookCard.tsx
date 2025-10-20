@@ -3,7 +3,7 @@
 import { memo } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { Book, BookStats } from '@/lib/api';
+import { Book, BookStats, TopArticle } from '@/lib/api';
 import { formatNumber, formatPublicationDate } from '@/lib/utils';
 import { analytics } from '@/lib/analytics';
 
@@ -11,10 +11,11 @@ interface BookCardProps {
   rank: number;
   book: Book;
   stats: BookStats;
+  topArticles?: TopArticle[];
   onNavigate?: () => void;
 }
 
-function BookCard({ rank, book, stats, onNavigate }: BookCardProps) {
+function BookCard({ rank, book, stats, topArticles, onNavigate }: BookCardProps) {
   // ランクに応じた色を決定
   const getRankStyle = () => {
     if (rank === 1) return 'text-yellow-500 drop-shadow-[0_0_8px_rgba(234,179,8,0.5)]'; // 金
@@ -179,27 +180,49 @@ function BookCard({ rank, book, stats, onNavigate }: BookCardProps) {
         </div>
       </div>
       
-      {/* 書籍概要とアクションボタン（右側） */}
-      {book.description && (
+      {/* トップ記事とアクションボタン（右側） */}
+      {topArticles && topArticles.length > 0 && (
         <div className="flex-1 min-w-0 w-full md:pl-4 md:border-l-2 border-qiita-border dark:border-dark-border flex flex-col justify-between pt-3 md:pt-0">
-          {/* 概要 - クリック可能 */}
-          <Link 
-            href={`/books/${book.isbn}`}
-            prefetch={true}
-            className="flex-1 flex flex-col cursor-pointer hover:opacity-80 transition-opacity duration-150"
-            onClick={() => {
-              onNavigate?.();
-              analytics.clickBook(book.isbn || '', book.title, rank);
-            }}
-          >
+          {/* トップ記事一覧 */}
+          <div className="flex-1 flex flex-col">
             <h4 className="text-sm font-bold text-qiita-text-dark dark:text-white mb-3 flex items-center gap-1.5">
-              <i className="ri-book-open-line text-qiita-green"></i>
-              書籍説明
+              <i className="ri-article-line text-qiita-green"></i>
+              人気記事トップ{topArticles.length}
             </h4>
-            <p className="text-sm text-qiita-text-dark dark:text-dark-text line-clamp-6 leading-relaxed font-medium whitespace-pre-line">
-              {book.description}
-            </p>
-          </Link>
+            <div className="space-y-2">
+              {topArticles.map((article, index) => (
+                <a
+                  key={article.id}
+                  href={article.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="group block p-2 rounded-lg bg-qiita-surface/50 dark:bg-dark-surface-light/50 hover:bg-qiita-green/10 dark:hover:bg-qiita-green/20 transition-colors duration-150 border border-qiita-border/50 dark:border-dark-border/50"
+                >
+                  <div className="flex items-start gap-2">
+                    <span className="flex-shrink-0 w-5 h-5 flex items-center justify-center rounded-full bg-qiita-green/20 dark:bg-qiita-green/30 text-qiita-green dark:text-dark-green text-xs font-bold">
+                      {index + 1}
+                    </span>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium text-qiita-text-dark dark:text-white line-clamp-2 group-hover:text-qiita-green dark:group-hover:text-dark-green transition-colors">
+                        {article.title}
+                      </p>
+                      <div className="flex items-center gap-2 mt-1 text-xs text-qiita-text dark:text-dark-text">
+                        <span className="flex items-center gap-1">
+                          <i className="ri-heart-line text-pink-500"></i>
+                          {formatNumber(article.likes_count)}
+                        </span>
+                        <span className="flex items-center gap-1">
+                          <i className="ri-user-line"></i>
+                          {article.author_name || article.author_id}
+                        </span>
+                      </div>
+                    </div>
+                    <i className="ri-external-link-line text-qiita-text-light dark:text-dark-text-light group-hover:text-qiita-green dark:group-hover:text-dark-green transition-colors flex-shrink-0"></i>
+                  </div>
+                </a>
+              ))}
+            </div>
+          </div>
           
           {/* アクションボタン（右下） */}
           <div className="flex gap-2 mt-4 justify-end">

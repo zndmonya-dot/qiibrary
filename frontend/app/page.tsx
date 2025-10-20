@@ -403,6 +403,7 @@ export default function Home() {
                         rank={item.rank}
                         book={item.book}
                         stats={item.stats}
+                        topArticles={item.top_articles}
                         onNavigate={savePageState}
                       />
                     </div>

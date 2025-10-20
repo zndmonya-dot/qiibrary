@@ -51,12 +51,26 @@ export interface BookStats {
 }
 
 /**
+ * トップ記事情報（簡易版）
+ */
+export interface TopArticle {
+  id: number;
+  title: string;
+  url: string;
+  author_id: string;
+  author_name: string | null;
+  likes_count: number;
+  published_at: string | null;
+}
+
+/**
  * ランキングアイテム
  */
 export interface RankingItem {
   rank: number;
   book: Book;
   stats: BookStats;
+  top_articles?: TopArticle[];
 }
 
 /**
