@@ -59,9 +59,11 @@ export default function Home() {
   useEffect(() => {
     if (isRestoring && !loading && savedScrollY !== null) {
       requestAnimationFrame(() => {
-        window.scrollTo({ top: savedScrollY, behavior: 'smooth' });
-        setSavedScrollY(null);
-        setIsRestoring(false);
+        requestAnimationFrame(() => {
+          window.scrollTo({ top: savedScrollY, behavior: 'smooth' });
+          setSavedScrollY(null);
+          setIsRestoring(false);
+        });
       });
     }
   }, [isRestoring, loading, savedScrollY]);
