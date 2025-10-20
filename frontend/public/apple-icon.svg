@@ -1,66 +1,36 @@
 <svg width="180" height="180" viewBox="0 0 180 180" fill="none" xmlns="http://www.w3.org/2000/svg">
   <defs>
-    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" style="stop-color:#5fda5f;stop-opacity:1" />
-      <stop offset="100%" style="stop-color:#3eb83e;stop-opacity:1" />
-    </linearGradient>
-    <linearGradient id="pageLeftGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-      <stop offset="0%" style="stop-color:#ffffff;stop-opacity:1" />
-      <stop offset="100%" style="stop-color:#f8f8f8;stop-opacity:1" />
-    </linearGradient>
-    <linearGradient id="pageRightGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-      <stop offset="0%" style="stop-color:#f8f8f8;stop-opacity:1" />
-      <stop offset="100%" style="stop-color:#ffffff;stop-opacity:1" />
-    </linearGradient>
     <filter id="shadow">
-      <feGaussianBlur in="SourceAlpha" stdDeviation="3"/>
-      <feOffset dx="0" dy="3" result="offsetblur"/>
-      <feComponentTransfer>
-        <feFuncA type="linear" slope="0.2"/>
-      </feComponentTransfer>
-      <feMerge>
-        <feMergeNode/>
-        <feMergeNode in="SourceGraphic"/>
-      </feMerge>
-    </filter>
-    <filter id="glow">
-      <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
-      <feMerge>
-        <feMergeNode in="coloredBlur"/>
-        <feMergeNode in="SourceGraphic"/>
-      </feMerge>
+      <feDropShadow dx="0" dy="3" stdDeviation="6" flood-opacity="0.15"/>
     </filter>
   </defs>
   
   <!-- Background -->
-  <rect width="180" height="180" rx="40" fill="url(#bgGrad)"/>
+  <rect width="180" height="180" rx="40" fill="#55c500"/>
   
-  <!-- Open book with curves -->
+  <!-- Book with bookmark -->
   <g filter="url(#shadow)">
-    <!-- Left page with curve -->
-    <path d="M 32 35 Q 32 33 34 33 L 86 33 Q 89 33 89.5 35 L 90 38 L 89.5 133 Q 89 135 86 135 L 34 135 Q 32 135 32 133 Z" 
-          fill="url(#pageLeftGrad)" stroke="none"/>
-    
-    <!-- Right page with curve -->
-    <path d="M 90 38 L 90.5 35 Q 91 33 94 33 L 146 33 Q 148 33 148 35 L 148 133 Q 148 135 146 135 L 94 135 Q 91 135 90.5 133 Z" 
-          fill="url(#pageRightGrad)" stroke="none"/>
+    <path d="M 42 28 C 39 28 35 31 35 35 L 35 145 C 35 148 39 152 42 152 L 138 152 C 141 152 145 148 145 145 L 145 35 C 145 31 141 28 138 28 L 98 28 L 90 42 L 82 28 Z" 
+          fill="#ffffff"/>
   </g>
   
-  <!-- Spine with glow -->
-  <line x1="90" y1="33" x2="90" y2="135" stroke="#ffffff" stroke-width="2.5" opacity="0.7" filter="url(#glow)"/>
+  <!-- Book spine -->
+  <line x1="90" y1="42" x2="90" y2="152" stroke="#55c500" stroke-width="4" stroke-linecap="round"/>
   
-  <!-- Minimal page lines -->
-  <g opacity="0.3">
-    <line x1="39" y1="49" x2="86" y2="47" stroke="#888888" stroke-width="1.2" stroke-linecap="round"/>
-    <line x1="39" y1="60" x2="86" y2="58" stroke="#888888" stroke-width="1.2" stroke-linecap="round"/>
-    <line x1="39" y1="71" x2="78" y2="70" stroke="#888888" stroke-width="1.2" stroke-linecap="round"/>
-    
-    <line x1="94" y1="47" x2="141" y2="49" stroke="#888888" stroke-width="1.2" stroke-linecap="round"/>
-    <line x1="94" y1="58" x2="141" y2="60" stroke="#888888" stroke-width="1.2" stroke-linecap="round"/>
-    <line x1="102" y1="70" x2="141" y2="71" stroke="#888888" stroke-width="1.2" stroke-linecap="round"/>
+  <!-- Page lines left -->
+  <g opacity="0.5">
+    <line x1="49" y1="56" x2="84" y2="56" stroke="#cccccc" stroke-width="2.5" stroke-linecap="round"/>
+    <line x1="49" y1="70" x2="84" y2="70" stroke="#cccccc" stroke-width="2.5" stroke-linecap="round"/>
+    <line x1="49" y1="84" x2="84" y2="84" stroke="#cccccc" stroke-width="2.5" stroke-linecap="round"/>
+    <line x1="49" y1="98" x2="77" y2="98" stroke="#cccccc" stroke-width="2.5" stroke-linecap="round"/>
   </g>
   
-  <!-- Q letter -->
-  <text x="90" y="115" font-family="system-ui, -apple-system, sans-serif" font-size="50" font-weight="900" fill="#ffffff" text-anchor="middle" opacity="0.95" filter="url(#glow)">Q</text>
+  <!-- Page lines right -->
+  <g opacity="0.5">
+    <line x1="96" y1="56" x2="131" y2="56" stroke="#cccccc" stroke-width="2.5" stroke-linecap="round"/>
+    <line x1="96" y1="70" x2="131" y2="70" stroke="#cccccc" stroke-width="2.5" stroke-linecap="round"/>
+    <line x1="96" y1="84" x2="131" y2="84" stroke="#cccccc" stroke-width="2.5" stroke-linecap="round"/>
+    <line x1="103" y1="98" x2="131" y2="98" stroke="#cccccc" stroke-width="2.5" stroke-linecap="round"/>
+  </g>
 </svg>
 

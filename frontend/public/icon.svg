@@ -1,68 +1,36 @@
 <svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
   <defs>
-    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" style="stop-color:#5fda5f;stop-opacity:1" />
-      <stop offset="100%" style="stop-color:#3eb83e;stop-opacity:1" />
-    </linearGradient>
-    <linearGradient id="pageLeftGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-      <stop offset="0%" style="stop-color:#ffffff;stop-opacity:1" />
-      <stop offset="100%" style="stop-color:#f8f8f8;stop-opacity:1" />
-    </linearGradient>
-    <linearGradient id="pageRightGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-      <stop offset="0%" style="stop-color:#f8f8f8;stop-opacity:1" />
-      <stop offset="100%" style="stop-color:#ffffff;stop-opacity:1" />
-    </linearGradient>
     <filter id="shadow">
-      <feGaussianBlur in="SourceAlpha" stdDeviation="10"/>
-      <feOffset dx="0" dy="8" result="offsetblur"/>
-      <feComponentTransfer>
-        <feFuncA type="linear" slope="0.2"/>
-      </feComponentTransfer>
-      <feMerge>
-        <feMergeNode/>
-        <feMergeNode in="SourceGraphic"/>
-      </feMerge>
-    </filter>
-    <filter id="glow">
-      <feGaussianBlur stdDeviation="4" result="coloredBlur"/>
-      <feMerge>
-        <feMergeNode in="coloredBlur"/>
-        <feMergeNode in="SourceGraphic"/>
-      </feMerge>
+      <feDropShadow dx="0" dy="8" stdDeviation="16" flood-opacity="0.15"/>
     </filter>
   </defs>
   
   <!-- Background -->
-  <rect width="512" height="512" rx="115" fill="url(#bgGrad)"/>
+  <rect width="512" height="512" rx="115" fill="#55c500"/>
   
-  <!-- Open book with 3D curves -->
+  <!-- Book with bookmark - Material Design inspired -->
   <g filter="url(#shadow)">
-    <!-- Left page with curve -->
-    <path d="M 90 100 Q 90 95 95 95 L 245 95 Q 252 95 254 100 L 256 110 L 254 380 Q 252 385 245 385 L 95 385 Q 90 385 90 380 Z" 
-          fill="url(#pageLeftGrad)" stroke="none"/>
-    
-    <!-- Right page with curve -->
-    <path d="M 256 110 L 258 100 Q 260 95 267 95 L 417 95 Q 422 95 422 100 L 422 380 Q 422 385 417 385 L 267 385 Q 260 385 258 380 Z" 
-          fill="url(#pageRightGrad)" stroke="none"/>
+    <path d="M 120 80 C 110 80 100 90 100 100 L 100 412 C 100 422 110 432 120 432 L 392 432 C 402 432 412 422 412 412 L 412 100 C 412 90 402 80 392 80 L 280 80 L 256 120 L 232 80 Z" 
+          fill="#ffffff"/>
   </g>
   
-  <!-- Spine with glow -->
-  <line x1="256" y1="95" x2="256" y2="385" stroke="#ffffff" stroke-width="6" opacity="0.7" filter="url(#glow)"/>
+  <!-- Book spine/center -->
+  <line x1="256" y1="120" x2="256" y2="432" stroke="#55c500" stroke-width="12" stroke-linecap="round"/>
   
-  <!-- Modern minimal page lines -->
-  <g opacity="0.3">
-    <line x1="110" y1="140" x2="245" y2="135" stroke="#888888" stroke-width="2.5" stroke-linecap="round"/>
-    <line x1="110" y1="170" x2="245" y2="165" stroke="#888888" stroke-width="2.5" stroke-linecap="round"/>
-    <line x1="110" y1="200" x2="245" y2="195" stroke="#888888" stroke-width="2.5" stroke-linecap="round"/>
-    <line x1="110" y1="230" x2="220" y2="227" stroke="#888888" stroke-width="2.5" stroke-linecap="round"/>
-    
-    <line x1="267" y1="135" x2="402" y2="140" stroke="#888888" stroke-width="2.5" stroke-linecap="round"/>
-    <line x1="267" y1="165" x2="402" y2="170" stroke="#888888" stroke-width="2.5" stroke-linecap="round"/>
-    <line x1="267" y1="195" x2="402" y2="200" stroke="#888888" stroke-width="2.5" stroke-linecap="round"/>
-    <line x1="292" y1="227" x2="402" y2="230" stroke="#888888" stroke-width="2.5" stroke-linecap="round"/>
+  <!-- Page lines left -->
+  <g opacity="0.5">
+    <line x1="140" y1="160" x2="240" y2="160" stroke="#cccccc" stroke-width="8" stroke-linecap="round"/>
+    <line x1="140" y1="200" x2="240" y2="200" stroke="#cccccc" stroke-width="8" stroke-linecap="round"/>
+    <line x1="140" y1="240" x2="240" y2="240" stroke="#cccccc" stroke-width="8" stroke-linecap="round"/>
+    <line x1="140" y1="280" x2="220" y2="280" stroke="#cccccc" stroke-width="8" stroke-linecap="round"/>
   </g>
   
-  <!-- Q letter modern and bold -->
-  <text x="256" y="330" font-family="system-ui, -apple-system, sans-serif" font-size="140" font-weight="900" fill="#ffffff" text-anchor="middle" opacity="0.95" filter="url(#glow)">Q</text>
+  <!-- Page lines right -->
+  <g opacity="0.5">
+    <line x1="272" y1="160" x2="372" y2="160" stroke="#cccccc" stroke-width="8" stroke-linecap="round"/>
+    <line x1="272" y1="200" x2="372" y2="200" stroke="#cccccc" stroke-width="8" stroke-linecap="round"/>
+    <line x1="272" y1="240" x2="372" y2="240" stroke="#cccccc" stroke-width="8" stroke-linecap="round"/>
+    <line x1="292" y1="280" x2="372" y2="280" stroke="#cccccc" stroke-width="8" stroke-linecap="round"/>
+  </g>
 </svg>
 
