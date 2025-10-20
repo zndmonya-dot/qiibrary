@@ -13,9 +13,8 @@ import { formatNumber, formatPublicationDate } from '@/lib/utils';
 export default function BookDetailPage() {
   const params = useParams();
   const router = useRouter();
-  const asin = params.asin as string; // URLパラメータ（互換性のため'asin'だが実際はISBN）
+  const asin = params.asin as string;
   
-  // 状態管理
   const [book, setBook] = useState<BookDetail | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -23,7 +22,6 @@ export default function BookDetailPage() {
   const previousCountRef = useRef(10);
   const [newlyAddedStart, setNewlyAddedStart] = useState<number | null>(null);
 
-  // 書籍データの取得
   useEffect(() => {
     const fetchBook = async () => {
       setLoading(true);
@@ -48,7 +46,6 @@ export default function BookDetailPage() {
     fetchBook();
   }, [asin]);
 
-  // 記事を追加表示（「もっと見る」ボタン）
   const handleShowMore = (increment: number) => {
     const currentCount = displayedArticlesCount;
     const newCount = Math.min(currentCount + increment, book?.qiita_articles.length || currentCount);
@@ -60,7 +57,6 @@ export default function BookDetailPage() {
     setTimeout(() => setNewlyAddedStart(null), 1200);
   };
 
-  // すべての記事を表示（「すべて表示」ボタン）
   const handleShowAll = () => {
     if (!book?.qiita_articles) return;
     

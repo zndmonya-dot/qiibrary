@@ -12,26 +12,22 @@ import { ITEMS_PER_PAGE } from '@/lib/constants';
 type PeriodType = 'daily' | 'monthly' | 'yearly' | 'all' | 'year';
 
 export default function Home() {
-  // sessionStorageから初期値を取得（ある場合）
+  // sessionStorageから初期値を取得
   const getInitialState = () => {
-    if (typeof window !== 'undefined') {
-      const savedState = sessionStorage.getItem('rankingPageState');
-      if (savedState) {
-        try {
-          return JSON.parse(savedState);
-        } catch (e) {
-          return null;
-        }
-      }
+    if (typeof window === 'undefined') return null;
+    const savedState = sessionStorage.getItem('rankingPageState');
+    if (!savedState) return null;
+    try {
+      return JSON.parse(savedState);
+    } catch {
+      return null;
     }
-    return null;
   };
 
   const initialState = getInitialState();
 
   const [period, setPeriod] = useState<PeriodType>(initialState?.period || 'yearly');
   const [selectedYear, setSelectedYear] = useState<number | null>(initialState?.selectedYear || null);
-  const [selectedMonth, setSelectedMonth] = useState<number | null>(null);
   const [availableYears, setAvailableYears] = useState<number[]>([]);
   const [rankings, setRankings] = useState<RankingResponse | null>(null);
   const [loading, setLoading] = useState(true);
@@ -42,29 +38,24 @@ export default function Home() {
   const [isRestoring, setIsRestoring] = useState(!!initialState);
   const [savedScrollY, setSavedScrollY] = useState<number | null>(initialState?.scrollY || null);
 
-  // ページ状態をsessionStorageに保存
   const savePageState = () => {
     if (typeof window !== 'undefined') {
-      const state = {
+      sessionStorage.setItem('rankingPageState', JSON.stringify({
         scrollY: window.scrollY,
         currentPage,
         period,
         selectedYear,
         searchQuery,
-      };
-      sessionStorage.setItem('rankingPageState', JSON.stringify(state));
+      }));
     }
   };
 
-  // 初回マウント時にsessionStorageをクリア（復元完了後）
   useEffect(() => {
     if (typeof window !== 'undefined' && initialState) {
-      // 次回は通常動作にするため、復元完了後にクリア
       sessionStorage.removeItem('rankingPageState');
     }
   }, []);
 
-  // データ読み込み完了後にスクロール位置を復元
   useEffect(() => {
     if (isRestoring && !loading && savedScrollY !== null) {
       setTimeout(() => {
@@ -75,14 +66,9 @@ export default function Home() {
     }
   }, [isRestoring, loading, savedScrollY]);
 
-  // 年を最新順にソート
   const sortedYears = [...availableYears].sort((a, b) => b - a);
-  
-  // 最近の年（デフォルト表示）と古い年（展開で表示）に分ける
   const recentYears = sortedYears.slice(0, 5);
   const olderYears = sortedYears.slice(5);
-
-  // 利用可能な年のリストを取得
   useEffect(() => {
     const fetchYears = async () => {
       try {
@@ -99,26 +85,14 @@ export default function Home() {
     const fetchRankings = async () => {
       setLoading(true);
       setError(null);
-      // 復元中でない場合のみページをリセット
-      if (!isRestoring) {
-        setCurrentPage(1);
-      }
+      if (!isRestoring) setCurrentPage(1);
       
       try {
-        let data: RankingResponse;
-        
-        if (period === 'daily') {
-          data = await getRankings.daily();
-        } else if (period === 'monthly') {
-          data = await getRankings.monthly();
-        } else if (period === 'yearly') {
-          data = await getRankings.yearly();
-        } else if (period === 'year' && selectedYear) {
-          data = await getRankings.byYear(selectedYear);
-        } else {
-          // all
-          data = await getRankings.all();
-        }
+        const data = period === 'daily' ? await getRankings.daily()
+          : period === 'monthly' ? await getRankings.monthly()
+          : period === 'yearly' ? await getRankings.yearly()
+          : period === 'year' && selectedYear ? await getRankings.byYear(selectedYear)
+          : await getRankings.all();
         
         setRankings(data);
       } catch (err) {
@@ -132,7 +106,6 @@ export default function Home() {
     fetchRankings();
   }, [period, selectedYear]);
 
-  // 検索フィルタリング
   const filteredRankings = rankings ? rankings.rankings.filter(item => {
     if (!searchQuery) return true;
     const query = searchQuery.toLowerCase();
@@ -144,12 +117,10 @@ export default function Home() {
     );
   }) : [];
 
-  // ページネーション用の計算
   const paginatedRankings = filteredRankings.slice(
     (currentPage - 1) * ITEMS_PER_PAGE,
     currentPage * ITEMS_PER_PAGE
   );
-  
   const totalPages = Math.ceil(filteredRankings.length / ITEMS_PER_PAGE);
   
   const handleNextPage = () => {
@@ -245,7 +216,6 @@ export default function Home() {
         {/* タブ - スライドアニメーション付き */}
         <div className="relative mb-6 bg-qiita-card dark:bg-dark-surface rounded-lg border border-qiita-border dark:border-dark-border p-3 md:p-4 overflow-x-auto animate-fade-in-up animate-delay-200">
           <div className="flex flex-nowrap md:flex-wrap gap-2 min-w-max md:min-w-0">
-            {/* 期間タブ */}
             <button
               onClick={() => {
                 setPeriod('daily');
@@ -308,12 +278,10 @@ export default function Home() {
               全期間
             </button>
             
-            {/* 年別セパレーター */}
             {recentYears.length > 0 && (
               <div className="w-px h-8 bg-qiita-border dark:bg-dark-border"></div>
             )}
             
-            {/* 最近の年をボタン表示 */}
             {recentYears.map(year => (
               <button
                 key={year}
@@ -333,7 +301,6 @@ export default function Home() {
               </button>
             ))}
             
-            {/* もっと見る/閉じるボタン（古い年がある場合のみ） */}
             {olderYears.length > 0 && (
               <button
                 onClick={() => setShowAllYears(!showAllYears)}
@@ -374,12 +341,11 @@ export default function Home() {
                   <i className="ri-calendar-2-line mr-1"></i>
                   {year}年
                 </button>
-              ))}
+              )              )}
             </div>
           )}
         </div>
         
-        {/* ランキング表示 */}
         {loading && !rankings && (
           <LoadingSpinner />
         )}
@@ -440,13 +406,10 @@ export default function Home() {
               )}
             </div>
             
-            {/* ページネーション */}
             {totalPages > 1 && (
               <div className="bg-qiita-card dark:bg-dark-surface rounded-lg p-3 md:p-6 shadow-sm border border-qiita-border dark:border-dark-border">
                 <div className="flex flex-col gap-4">
-                  {/* ページネーションボタン */}
                   <div className="flex items-center justify-center gap-1 md:gap-2 flex-wrap">
-                    {/* 最初のページへ */}
                     <button
                       onClick={() => {
                         setCurrentPage(1);
@@ -463,7 +426,6 @@ export default function Home() {
                       <i className="ri-skip-back-mini-line text-base md:text-lg"></i>
                     </button>
                     
-                    {/* 前のページへ */}
                     <button
                       onClick={handlePrevPage}
                       disabled={currentPage === 1}
@@ -477,7 +439,6 @@ export default function Home() {
                       <span className="hidden sm:inline">前へ</span>
                     </button>
                     
-                    {/* ページ番号リスト */}
                     {(() => {
                       const pageNumbers: (number | string)[] = [];
                       const maxVisible = 7; // 表示する最大ページ番号数
@@ -540,7 +501,6 @@ export default function Home() {
                       ));
                     })()}
                     
-                    {/* 次のページへ */}
                     <button
                       onClick={handleNextPage}
                       disabled={currentPage === totalPages}
@@ -554,7 +514,6 @@ export default function Home() {
                       <i className="ri-arrow-right-s-line text-base md:text-lg"></i>
                     </button>
                     
-                    {/* 最後のページへ */}
                     <button
                       onClick={() => {
                         setCurrentPage(totalPages);
@@ -572,7 +531,6 @@ export default function Home() {
                     </button>
                   </div>
                   
-                  {/* ページ直接入力 */}
                   <div className="flex items-center justify-center gap-2 md:gap-3">
                     <span className="text-xs md:text-sm text-qiita-text dark:text-dark-text">ページ:</span>
                     <input
