@@ -111,8 +111,17 @@ export default function Footer() {
           </div>
         </div>
 
+        {/* Amazon Associates Disclosure */}
+        <div className="pt-8 pb-6 border-t border-gray-600">
+          <div className="max-w-3xl mx-auto text-center">
+            <p className="text-xs text-gray-400 leading-relaxed mb-4">
+              当サイトは、Amazon.co.jpを宣伝しリンクすることによってサイトが紹介料を獲得できる手段を提供することを目的に設定されたアフィリエイトプログラムである、Amazonアソシエイト・プログラムの参加者です。
+            </p>
+          </div>
+        </div>
+
         {/* Bottom Bar */}
-        <div className="pt-8 border-t border-gray-600">
+        <div className="pt-4 border-t border-gray-600">
           <div className="flex justify-center items-center gap-2 text-xs text-gray-400">
             <i className="ri-copyright-line"></i>
             <span>{currentYear} Qiibrary. All rights reserved.</span>
