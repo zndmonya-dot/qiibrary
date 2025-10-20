@@ -171,7 +171,7 @@ export default function Home() {
         </div>
         
         {/* 検索バー */}
-        <div className={`mb-6 bg-qiita-card dark:bg-dark-surface rounded-lg border border-qiita-border dark:border-dark-border p-3 md:p-4 ${!isRestoring ? 'animate-fade-in-up' : ''}`}>
+        <div className={`mb-6 bg-qiita-card dark:bg-dark-surface rounded-lg border border-qiita-border dark:border-dark-border p-3 md:p-4 ${!isRestoring ? 'animate-fade-in-up animate-delay-100' : ''}`}>
           <div className="relative">
             <i className="ri-search-line absolute left-3 md:left-4 top-1/2 -translate-y-1/2 text-qiita-text dark:text-dark-text text-lg md:text-xl"></i>
             <input
@@ -214,7 +214,7 @@ export default function Home() {
         </div>
         
         {/* タブ */}
-        <div className={`relative mb-6 bg-qiita-card dark:bg-dark-surface rounded-lg border border-qiita-border dark:border-dark-border p-3 md:p-4 overflow-x-auto ${!isRestoring ? 'animate-fade-in-up' : ''}`}>
+        <div className={`relative mb-6 bg-qiita-card dark:bg-dark-surface rounded-lg border border-qiita-border dark:border-dark-border p-3 md:p-4 overflow-x-auto ${!isRestoring ? 'animate-fade-in-up animate-delay-200' : ''}`}>
           <div className="flex flex-nowrap md:flex-wrap gap-2 min-w-max md:min-w-0">
             <button
               onClick={() => {
@@ -365,7 +365,7 @@ export default function Home() {
 
         {!error && rankings && !loading && (
           <div>
-            <div className={`mb-6 flex items-center justify-between bg-qiita-card dark:bg-dark-surface p-4 rounded-lg shadow-sm border border-qiita-border dark:border-dark-border ${!isRestoring ? 'animate-fade-in-up' : ''}`}>
+            <div className={`mb-6 flex items-center justify-between bg-qiita-card dark:bg-dark-surface p-4 rounded-lg shadow-sm border border-qiita-border dark:border-dark-border ${!isRestoring ? 'animate-fade-in-up animate-delay-300' : ''}`}>
               <div className="flex items-center gap-2">
                 <i className="ri-trophy-line text-qiita-green dark:text-dark-green text-2xl"></i>
                 <h2 className="text-lg font-semibold text-qiita-text-dark dark:text-white">
@@ -380,7 +380,12 @@ export default function Home() {
             <div className="space-y-4 mb-8">
               {paginatedRankings.length > 0 ? (
                 paginatedRankings.map((item, index) => {
-                  const animationClass = !isRestoring ? 'animate-fade-in-up' : '';
+                  let animationClass = '';
+                  if (!isRestoring) {
+                    if (index === 0) animationClass = 'animate-fade-in-up animate-delay-400';
+                    else if (index === 1) animationClass = 'animate-fade-in-up animate-delay-500';
+                    else if (index === 2) animationClass = 'animate-fade-in-up animate-delay-600';
+                  }
                   
                   return (
                     <div key={item.book.id} className={animationClass}>
