@@ -172,10 +172,10 @@ export default function Home() {
             <div className="w-full text-center md:text-left">
               <h2 className="text-xl md:text-3xl font-bold mb-2 md:mb-3 flex items-center justify-center md:justify-start gap-2 md:gap-3 text-qiita-text-dark dark:text-white">
                 <i className="ri-trophy-line text-qiita-green dark:text-dark-green text-2xl md:text-3xl"></i>
-                Qiitaで選ばれる技術書ライブラリ
+                Qiitaで話題の技術書まとめ
               </h2>
               <p className="text-qiita-text dark:text-dark-text font-medium text-sm md:text-base leading-relaxed">
-                実際に現場で使われている技術書をランキングで紹介
+                おすすめ書籍をランキング形式でわかりやすく紹介！
               </p>
             </div>
           </div>
