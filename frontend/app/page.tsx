@@ -233,7 +233,7 @@ export default function Home() {
                 setSelectedYear(null);
                 analytics.changeRankingPeriod('daily');
               }}
-              className={`px-2.5 md:px-4 py-1 md:py-2 text-xs md:text-base rounded-lg font-semibold whitespace-nowrap ${
+              className={`px-2.5 md:px-4 py-1 md:py-2 text-xs md:text-base rounded-lg font-semibold whitespace-nowrap transition-all duration-150 ${
                 period === 'daily'
                   ? 'bg-qiita-green dark:bg-dark-green text-white shadow-sm' 
                   : 'bg-qiita-surface dark:bg-dark-surface-light text-qiita-text-dark dark:text-dark-text hover-primary'
@@ -315,7 +315,7 @@ export default function Home() {
             {olderYears.length > 0 && (
               <button
                 onClick={() => setShowAllYears(!showAllYears)}
-                className="px-2.5 md:px-4 py-1 md:py-2 text-xs md:text-base rounded-lg font-semibold bg-qiita-surface dark:bg-dark-surface-light text-qiita-text-dark dark:text-dark-text hover-primary"
+                className="px-2.5 md:px-4 py-1 md:py-2 text-xs md:text-base rounded-lg font-semibold transition-all duration-150 bg-qiita-surface dark:bg-dark-surface-light text-qiita-text-dark dark:text-dark-text hover-primary"
               >
                 {showAllYears ? (
                   <>
@@ -427,7 +427,7 @@ export default function Home() {
                       className={`flex items-center justify-center w-8 h-8 md:w-10 md:h-10 rounded-lg font-medium transition-all duration-150 ${
                         currentPage === 1
                           ? 'bg-qiita-surface dark:bg-dark-surface-light text-qiita-text-light dark:text-dark-text-light cursor-not-allowed opacity-50'
-                          : 'bg-qiita-surface dark:bg-dark-surface-light text-qiita-text dark:text-dark-text hover-primary hover-link'
+                          : 'bg-qiita-surface dark:bg-dark-surface-light text-qiita-text dark:text-dark-text hover-primary'
                       }`}
                       title="最初のページ"
                     >
@@ -440,7 +440,7 @@ export default function Home() {
                       className={`flex items-center gap-0.5 md:gap-1 px-2 md:px-4 h-8 md:h-10 rounded-lg font-medium text-sm md:text-base transition-all duration-150 ${
                         currentPage === 1
                           ? 'bg-qiita-surface dark:bg-dark-surface-light text-qiita-text-light dark:text-dark-text-light cursor-not-allowed opacity-50'
-                          : 'bg-qiita-surface dark:bg-dark-surface-light text-qiita-text dark:text-dark-text hover-primary hover-link'
+                          : 'bg-qiita-surface dark:bg-dark-surface-light text-qiita-text dark:text-dark-text hover-primary'
                       }`}
                     >
                       <i className="ri-arrow-left-s-line text-base md:text-lg"></i>
@@ -496,7 +496,7 @@ export default function Home() {
                             className={`flex items-center justify-center w-8 h-8 md:w-10 md:h-10 rounded-lg font-medium text-xs md:text-base transition-all duration-150 ${
                               currentPage === page
                                 ? 'bg-qiita-green dark:bg-dark-green text-white shadow-sm'
-                                : 'bg-qiita-surface dark:bg-dark-surface-light text-qiita-text dark:text-dark-text hover-primary hover-link'
+                                : 'bg-qiita-surface dark:bg-dark-surface-light text-qiita-text dark:text-dark-text hover-primary'
                             }`}
                           >
                             {page}
@@ -515,7 +515,7 @@ export default function Home() {
                       className={`flex items-center gap-0.5 md:gap-1 px-2 md:px-4 h-8 md:h-10 rounded-lg font-medium text-sm md:text-base transition-all duration-150 ${
                         currentPage === totalPages
                           ? 'bg-qiita-surface dark:bg-dark-surface-light text-qiita-text-light dark:text-dark-text-light cursor-not-allowed opacity-50'
-                          : 'bg-qiita-surface dark:bg-dark-surface-light text-qiita-text dark:text-dark-text hover-primary hover-link'
+                          : 'bg-qiita-surface dark:bg-dark-surface-light text-qiita-text dark:text-dark-text hover-primary'
                       }`}
                     >
                       <span className="hidden sm:inline">次へ</span>
@@ -531,7 +531,7 @@ export default function Home() {
                       className={`flex items-center justify-center w-8 h-8 md:w-10 md:h-10 rounded-lg font-medium transition-all duration-150 ${
                         currentPage === totalPages
                           ? 'bg-qiita-surface dark:bg-dark-surface-light text-qiita-text-light dark:text-dark-text-light cursor-not-allowed opacity-50'
-                          : 'bg-qiita-surface dark:bg-dark-surface-light text-qiita-text dark:text-dark-text hover-primary hover-link'
+                          : 'bg-qiita-surface dark:bg-dark-surface-light text-qiita-text dark:text-dark-text hover-primary'
                       }`}
                       title="最後のページ"
                     >
