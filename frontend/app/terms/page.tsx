@@ -44,7 +44,7 @@ export default function TermsPage() {
               <div className="bg-qiita-surface dark:bg-dark-surface-light rounded-lg p-4">
                 <p className="mb-3">本サービスは、以下の機能を提供します：</p>
                 <ul className="list-disc list-inside space-y-2 ml-4">
-                  <li>Qiita記事で言及されたIT技術書のランキング表示</li>
+                  <li>Qiitaで話題のIT技術書のランキング表示</li>
                   <li>書籍の詳細情報の提供（OpenBD、Google Books APIを利用）</li>
                   <li>関連するQiita記事の紹介</li>
                   <li>Amazon.co.jpへのアフィリエイトリンクの提供</li>

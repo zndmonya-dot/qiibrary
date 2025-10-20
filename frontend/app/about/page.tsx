@@ -31,7 +31,7 @@ export default function AboutPage() {
               </h2>
               <div className="bg-qiita-surface dark:bg-dark-surface-light rounded-lg p-5">
                 <p className="mb-3">
-                  Qiibraryは、<span className="font-semibold text-qiita-text-dark dark:text-white">Qiita記事で言及されたIT技術書をランキング形式で表示する</span>サービスです。
+                  Qiibraryは、<span className="font-semibold text-qiita-text-dark dark:text-white">Qiitaで話題のIT技術書をランキング形式でまとめた</span>サービスです。
                 </p>
                 <p className="mb-3">
                   技術書選びに迷ったとき、「Qiitaで人気の本は何だろう？」と思ったことはありませんか？

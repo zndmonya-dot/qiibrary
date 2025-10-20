@@ -95,11 +95,11 @@ export default function LegalPage() {
               </h2>
               <div className="bg-qiita-surface dark:bg-dark-surface-light rounded-lg p-4">
                 <p className="mb-3">
-                  当サイトは、Qiita記事で言及されたIT技術書の情報を収集・整理し、ランキング形式で表示する情報提供サービスです。
+                  当サイトは、Qiitaで話題のIT技術書の情報を収集・整理し、ランキング形式で表示する情報提供サービスです。
                 </p>
                 <p className="font-semibold text-qiita-text-dark dark:text-white mb-2">提供する主な機能：</p>
                 <ul className="list-disc list-inside space-y-1 ml-4 text-sm">
-                  <li>IT技術書のランキング表示（日次・月次・年次・全期間）</li>
+                  <li>IT技術書のランキング表示（24時間・30日間・365日間・年別・全期間）</li>
                   <li>書籍の詳細情報の表示（OpenBD、Google Books APIを利用）</li>
                   <li>関連するQiita記事の紹介</li>
                   <li>Amazon.co.jpへの商品リンクの提供</li>
