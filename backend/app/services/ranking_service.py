@@ -29,7 +29,7 @@ class RankingService:
         days: Optional[int] = None,
         year: Optional[int] = None,
         month: Optional[int] = None,
-        limit: Optional[int] = None,
+        limit: Optional[int] = 100,  # デフォルト100件に制限してパフォーマンス改善
         scoring_method: str = "weighted"
     ) -> List[Dict]:
         """
@@ -40,7 +40,7 @@ class RankingService:
             days: 過去N日間のランキング（Qiita記事のpublished_at基準、Noneの場合は全期間）
             year: 特定の年のランキング（例: 2024、Qiita記事が投稿された年）
             month: 特定の月のランキング（1-12、yearと併用、Qiita記事が投稿された月）
-            limit: 取得件数（Noneの場合は全件）
+            limit: 取得件数（デフォルト: 100件、パフォーマンスのため制限推奨）
             scoring_method: スコアリング方式
                 - "simple": シンプル（言及数のみ）
                 - "weighted": 加重スコア（推奨）
