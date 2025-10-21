@@ -11,17 +11,29 @@ app = FastAPI(
 
 # CORS設定
 frontend_url = os.getenv("FRONTEND_URL", "http://localhost:3000")
+allowed_origins = [
+    frontend_url,
+    "http://localhost:3000",
+    "http://localhost:3001",
+    "http://localhost:3002",
+    "http://127.0.0.1:3000",
+    "http://127.0.0.1:3001",
+    "http://127.0.0.1:3002",
+    # Vercel本番環境
+    "https://qiibrary.com",
+    "https://www.qiibrary.com",
+    # Vercel実際のURL
+    "https://qiibrary.vercel.app",
+]
+
+# Vercelのプレビュー環境も許可（*.vercel.app）
+vercel_preview_domain = os.getenv("VERCEL_PREVIEW_DOMAIN", "")
+if vercel_preview_domain:
+    allowed_origins.append(vercel_preview_domain)
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        frontend_url,
-        "http://localhost:3000",
-        "http://localhost:3001",
-        "http://localhost:3002",
-        "http://127.0.0.1:3000",
-        "http://127.0.0.1:3001",
-        "http://127.0.0.1:3002",
-    ],
+    allow_origins=allowed_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

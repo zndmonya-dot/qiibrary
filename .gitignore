@@ -60,4 +60,11 @@ yarn-error.log*
 backend/backups/*.dump
 backend/backups/*.json.gz
 backend/backups/*.sql
+C:\backup/
+
+# Scripts - Archive (migration/temporary scripts)
+backend/scripts/_archive/
+
+# Temporary connection info
+NEON_PGADMIN_CONNECTION.txt
 
