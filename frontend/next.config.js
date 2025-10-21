@@ -21,15 +21,6 @@ const nextConfig = {
         protocol: 'https',
         hostname: 'storage.googleapis.com',
       },
-      // 楽天ブックスAPI画像ホスト
-      {
-        protocol: 'https',
-        hostname: 'thumbnail.image.rakuten.co.jp',
-      },
-      {
-        protocol: 'https',
-        hostname: 'books.rakuten.co.jp',
-      },
       // Google Books API画像ホスト
       {
         protocol: 'https',
