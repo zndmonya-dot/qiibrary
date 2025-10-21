@@ -1,36 +1,40 @@
-# Qiibrary - Qiitaで選ばれる技術書ランキング
+# Qiibrary - Qiitaで話題の技術書まとめ
 
-Zenn Booksから技術書を収集し、ランキング形式で表示するWebサービス。
-日別・月別・年別のランキングを提供し、将来的には手動でYouTube動画リンクを追加できます。
+Qiita記事で言及されたIT技術書を収集し、ランキング形式で表示するWebサービス。
 
 ## 概要
 
 ### 主な機能
 
 - **ランキング表示**
-  - 日別ランキング（TOP 50）
-  - 月別ランキング（TOP 50）
-  - 年別ランキング（TOP 50）
+  - 24時間ランキング
+  - 30日間ランキング
+  - 365日間ランキング
+  - 年別ランキング（2015年以降）
+  - 全期間ランキング
   
 - **書籍詳細ページ**
   - 書籍情報（タイトル、著者、出版社、価格など）
-  - Zenn Books URL
-  - （将来的に）紹介しているYouTube動画の一覧・埋め込み
+  - Amazon商品ページへのリンク
+  - 言及しているQiita記事の一覧
   
 - **自動データ収集**
-  - Zenn Books APIから技術書情報を定期取得
-  - いいね数をベースにランキングを計算
+  - Qiita APIから記事情報を取得
+  - OpenBD APIとGoogle Books APIから書籍情報を取得
+  - 言及数をベースにランキングを計算
 
 ### データフロー
 
 ```
-Zenn Books API
+Qiita API
     ↓
-書籍情報取得（いいね順）
+記事からISBN抽出
+    ↓
+OpenBD/Google Books APIで書籍情報取得
     ↓
 データベース保存
     ↓
-ランキング計算（日次バッチ）
+ランキング計算
     ↓
 フロントエンド表示
 ```
@@ -40,59 +44,62 @@ Zenn Books API
 ### フロントエンド
 - **Next.js 14** (App Router) + TypeScript
 - **Tailwind CSS** - スタイリング
-- **Remix Icon** - アイコン
-- **SWR/TanStack Query** - データフェッチング・キャッシュ
+- **Lucide Icons** - アイコン
 - **Axios** - HTTP クライアント
 
 ### バックエンド
 - **FastAPI** (Python 3.11+)
-- **SQLAlchemy 2.0** - ORM
+- **SQLAlchemy ORM** - ORM
 - **Alembic** - マイグレーション
 - **Pydantic** - バリデーション
-- **Celery** - 非同期タスク（将来的に）
-- **Redis** - キャッシュ・タスクキュー（将来的に）
 
 ### データベース
 - **PostgreSQL 16+**
 
 ### デプロイ
 - **フロントエンド**: Vercel
-- **バックエンド**: Railway / Render / AWS ECS
-- **データベース**: Supabase / Railway / AWS RDS
+- **バックエンド**: Render
+- **データベース**: Neon DB (Serverless PostgreSQL)
+- **ドメイン**: Cloudflare Registrar
+- **DNS/CDN**: Cloudflare
 
 ## データベース設計
 
 ### テーブル一覧
 
 1. **books** - 書籍マスター
-2. **youtube_videos** - YouTube動画情報（将来的に手動追加）
-3. **book_mentions** - 書籍と動画の関連付け
-4. **book_daily_stats** - 書籍の日次統計
+2. **qiita_articles** - Qiita記事情報
 
 ### ER図
 
 ```
 books (書籍マスター)
 ├─ id (PK)
-├─ asin (Zenn slug or ISBN)
+├─ isbn
 ├─ title
 ├─ author
 ├─ publisher
 ├─ publication_date
-├─ price
-├─ image_url
-├─ affiliate_url (Zenn URL)
-├─ locale (ja/en)
-├─ total_views
-├─ total_mentions (いいね数)
+├─ description
+├─ thumbnail_url
+├─ amazon_url
+├─ amazon_affiliate_url
+├─ total_mentions
 └─ latest_mention_at
 
-book_daily_stats (日次統計)
+qiita_articles
 ├─ id (PK)
 ├─ book_id (FK)
-├─ date
-├─ daily_views
-└─ daily_mentions
+├─ qiita_id
+├─ title
+├─ url
+├─ author_id
+├─ author_name
+├─ tags
+├─ likes_count
+├─ stocks_count
+├─ comments_count
+└─ published_at
 ```
 
 ## API設計
@@ -100,10 +107,9 @@ book_daily_stats (日次統計)
 ### エンドポイント
 
 ```
-GET  /api/rankings/today     日別ランキング
-GET  /api/rankings/monthly   月別ランキング
-GET  /api/rankings/yearly    年別ランキング
-GET  /api/books/{asin}       書籍詳細
+GET  /api/rankings/              ランキング（クエリパラメータで期間指定）
+GET  /api/rankings/years         利用可能な年のリスト
+GET  /api/books/{asin}           書籍詳細
 ```
 
 ## セットアップ
@@ -126,10 +132,18 @@ npm run dev
 
 ```bash
 cd backend
+python -m venv venv
+venv\Scripts\activate  # Windows
+# source venv/bin/activate  # Mac/Linux
+
 pip install -r requirements.txt
 
-# データベーステーブル作成とデータ収集
-python scripts/setup_and_collect_zenn.py
+# 環境変数設定
+copy env.template .env
+# .envファイルを編集
+
+# データベースマイグレーション
+alembic upgrade head
 
 # サーバー起動
 uvicorn app.main:app --reload
@@ -142,31 +156,9 @@ cd backend
 start.bat
 ```
 
-### データ収集
-
-Zenn Books APIから書籍データを収集：
-
-```bash
-cd backend
-python scripts/setup_and_collect_zenn.py
-```
-
 ## 収益化
 
-- **Zenn Books** - 有料技術書の場合、Zennの収益分配プログラム
-- **楽天ブックスAPI** - 将来的に統合予定（楽天アフィリエイト）
-- **YouTube** - 将来的に動画リンクを手動追加
-
-## 今後の拡張予定
-
-- [x] 多言語対応（日本語・英語）
-- [ ] 管理画面（YouTube動画の手動追加・編集）
-- [ ] ユーザー登録・ログイン
-- [ ] お気に入り機能
-- [ ] 書籍の検索機能
-- [ ] カテゴリ別ランキング
-- [ ] トレンド分析
-- [ ] メール通知（新着書籍、ランキング変動）
+- **Amazonアソシエイト・プログラム** - 書籍購入時の紹介料（現在審査中）
 
 ## ライセンス
 
@@ -174,18 +166,17 @@ MIT License
 
 ## 開発者
 
-Qiibrary Development Team
+https://github.com/zndmonya-dot/qiibrary
 
 ---
 
-### デプロイ前のチェックリスト
+## デプロイ前のチェックリスト
 
-- [ ] 利用規約・プライバシーポリシー・特商法ページの内容を正式版に更新
+- [x] 利用規約・プライバシーポリシー・特商法ページの実装
 - [ ] OGP画像（`public/og-image.png`）を作成
-- [ ] 環境変数を本番用に設定（`.env.production`）
-- [ ] Google Analytics IDを設定
-- [ ] サイトマップを確認
-- [ ] robots.txtを確認
-- [ ] セキュリティヘッダーを設定
-- [ ] SSL証明書を設定
+- [x] サイトマップを実装
+- [x] robots.txtを実装
+- [x] アイコン・ファビコンを作成
+- [ ] SSL証明書を設定（Cloudflare経由）
 - [ ] データベースバックアップを設定
+- [ ] 環境変数を本番用に設定

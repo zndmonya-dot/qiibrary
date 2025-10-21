@@ -4,7 +4,7 @@ from typing import Optional
 
 class Settings(BaseSettings):
     # Database
-    DATABASE_URL: str = "postgresql://postgres:postgres@localhost:5432/booktuber?client_encoding=utf8"
+    DATABASE_URL: str = "postgresql://postgres:postgres@localhost:5432/qiibrary?client_encoding=utf8"
     
     # API Keys
     QIITA_API_TOKEN: str = ""
@@ -18,8 +18,8 @@ class Settings(BaseSettings):
     # Redis（サンプルデモ用にオプショナル）
     REDIS_URL: str = "redis://localhost:6379/0"
     
-    # JWT
-    SECRET_KEY: str = "your-secret-key-change-this-in-production"
+    # JWT（本番環境では必ず環境変数で設定してください）
+    SECRET_KEY: str = "dev-secret-key-CHANGE-THIS-IN-PRODUCTION-use-openssl-rand-hex-32"
     ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
     

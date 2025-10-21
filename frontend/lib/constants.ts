@@ -38,8 +38,8 @@ export const COLORS = {
 // 外部リンク
 // ========================================
 export const EXTERNAL_LINKS = {
-  AMAZON_ASSOCIATE_TAG: 'booktuber-22',
-  GITHUB: 'https://github.com/your_account',
-  TWITTER: 'https://twitter.com/your_account',
+  AMAZON_ASSOCIATE_TAG: '', // Amazonアソシエイトタグ（審査中）
+  GITHUB: 'https://github.com/zndmonya-dot/qiibrary',
+  TWITTER: 'https://x.com/qiibrary', // X（旧Twitter）アカウント
 } as const;
 

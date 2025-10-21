@@ -6,7 +6,6 @@ import Image from 'next/image';
 import Link from 'next/link';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
-import YouTubeEmbed from '@/components/YouTubeEmbed';
 import LoadingSpinner from '@/components/LoadingSpinner';
 import { getBookDetail, BookDetail } from '@/lib/api';
 import { formatNumber, formatPublicationDate } from '@/lib/utils';
@@ -265,44 +264,6 @@ export default function BookDetailPage() {
                     </button>
                   </div>
                 )}
-              </div>
-            )}
-        
-            {/* YouTube動画セクション */}
-            {book.youtube_videos && book.youtube_videos.length > 0 && (
-              <div className="mb-12 animate-fade-in-up animate-delay-300">
-                {/* セクションヘッダー */}
-                <div className="mb-6">
-                  <div className="bg-youtube-red/10 dark:bg-youtube-red/20 rounded-lg p-3 md:p-5 border-l-4 border-youtube-red">
-                    <h2 className="text-base md:text-xl lg:text-2xl font-bold lg:font-extrabold flex items-center gap-2 md:gap-3 text-qiita-text-dark dark:text-white">
-                      <div className="w-10 h-10 md:w-12 md:h-12 lg:w-14 lg:h-14 bg-youtube-red rounded-full flex items-center justify-center flex-shrink-0 shadow-lg">
-                        <i className="ri-youtube-fill text-white text-lg md:text-2xl lg:text-3xl"></i>
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2 md:gap-3 flex-wrap">
-                          <span className="text-sm md:text-base lg:text-lg">この本を紹介しているYouTube動画</span>
-                          <span className="bg-youtube-red text-white text-xs md:text-sm lg:text-base font-bold px-2 md:px-3 lg:px-4 py-0.5 md:py-1 rounded-full">
-                            {book.youtube_videos.length}件
-                          </span>
-                        </div>
-                        <p className="text-xs md:text-sm lg:text-base text-qiita-text dark:text-dark-text font-normal lg:font-medium mt-1">
-                          動画で詳しい解説をチェック
-                        </p>
-                      </div>
-                    </h2>
-                  </div>
-                </div>
-                
-                {/* 動画グリッド */}
-                <div className={`grid gap-6 ${
-                  book.youtube_videos.length === 1 
-                    ? 'grid-cols-1 max-w-2xl mx-auto' 
-                    : 'grid-cols-1 lg:grid-cols-2'
-                }`}>
-                  {book.youtube_videos.map((video) => (
-                    <YouTubeEmbed key={video.video_id} video={video} />
-                  ))}
-                </div>
               </div>
             )}
       </main>

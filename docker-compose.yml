@@ -4,44 +4,27 @@ services:
   # PostgreSQL データベース
   postgres:
     image: postgres:15
-    container_name: booktuber-postgres
+    container_name: qiibrary-postgres
     environment:
       POSTGRES_USER: user
       POSTGRES_PASSWORD: password
-      POSTGRES_DB: booktuber
+      POSTGRES_DB: qiibrary
       TZ: Asia/Tokyo
     ports:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U user -d booktuber"]
+      test: ["CMD-SHELL", "pg_isready -U user -d qiibrary"]
       interval: 10s
       timeout: 5s
-      retries: 5
-
-  # Redis キャッシュ
-  redis:
-    image: redis:7-alpine
-    container_name: booktuber-redis
-    ports:
-      - "6379:6379"
-    volumes:
-      - redis_data:/data
-    command: redis-server --appendonly yes
-    healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
-      interval: 10s
-      timeout: 3s
       retries: 5
 
 volumes:
   postgres_data:
     driver: local
-  redis_data:
-    driver: local
 
 networks:
   default:
-    name: booktuber-network
+    name: qiibrary-network
 
