@@ -7,7 +7,7 @@ import math
 from typing import List, Dict, Optional
 from datetime import datetime, timedelta
 from sqlalchemy.orm import Session
-from sqlalchemy import func
+from sqlalchemy import func, text
 
 from ..models.book import Book, BookQiitaMention
 from ..models.qiita_article import QiitaArticle
@@ -22,6 +22,178 @@ class RankingService:
     def __init__(self, db: Session):
         self.db = db
         self.openbd_service = get_openbd_service()
+    
+    def get_ranking_fast(
+        self,
+        tags: Optional[List[str]] = None,
+        days: Optional[int] = None,
+        year: Optional[int] = None,
+        month: Optional[int] = None,
+        limit: Optional[int] = 100
+    ) -> List[Dict]:
+        """
+        高速ランキング取得（直接SQL使用、top_articlesも2クエリで効率取得）
+        
+        NEONなどネットワークレイテンシーが高い環境でも高速動作
+        """
+        # 期間条件を構築
+        date_condition = ""
+        if days is not None:
+            start_date = (datetime.now() - timedelta(days=days)).strftime('%Y-%m-%d')
+            date_condition = f"AND qa.published_at >= '{start_date}'"
+        elif year is not None and month is not None:
+            import calendar
+            last_day = calendar.monthrange(year, month)[1]
+            date_condition = f"AND qa.published_at >= '{year}-{month:02d}-01' AND qa.published_at <= '{year}-{month:02d}-{last_day}'"
+        elif year is not None:
+            date_condition = f"AND qa.published_at >= '{year}-01-01' AND qa.published_at <= '{year}-12-31'"
+        
+        # タグ条件を構築
+        tag_condition = ""
+        if tags:
+            tag_checks = " OR ".join([f"qa.tags ? '{tag}'" for tag in tags])
+            tag_condition = f"AND ({tag_checks})"
+        
+        # limit句
+        limit_clause = f"LIMIT {limit}" if limit else ""
+        
+        # 直接SQL（1回のクエリでランキングデータ取得）
+        # スコアを計算してソート（元のget_ranking()と同じロジック）
+        sql = text(f"""
+            WITH book_stats AS (
+                SELECT 
+                    b.id, b.isbn, b.title, b.author, b.publisher, b.publication_date,
+                    b.description, b.thumbnail_url, b.amazon_url, b.amazon_affiliate_url,
+                    b.total_mentions, b.first_mentioned_at,
+                    COUNT(DISTINCT bqm.id) as mention_count,
+                    COUNT(DISTINCT qa.id) as article_count,
+                    COUNT(DISTINCT qa.author_id) as unique_user_count,
+                    COALESCE(SUM(qa.likes_count), 0) as total_likes,
+                    MAX(bqm.mentioned_at) as latest_mention_at
+                FROM books b
+                JOIN book_qiita_mentions bqm ON b.id = bqm.book_id
+                JOIN qiita_articles qa ON bqm.article_id = qa.id
+                WHERE 1=1
+                {date_condition}
+                {tag_condition}
+                GROUP BY b.id, b.isbn, b.title, b.author, b.publisher, b.publication_date,
+                         b.description, b.thumbnail_url, b.amazon_url, b.amazon_affiliate_url,
+                         b.total_mentions, b.first_mentioned_at
+            )
+            SELECT 
+                *,
+                -- 品質重視スコア: unique_user_count * (1 + ln(avg_likes + 1))
+                unique_user_count * (1 + LN(CASE WHEN article_count > 0 THEN (total_likes::float / article_count) + 1 ELSE 1 END)) as calculated_score
+            FROM book_stats
+            ORDER BY calculated_score DESC
+            {limit_clause}
+        """)
+        
+        results = self.db.execute(sql).fetchall()
+        
+        # 取得した書籍IDのリストを作成
+        book_ids = [row.id for row in results]
+        
+        # トップ記事を一括取得（2回目のクエリ）
+        top_articles_map = {}
+        if book_ids:
+            # WINDOW関数でトップ3記事を一括取得
+            articles_sql = text(f"""
+                WITH ranked_articles AS (
+                    SELECT 
+                        bqm.book_id,
+                        qa.id,
+                        qa.qiita_id,
+                        qa.title,
+                        qa.url,
+                        qa.author_id,
+                        qa.author_name,
+                        qa.likes_count,
+                        qa.published_at,
+                        ROW_NUMBER() OVER (PARTITION BY bqm.book_id ORDER BY qa.likes_count DESC) as rn
+                    FROM book_qiita_mentions bqm
+                    JOIN qiita_articles qa ON bqm.article_id = qa.id
+                    WHERE bqm.book_id = ANY(:book_ids)
+                    {date_condition}
+                    {tag_condition}
+                )
+                SELECT * FROM ranked_articles WHERE rn <= 3
+                ORDER BY book_id, rn
+            """)
+            
+            articles_results = self.db.execute(articles_sql, {"book_ids": book_ids}).fetchall()
+            
+            # book_id別にトップ記事を整理
+            for article in articles_results:
+                if article.book_id not in top_articles_map:
+                    top_articles_map[article.book_id] = []
+                
+                top_articles_map[article.book_id].append({
+                    "id": article.id,
+                    "qiita_id": article.qiita_id,
+                    "title": article.title,
+                    "url": article.url,
+                    "author_id": article.author_id,
+                    "author_name": article.author_name,
+                    "likes_count": article.likes_count,
+                    "published_at": article.published_at.isoformat() if article.published_at else None,
+                })
+        
+        # ランキング形式に整形
+        rankings = []
+        now = datetime.now()
+        for rank, row in enumerate(results, start=1):
+            mention_count = int(row.mention_count) if row.mention_count else 0
+            article_count = int(row.article_count) if row.article_count else 0
+            unique_user_count = int(row.unique_user_count) if row.unique_user_count else 0
+            total_likes = int(row.total_likes) if row.total_likes else 0
+            avg_likes = total_likes / article_count if article_count > 0 else 0
+            
+            # スコア（SQLで計算済み）
+            score = float(row.calculated_score) if hasattr(row, 'calculated_score') else unique_user_count * (1 + math.log(avg_likes + 1))
+            
+            # NEWバッジ判定
+            is_new = False
+            if row.first_mentioned_at:
+                days_since_first = (now - row.first_mentioned_at).days
+                is_new = days_since_first <= 30
+            
+            # Amazonアフィリエイトリンク生成
+            amazon_affiliate_url = self.openbd_service.generate_amazon_affiliate_url(row.isbn)
+            
+            # トップ記事を取得
+            top_articles = top_articles_map.get(row.id, [])
+            
+            rankings.append({
+                "rank": rank,
+                "book": {
+                    "id": row.id,
+                    "isbn": row.isbn,
+                    "title": row.title,
+                    "author": row.author,
+                    "publisher": row.publisher,
+                    "publication_date": row.publication_date.isoformat() if row.publication_date else None,
+                    "description": row.description,
+                    "thumbnail_url": row.thumbnail_url,
+                    "amazon_url": row.amazon_url,
+                    "amazon_affiliate_url": amazon_affiliate_url,
+                    "total_mentions": row.total_mentions,
+                },
+                "stats": {
+                    "mention_count": mention_count,
+                    "article_count": article_count,
+                    "unique_user_count": unique_user_count,
+                    "total_likes": total_likes,
+                    "avg_likes": round(avg_likes, 2),
+                    "score": round(score, 2),
+                    "latest_mention_at": row.latest_mention_at.isoformat() if row.latest_mention_at else None,
+                    "is_new": is_new,
+                },
+                "top_articles": top_articles,
+            })
+        
+        logger.info(f"高速ランキング取得完了: {len(rankings)}件、トップ記事も取得")
+        return rankings
     
     def get_ranking(
         self,
@@ -342,23 +514,21 @@ class RankingService:
     
     def get_available_years(self) -> List[int]:
         """
-        データが存在する年のリストを取得
+        データが存在する年のリストを取得（高速版：直接SQL使用）
         
         Returns:
             年のリスト（降順）
         """
-        from sqlalchemy import extract, distinct
-        from typing import Any, List as ListType
+        # 直接SQLで高速化
+        sql = text("""
+            SELECT DISTINCT EXTRACT(YEAR FROM published_at)::int as year
+            FROM qiita_articles
+            WHERE published_at IS NOT NULL
+            ORDER BY year DESC
+        """)
         
-        # latest_mention_atから年を抽出
-        years: ListType[Any] = (
-            self.db.query(distinct(extract('year', Book.latest_mention_at)))
-            .filter(Book.latest_mention_at.isnot(None))
-            .order_by(extract('year', Book.latest_mention_at).desc())
-            .all()
-        )
-        
-        return [int(year[0]) for year in years if year[0]]
+        results = self.db.execute(sql).fetchall()
+        return [int(row.year) for row in results if row.year]
 
 
 # ヘルパー関数

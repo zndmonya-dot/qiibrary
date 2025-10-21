@@ -51,13 +51,13 @@ async def get_rankings(
             tag_list = [tag.strip() for tag in tags.split(",") if tag.strip()]
         
         ranking_service = RankingService(db)
-        rankings = ranking_service.get_ranking(
+        # 高速版を使用（NEONでも高速動作）
+        rankings = ranking_service.get_ranking_fast(
             tags=tag_list,
             days=days,
             year=year,
             month=month,
-            limit=limit,
-            scoring_method="quality"  # 品質重視方式を使用
+            limit=limit
         )
         
         # 期間ラベルを生成
