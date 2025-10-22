@@ -78,10 +78,10 @@ async def get_book_detail(
                     "youtube_url": link.youtube_url,
                     "youtube_video_id": link.youtube_video_id,
                     "title": link.title,
-                    "channel_name": link.channel_name,
+                    "channel_name": getattr(link, 'channel_name', None),
                     "thumbnail_url": link.thumbnail_url,
-                    "view_count": link.view_count or 0,
-                    "like_count": link.like_count or 0,
+                    "view_count": getattr(link, 'view_count', 0) or 0,
+                    "like_count": getattr(link, 'like_count', 0) or 0,
                     "display_order": link.display_order,
                 }
                 for link in youtube_links
