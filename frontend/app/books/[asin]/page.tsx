@@ -103,7 +103,7 @@ export default function BookDetailPage() {
         '@type': 'Organization',
         name: book.publisher
       } : undefined,
-      datePublished: book.published_date || undefined,
+      datePublished: book.publication_date || undefined,
       aggregateRating: totalLikes > 0 ? {
         '@type': 'AggregateRating',
         ratingValue: Math.min(5, (totalLikes / articleCount) / 20), // いいね数を5点満点に正規化
