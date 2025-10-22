@@ -53,8 +53,8 @@ export default function DailyTweetPage() {
 
 『${title}』
 
-👥 ${articleCount}件のQiita記事で紹介
-❤️ 総いいね数: ${likesDisplay}
+👥 累計${articleCount}件のQiita記事で紹介
+❤️ 累計いいね数: ${likesDisplay}
 
 詳しくはこちら👇
 ${bookUrl}
@@ -162,9 +162,10 @@ ${bookUrl}
           <h1 className="text-3xl font-bold text-qiita-text-dark dark:text-white mb-2">
             デイリーツイート生成
           </h1>
-          <p className="text-qiita-text dark:text-dark-text">
-            24時間ランキング1位の書籍をX（Twitter）で紹介するためのツイート文を生成します。
-          </p>
+        <p className="text-qiita-text dark:text-dark-text">
+          24時間ランキング1位の書籍をX（Twitter）で紹介するためのツイート文を生成します。<br />
+          <span className="text-sm text-qiita-text-light dark:text-dark-text-light">※記事数・いいね数は累計データです</span>
+        </p>
         </div>
 
         <div className="bg-qiita-card dark:bg-dark-surface rounded-lg p-6 border border-qiita-border dark:border-dark-border shadow-sm mb-6">
