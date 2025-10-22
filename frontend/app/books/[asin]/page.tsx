@@ -366,11 +366,11 @@ export default function BookDetailPage() {
                   href={book.amazon_affiliate_url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-3 px-6 md:px-8 py-3 md:py-4 bg-gradient-to-r from-[#FF9900] to-[#FFB84D] hover:from-[#FFB84D] hover:to-[#FF9900] text-white font-bold text-base md:text-lg rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
+                  className="inline-flex items-center gap-2 md:gap-3 px-6 md:px-8 py-3 md:py-3.5 bg-qiita-surface dark:bg-dark-surface-light border-2 border-qiita-green dark:border-dark-green text-qiita-green dark:text-dark-green hover:bg-qiita-green dark:hover:bg-dark-green hover:text-white dark:hover:text-white font-bold text-sm md:text-base rounded-lg transition-all duration-200"
                 >
-                  <i className="ri-shopping-cart-line text-xl md:text-2xl"></i>
+                  <i className="ri-shopping-cart-line text-lg md:text-xl"></i>
                   <span>Amazonで購入する</span>
-                  <i className="ri-external-link-line text-lg"></i>
+                  <i className="ri-external-link-line text-sm md:text-base"></i>
                 </a>
               </div>
             )}
