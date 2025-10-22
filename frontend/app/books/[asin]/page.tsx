@@ -29,6 +29,9 @@ export default function BookDetailPage() {
   const [newlyAddedStart, setNewlyAddedStart] = useState<number | null>(null);
 
   useEffect(() => {
+    // ページトップにスクロール
+    window.scrollTo(0, 0);
+    
     const fetchBook = async () => {
       setLoading(true);
       setError(null);
@@ -114,7 +117,7 @@ export default function BookDetailPage() {
         <div className="min-h-screen bg-qiita-bg dark:bg-dark-bg">
           <Header />
           
-          <main className="container mx-auto px-3 md:px-4 py-4 md:py-8">
+          <main className="container mx-auto px-3 md:px-4 pt-6 pb-4 md:py-8">
             {/* 戻るボタン */}
             <button
               onClick={() => router.push('/')}
