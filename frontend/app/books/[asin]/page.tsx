@@ -269,6 +269,76 @@ export default function BookDetailPage() {
                 )}
               </div>
             )}
+
+            {/* YouTube動画セクション */}
+            {book.youtube_videos && book.youtube_videos.length > 0 && (
+              <div id="youtube-videos" className="mb-12 scroll-mt-24">
+                {/* セクションヘッダー */}
+                <div className="mb-4 md:mb-6">
+                  <div className="flex items-center gap-2 md:gap-3 mb-1.5 md:mb-2">
+                    <h2 className="text-base md:text-lg font-bold text-qiita-text-dark dark:text-white">
+                      関連動画
+                    </h2>
+                    <span className="text-xs md:text-sm font-bold text-red-500 dark:text-red-400 px-1.5 md:px-2 py-0.5 bg-red-500/10 dark:bg-red-500/20 rounded">
+                      {book.youtube_videos.length}件
+                    </span>
+                  </div>
+                  <p className="text-xs md:text-sm text-qiita-text dark:text-dark-text">
+                    この本について詳しく解説している動画
+                  </p>
+                </div>
+                
+                <div className="grid md:grid-cols-2 gap-3 md:gap-4">
+                  {book.youtube_videos.map((video, index) => {
+                    const delayMs = index * 100;
+                    const style: React.CSSProperties = {
+                      animation: `fadeInUp 0.5s ease-out ${delayMs}ms forwards`,
+                      opacity: 0,
+                      transform: 'translateY(20px)'
+                    };
+
+                    return (
+                      <a
+                        key={video.video_id}
+                        href={video.video_url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="group block rounded-lg bg-qiita-surface dark:bg-[#2f3232] hover-card overflow-hidden"
+                        style={style}
+                      >
+                        {/* サムネイル */}
+                        <div className="relative aspect-video bg-gray-200 dark:bg-gray-800 overflow-hidden">
+                          {video.thumbnail_url && (
+                            <img
+                              src={video.thumbnail_url}
+                              alt={video.title}
+                              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                            />
+                          )}
+                          <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors flex items-center justify-center">
+                            <div className="w-12 h-12 md:w-16 md:h-16 bg-red-600 rounded-full flex items-center justify-center opacity-80 group-hover:opacity-100 transition-opacity">
+                              <i className="ri-play-fill text-white text-2xl md:text-3xl ml-1"></i>
+                            </div>
+                          </div>
+                        </div>
+                        
+                        {/* 動画情報 */}
+                        <div className="p-3 md:p-4">
+                          <h3 className="text-sm md:text-base font-bold text-qiita-text-dark dark:text-white mb-2 group-hover-text-green line-clamp-2 leading-relaxed">
+                            {video.title}
+                          </h3>
+                          
+                          <div className="flex items-center gap-2 text-xs text-qiita-text dark:text-dark-text">
+                            <i className="ri-youtube-line text-red-500"></i>
+                            <span className="truncate">{video.channel_name}</span>
+                          </div>
+                        </div>
+                      </a>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
       </main>
       
       <Footer />
