@@ -27,6 +27,7 @@ export default function BookDetailPage() {
   const [displayedArticlesCount, setDisplayedArticlesCount] = useState(INITIAL_ARTICLES_COUNT);
   const previousCountRef = useRef(INITIAL_ARTICLES_COUNT);
   const [newlyAddedStart, setNewlyAddedStart] = useState<number | null>(null);
+  const [selectedVideoId, setSelectedVideoId] = useState<string | null>(null);
 
   useEffect(() => {
     // ページトップにスクロール
@@ -298,12 +299,10 @@ export default function BookDetailPage() {
                     };
 
                     return (
-                      <a
+                      <button
                         key={video.video_id}
-                        href={video.video_url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="group block rounded-lg bg-qiita-surface dark:bg-[#2f3232] hover-card overflow-hidden"
+                        onClick={() => setSelectedVideoId(video.video_id)}
+                        className="group block rounded-lg bg-qiita-surface dark:bg-[#2f3232] hover-card overflow-hidden w-full text-left"
                         style={style}
                       >
                         {/* サムネイル */}
@@ -316,7 +315,7 @@ export default function BookDetailPage() {
                             />
                           )}
                           <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors flex items-center justify-center">
-                            <div className="w-12 h-12 md:w-16 md:h-16 bg-red-600 rounded-full flex items-center justify-center opacity-80 group-hover:opacity-100 transition-opacity">
+                            <div className="w-12 h-12 md:w-16 md:h-16 bg-red-600 rounded-full flex items-center justify-center opacity-80 group-hover:opacity-100 transition-opacity shadow-lg">
                               <i className="ri-play-fill text-white text-2xl md:text-3xl ml-1"></i>
                             </div>
                           </div>
@@ -333,9 +332,39 @@ export default function BookDetailPage() {
                             <span className="truncate">{video.channel_name}</span>
                           </div>
                         </div>
-                      </a>
+                      </button>
                     );
                   })}
+                </div>
+              </div>
+            )}
+
+            {/* 動画再生モーダル */}
+            {selectedVideoId && (
+              <div
+                className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4 animate-fade-in"
+                onClick={() => setSelectedVideoId(null)}
+              >
+                <div
+                  className="relative w-full max-w-5xl aspect-video bg-black rounded-lg overflow-hidden shadow-2xl"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  {/* 閉じるボタン */}
+                  <button
+                    onClick={() => setSelectedVideoId(null)}
+                    className="absolute top-2 right-2 md:top-4 md:right-4 w-10 h-10 bg-black/50 hover:bg-black/70 text-white rounded-full flex items-center justify-center z-10 transition-colors"
+                    aria-label="閉じる"
+                  >
+                    <i className="ri-close-line text-2xl"></i>
+                  </button>
+                  
+                  {/* YouTube埋め込み */}
+                  <iframe
+                    src={`https://www.youtube.com/embed/${selectedVideoId}?autoplay=1`}
+                    className="w-full h-full"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowFullScreen
+                  ></iframe>
                 </div>
               </div>
             )}
