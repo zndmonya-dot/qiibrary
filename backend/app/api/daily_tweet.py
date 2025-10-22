@@ -46,12 +46,16 @@ def get_pattern_config(pattern: RankingPattern) -> dict:
     if pattern == "daily":
         return {
             "days": 1,
+            "year": None,
+            "month": None,
             "title": "【Qiita技術書ランキング 本日の1位】",
             "period_label": "24時間"
         }
     elif pattern == "weekly":
         return {
             "days": 7,
+            "year": None,
+            "month": None,
             "title": "【Qiita技術書ランキング 今週の1位】",
             "period_label": "7日間"
         }
@@ -60,30 +64,38 @@ def get_pattern_config(pattern: RankingPattern) -> dict:
         if now.day <= 3:  # 月初3日間は先月のランキング
             last_month = now.replace(day=1) - timedelta(days=1)
             return {
-                "days": 30,
-                "title": f"【Qiita技術書ランキング {last_month.month}月の1位】",
+                "days": None,
+                "year": last_month.year,
+                "month": last_month.month,
+                "title": f"【Qiita技術書ランキング {last_month.year}年{last_month.month}月の1位】",
                 "period_label": f"{last_month.year}年{last_month.month}月"
             }
         else:
             return {
-                "days": 30,
-                "title": "【Qiita技術書ランキング 今月の1位】",
-                "period_label": "30日間"
+                "days": None,
+                "year": now.year,
+                "month": now.month,
+                "title": f"【Qiita技術書ランキング {now.year}年{now.month}月の1位】",
+                "period_label": f"{now.year}年{now.month}月"
             }
     else:  # yearly
         # 年初の場合は去年のランキング
         if now.month == 1 and now.day <= 7:
             last_year = now.year - 1
             return {
-                "days": 365,
+                "days": None,
+                "year": last_year,
+                "month": None,
                 "title": f"【Qiita技術書ランキング {last_year}年の1位】",
                 "period_label": f"{last_year}年"
             }
         else:
             return {
-                "days": 365,
-                "title": "【Qiita技術書ランキング 今年の1位】",
-                "period_label": "365日間"
+                "days": None,
+                "year": now.year,
+                "month": None,
+                "title": f"【Qiita技術書ランキング {now.year}年の1位】",
+                "period_label": f"{now.year}年"
             }
 
 
@@ -121,8 +133,8 @@ async def get_daily_tweet(
     パターン:
     - daily: 24時間ランキング
     - weekly: 7日間ランキング
-    - monthly: 30日間ランキング（月初は先月）
-    - yearly: 365日間ランキング（年初は去年）
+    - monthly: カレンダー上の月ランキング（例: 2025年10月1日〜31日、月初は先月）
+    - yearly: カレンダー上の年ランキング（例: 2025年1月1日〜12月31日、年初は去年）
     """
     try:
         # パターン設定を取得
@@ -130,7 +142,12 @@ async def get_daily_tweet(
         
         # ランキングを取得
         ranking_service = RankingService(db)
-        rankings_data = ranking_service.get_ranking_fast(days=pattern_config['days'], limit=1)
+        rankings_data = ranking_service.get_ranking_fast(
+            days=pattern_config['days'],
+            year=pattern_config['year'],
+            month=pattern_config['month'],
+            limit=1
+        )
         
         if not rankings_data or len(rankings_data) == 0:
             raise HTTPException(

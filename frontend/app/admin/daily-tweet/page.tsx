@@ -25,12 +25,12 @@ const PATTERNS: Record<RankingPattern, PatternInfo> = {
   },
   monthly: {
     label: '今月の1位',
-    description: '30日間ランキング（月初は先月）',
+    description: 'カレンダー月ランキング（月初は先月）',
     icon: 'ri-calendar-2-line'
   },
   yearly: {
     label: '今年の1位',
-    description: '365日間ランキング（年初は去年）',
+    description: 'カレンダー年ランキング（年初は去年）',
     icon: 'ri-calendar-event-line'
   }
 };
