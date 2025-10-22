@@ -12,10 +12,9 @@ interface BookCardProps {
   book: Book;
   stats: BookStats;
   topArticles?: TopArticle[];
-  onNavigate?: () => void;
 }
 
-function BookCard({ rank, book, stats, topArticles, onNavigate }: BookCardProps) {
+function BookCard({ rank, book, stats, topArticles }: BookCardProps) {
   // ランクに応じた色を決定
   const getRankStyle = () => {
     if (rank === 1) return 'text-yellow-500 drop-shadow-[0_0_8px_rgba(234,179,8,0.5)]'; // 金
@@ -137,7 +136,7 @@ function BookCard({ rank, book, stats, topArticles, onNavigate }: BookCardProps)
             href={book.amazon_affiliate_url}
             target="_blank"
             rel="noopener noreferrer"
-            className="hidden md:inline-flex w-[160px] items-center justify-center gap-1 px-2 py-2 bg-[#FF9900] text-white rounded-lg font-semibold text-xs transition-all duration-150 shadow-sm"
+            className="hidden md:inline-flex w-[160px] items-center justify-center gap-1 px-2 py-2 bg-[#FF9900] text-white rounded-lg font-semibold text-xs shadow-sm"
             onClick={() => analytics.clickAmazonLink(book.isbn || '', book.title)}
           >
             <i className="ri-amazon-line text-sm"></i>
@@ -166,7 +165,7 @@ function BookCard({ rank, book, stats, topArticles, onNavigate }: BookCardProps)
                   }
                 }}
               >
-                <h3 className="text-base md:text-lg font-bold line-clamp-2 leading-relaxed text-qiita-text-dark dark:text-white transition-colors duration-200">
+                <h3 className="text-base md:text-lg font-bold line-clamp-2 leading-relaxed text-qiita-text-dark dark:text-white">
                   {book.title || `ISBN: ${book.isbn} の書籍`}
                 </h3>
               </a>
@@ -206,8 +205,7 @@ function BookCard({ rank, book, stats, topArticles, onNavigate }: BookCardProps)
                 <Link
                   href={`/books/${book.isbn}#qiita-articles`}
                   prefetch={true}
-                  className="flex items-center gap-1.5 text-qiita-green dark:text-dark-green hover-scale"
-                  onClick={() => onNavigate?.()}
+                  className="flex items-center gap-1.5 text-qiita-green dark:text-dark-green"
                 >
                   <i className="ri-article-line text-lg"></i>
                   <span className="font-bold text-base">{formatNumber(stats.mention_count)}</span>
@@ -217,8 +215,7 @@ function BookCard({ rank, book, stats, topArticles, onNavigate }: BookCardProps)
                   <Link
                     href={`/books/${book.isbn}#qiita-articles`}
                     prefetch={true}
-                    className="flex items-center gap-1.5 text-pink-600 dark:text-pink-400 hover-scale"
-                    onClick={() => onNavigate?.()}
+                    className="flex items-center gap-1.5 text-pink-600 dark:text-pink-400"
                   >
                     <i className="ri-heart-fill text-lg"></i>
                     <span className="font-bold text-base">{formatNumber(stats.total_likes)}</span>
@@ -244,14 +241,14 @@ function BookCard({ rank, book, stats, topArticles, onNavigate }: BookCardProps)
                   href={article.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="group block p-2.5 md:p-3 rounded-lg bg-qiita-surface/30 dark:bg-dark-surface-light/30 border border-qiita-border/30 dark:border-dark-border/30 hover-card"
+                  className="block p-2.5 md:p-3 rounded-lg bg-qiita-surface/30 dark:bg-dark-surface-light/30 border border-qiita-border/30 dark:border-dark-border/30"
                 >
                   <div className="flex items-start gap-2.5">
                     <span className="flex-shrink-0 w-6 h-6 flex items-center justify-center rounded-full bg-qiita-green/20 dark:bg-qiita-green/30 text-qiita-green dark:text-dark-green text-xs font-bold">
                       {index + 1}
                     </span>
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-semibold text-qiita-text-dark dark:text-white line-clamp-2 leading-relaxed group-hover:text-qiita-green dark:group-hover:text-dark-green transition-colors mb-1.5">
+                      <p className="text-sm font-semibold text-qiita-text-dark dark:text-white line-clamp-2 leading-relaxed mb-1.5">
                         {article.title}
                       </p>
                       <div className="flex items-center gap-1 text-xs text-qiita-text dark:text-dark-text">
@@ -259,7 +256,7 @@ function BookCard({ rank, book, stats, topArticles, onNavigate }: BookCardProps)
                         <span>{formatNumber(article.likes_count)}</span>
                       </div>
                     </div>
-                    <i className="ri-external-link-line text-base text-qiita-text-light dark:text-dark-text-light group-hover:text-qiita-green dark:group-hover:text-dark-green transition-colors flex-shrink-0"></i>
+                    <i className="ri-external-link-line text-base text-qiita-text-light dark:text-dark-text-light flex-shrink-0"></i>
                   </div>
                 </a>
               ))}
@@ -268,9 +265,8 @@ function BookCard({ rank, book, stats, topArticles, onNavigate }: BookCardProps)
               <Link
                 href={`/books/${book.isbn}#qiita-articles`}
                 prefetch={true}
-                className="inline-flex items-center gap-1 text-xs text-qiita-green dark:text-dark-green hover-scale font-medium"
+                className="inline-flex items-center gap-1 text-xs text-qiita-green dark:text-dark-green font-medium"
                 onClick={() => {
-                  onNavigate?.();
                   analytics.clickBook(book.isbn || '', book.title, rank);
                 }}
               >
