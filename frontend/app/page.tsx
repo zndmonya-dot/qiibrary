@@ -182,9 +182,9 @@ export default function Home() {
         </div>
         
         {/* 検索バー */}
-        <div className={`mb-3 md:mb-6 bg-qiita-card dark:bg-dark-surface rounded-lg border border-qiita-border dark:border-dark-border p-2 md:p-4 ${!isRestoring ? 'animate-fade-in-up' : ''}`}>
+        <div className={`mb-4 md:mb-6 bg-qiita-card dark:bg-dark-surface rounded-lg border border-qiita-border dark:border-dark-border p-3 md:p-4 ${!isRestoring ? 'animate-fade-in-up' : ''}`}>
           <div className="relative">
-            <i className="ri-search-line absolute left-2.5 md:left-4 top-1/2 -translate-y-1/2 text-qiita-text dark:text-dark-text text-base md:text-xl"></i>
+            <i className="ri-search-line absolute left-3 md:left-4 top-1/2 -translate-y-1/2 text-qiita-text dark:text-dark-text text-lg md:text-xl"></i>
             <input
               type="text"
               placeholder="書籍名、著者、出版社、ISBNで検索..."
@@ -196,7 +196,7 @@ export default function Home() {
                   analytics.search(e.target.value, filteredRankings.length);
                 }
               }}
-              className="w-full pl-8 md:pl-12 pr-3 md:pr-4 py-1.5 md:py-3 text-xs md:text-base bg-qiita-surface dark:bg-[#494b4b] text-qiita-text-dark dark:text-white rounded-lg border border-qiita-border dark:border-dark-border focus:outline-none font-medium"
+              className="w-full pl-10 md:pl-12 pr-10 md:pr-12 py-2.5 md:py-3 text-sm md:text-base bg-qiita-surface dark:bg-[#494b4b] text-qiita-text-dark dark:text-white rounded-lg border border-qiita-border dark:border-dark-border focus:outline-none focus:ring-2 focus:ring-qiita-green/50 dark:focus:ring-dark-green/50 font-medium"
             />
             {searchQuery && (
               <button
@@ -204,20 +204,21 @@ export default function Home() {
                   setSearchQuery('');
                   setCurrentPage(1);
                 }}
-                className="absolute right-4 top-1/2 -translate-y-1/2 text-qiita-text dark:text-dark-text hover-link"
+                className="absolute right-3 md:right-4 top-1/2 -translate-y-1/2 text-qiita-text dark:text-dark-text p-1"
+                aria-label="検索をクリア"
               >
-                <i className="ri-close-circle-line text-xl"></i>
+                <i className="ri-close-circle-line text-xl md:text-2xl"></i>
               </button>
             )}
           </div>
           {searchQuery && filteredRankings.length > 0 && (
-            <div className="mt-3 text-sm text-qiita-text dark:text-dark-text font-medium">
+            <div className="mt-3 text-sm md:text-base text-qiita-text dark:text-dark-text font-medium">
               <i className="ri-information-line text-qiita-green dark:text-dark-green mr-1"></i>
               {filteredRankings.length}件の書籍が見つかりました
             </div>
           )}
           {searchQuery && filteredRankings.length === 0 && !loading && (
-            <div className="mt-3 text-sm text-red-600 dark:text-red-400 font-medium">
+            <div className="mt-3 text-sm md:text-base text-red-600 dark:text-red-400 font-medium">
               <i className="ri-error-warning-line mr-1"></i>
               該当する書籍が見つかりませんでした
             </div>
