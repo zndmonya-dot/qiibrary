@@ -49,17 +49,16 @@ export default function DailyTweetPage() {
     const asin = book.isbn?.replace(/-/g, '') || '';
     const bookUrl = asin ? `https://qiibrary.com/books/${asin}` : 'https://qiibrary.com';
     
-    const tweet = `📚 本日の24時間ランキング1位 📚
+    const tweet = `【Qiita 24時間で人気の技術書】
 
-『${title}』
+${title}
 
-👥 累計${articleCount}件のQiita記事で紹介
-❤️ 累計いいね数: ${likesDisplay}
+累計${articleCount}件の記事で紹介
+累計いいね: ${likesDisplay}
 
-詳しくはこちら👇
 ${bookUrl}
 
-#プログラミング #技術書 #Qiita #エンジニア`;
+#技術書 #Qiita #エンジニア`;
     
     return tweet;
   };
