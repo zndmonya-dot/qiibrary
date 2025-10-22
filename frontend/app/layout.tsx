@@ -73,11 +73,24 @@ export default function RootLayout({
     <html lang="ja" suppressHydrationWarning>
       <head />
       <body>
-        {/* デフォルトでダークモード（ユーザー設定は保存しない） */}
+        {/* ローカルストレージからテーマを読み込み（ちらつき防止） */}
         <script
           dangerouslySetInnerHTML={{
             __html: `
-              document.documentElement.classList.add('dark');
+              (function() {
+                try {
+                  const stored = localStorage.getItem('qiibrary-theme');
+                  const theme = stored || 'dark';
+                  if (theme === 'dark') {
+                    document.documentElement.classList.add('dark');
+                  } else {
+                    document.documentElement.classList.remove('dark');
+                  }
+                } catch (e) {
+                  // デフォルトでダークモード
+                  document.documentElement.classList.add('dark');
+                }
+              })();
             `,
           }}
         />

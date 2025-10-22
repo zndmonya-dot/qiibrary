@@ -2,8 +2,41 @@
 
 import { Theme, DEFAULT_THEME } from './constants';
 
+const THEME_STORAGE_KEY = 'qiibrary-theme';
+
 /**
- * テーマをDOMに適用（ユーザー設定は保存しない）
+ * ローカルストレージからテーマを読み込む
+ */
+function getStoredTheme(): Theme | null {
+  if (typeof window === 'undefined') return null;
+  
+  try {
+    const stored = localStorage.getItem(THEME_STORAGE_KEY);
+    if (stored === 'dark' || stored === 'light') {
+      return stored;
+    }
+  } catch (e) {
+    // ローカルストレージが使えない場合は無視
+  }
+  
+  return null;
+}
+
+/**
+ * ローカルストレージにテーマを保存
+ */
+function saveTheme(theme: Theme): void {
+  if (typeof window === 'undefined') return;
+  
+  try {
+    localStorage.setItem(THEME_STORAGE_KEY, theme);
+  } catch (e) {
+    // ローカルストレージが使えない場合は無視
+  }
+}
+
+/**
+ * テーマをDOMに適用してローカルストレージに保存
  */
 export function applyTheme(theme: Theme): void {
   if (theme === 'dark') {
@@ -11,14 +44,22 @@ export function applyTheme(theme: Theme): void {
   } else {
     document.documentElement.classList.remove('dark');
   }
+  
+  // ローカルストレージに保存
+  saveTheme(theme);
 }
 
 /**
- * 現在のテーマを取得（DOMから）
+ * 現在のテーマを取得（ローカルストレージ → DOM の順）
  */
 export function getCurrentTheme(): Theme {
   if (typeof window === 'undefined') return DEFAULT_THEME;
   
+  // まずローカルストレージから取得
+  const stored = getStoredTheme();
+  if (stored) return stored;
+  
+  // なければDOMから取得
   const isDark = document.documentElement.classList.contains('dark');
   return isDark ? 'dark' : 'light';
 }
@@ -35,7 +76,15 @@ export function toggleTheme(): Theme {
 
 /**
  * テーマを初期化（ページロード時に呼び出す）
+ * ローカルストレージに保存された設定があればそれを使用
  */
 export function initTheme(): void {
-  applyTheme(DEFAULT_THEME);
+  const stored = getStoredTheme();
+  const theme = stored || DEFAULT_THEME;
+  
+  if (theme === 'dark') {
+    document.documentElement.classList.add('dark');
+  } else {
+    document.documentElement.classList.remove('dark');
+  }
 }
