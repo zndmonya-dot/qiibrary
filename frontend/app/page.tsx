@@ -165,7 +165,7 @@ export default function Home() {
             </div>
           )}
           {searchQuery && filteredRankings.length === 0 && !loading && (
-            <div className="mt-3 text-sm md:text-base text-red-600 dark:text-red-400 font-medium">
+            <div className="mt-3 text-sm md:text-base text-red-600 dark:text-red-400 font-medium animate-fade-in-up">
               <i className="ri-error-warning-line mr-1"></i>
               該当する書籍が見つかりませんでした
             </div>
@@ -353,7 +353,7 @@ export default function Home() {
                   );
                 })
               ) : (
-                <div className="bg-qiita-card dark:bg-dark-surface rounded-lg p-12 text-center border border-qiita-border dark:border-dark-border shadow-sm">
+                <div className="bg-qiita-card dark:bg-dark-surface rounded-lg p-12 text-center border border-qiita-border dark:border-dark-border shadow-sm animate-fade-in-up">
                   <i className="ri-inbox-line text-6xl text-qiita-text-light dark:text-dark-text-light mb-4"></i>
                   <h3 className="text-xl font-bold text-qiita-text-dark dark:text-white mb-2">データがありません</h3>
                   <p className="text-qiita-text dark:text-dark-text">この期間のランキングデータはまだ収集されていません。</p>
