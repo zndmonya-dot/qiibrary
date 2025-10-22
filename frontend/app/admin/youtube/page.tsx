@@ -2,6 +2,8 @@
 
 import { useState, useEffect } from 'react';
 import axios from 'axios';
+import Header from '@/components/Header';
+import Footer from '@/components/Footer';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 
@@ -196,115 +198,123 @@ export default function YouTubeAdminPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-qiita-surface via-qiita-surface to-qiita-card dark:from-dark-surface dark:via-dark-surface dark:to-dark-card p-4 md:p-8">
-      <div className="max-w-7xl mx-auto">
+    <div className="min-h-screen bg-qiita-bg dark:bg-dark-bg">
+      <Header />
+      
+      <main className="container mx-auto px-3 md:px-4 py-3 md:py-8 min-h-[calc(100vh-120px)]">
         {/* ヘッダー */}
-        <div className="mb-8">
-          <h1 className="text-3xl md:text-4xl font-bold text-qiita-text dark:text-dark-text mb-2 flex items-center gap-3">
-            <i className="ri-youtube-line text-red-500"></i>
+        <div className="mb-3 md:mb-8 bg-qiita-card dark:bg-dark-surface rounded-xl p-3 md:p-8 border-l-4 border-qiita-green dark:border-dark-green shadow-sm">
+          <h2 className="text-lg md:text-3xl font-bold mb-1.5 md:mb-3 flex items-center gap-2 md:gap-3 text-qiita-text-dark dark:text-white">
+            <i className="ri-youtube-line text-xl md:text-3xl text-red-500"></i>
             YouTube動画管理
-          </h1>
-          <p className="text-qiita-text-light dark:text-dark-text-light">
+          </h2>
+          <p className="text-qiita-text dark:text-dark-text font-medium text-xs md:text-base">
             人気書籍にYouTube動画を追加して、より詳しい情報を提供しましょう
           </p>
         </div>
 
-        <div className="grid lg:grid-cols-5 gap-6">
+        <div className="grid lg:grid-cols-5 gap-3 md:gap-6">
           {/* 左側：ランキング (3/5) */}
           <div className="lg:col-span-3">
             {/* モード切り替え */}
-            <div className="flex gap-2 mb-4">
-              <button
-                onClick={() => setMode('period')}
-                className={`flex-1 px-4 py-3 rounded-xl font-semibold transition-all duration-200 ${
-                  mode === 'period'
-                    ? 'bg-gradient-to-r from-qiita-green to-emerald-500 dark:from-dark-green dark:to-emerald-600 text-white shadow-lg shadow-qiita-green/30 dark:shadow-dark-green/30'
-                    : 'bg-qiita-card dark:bg-dark-card text-qiita-text dark:text-dark-text border border-qiita-border dark:border-dark-border hover:border-qiita-green dark:hover:border-dark-green'
-                }`}
-              >
-                <i className="ri-time-line mr-2"></i>期間別
-              </button>
-              <button
-                onClick={() => setMode('year')}
-                className={`flex-1 px-4 py-3 rounded-xl font-semibold transition-all duration-200 ${
-                  mode === 'year'
-                    ? 'bg-gradient-to-r from-qiita-green to-emerald-500 dark:from-dark-green dark:to-emerald-600 text-white shadow-lg shadow-qiita-green/30 dark:shadow-dark-green/30'
-                    : 'bg-qiita-card dark:bg-dark-card text-qiita-text dark:text-dark-text border border-qiita-border dark:border-dark-border hover:border-qiita-green dark:hover:border-dark-green'
-                }`}
-              >
-                <i className="ri-calendar-line mr-2"></i>年次別
-              </button>
+            <div className="mb-3 md:mb-4 bg-qiita-card dark:bg-dark-surface rounded-lg border border-qiita-border dark:border-dark-border p-2">
+              <div className="flex gap-2">
+                <button
+                  onClick={() => setMode('period')}
+                  className={`flex-1 px-3 md:px-4 py-2 md:py-2.5 text-xs md:text-base rounded-lg font-semibold transition-all ${
+                    mode === 'period'
+                      ? 'bg-qiita-green dark:bg-dark-green text-white shadow-sm'
+                      : 'bg-qiita-surface dark:bg-dark-surface-light text-qiita-text-dark dark:text-dark-text hover:bg-qiita-green/10 dark:hover:bg-dark-green/10'
+                  }`}
+                >
+                  <i className="ri-time-line mr-1"></i>期間別
+                </button>
+                <button
+                  onClick={() => setMode('year')}
+                  className={`flex-1 px-3 md:px-4 py-2 md:py-2.5 text-xs md:text-base rounded-lg font-semibold transition-all ${
+                    mode === 'year'
+                      ? 'bg-qiita-green dark:bg-dark-green text-white shadow-sm'
+                      : 'bg-qiita-surface dark:bg-dark-surface-light text-qiita-text-dark dark:text-dark-text hover:bg-qiita-green/10 dark:hover:bg-dark-green/10'
+                  }`}
+                >
+                  <i className="ri-calendar-line mr-1"></i>年次別
+                </button>
+              </div>
             </div>
 
             {/* 期間選択 / 年次選択 */}
             {mode === 'period' ? (
-              <div className="grid grid-cols-3 gap-2 mb-4">
-                {(['24h', '30d', '365d'] as RankingPeriod[]).map((p) => (
-                  <button
-                    key={p}
-                    onClick={() => setPeriod(p)}
-                    className={`px-4 py-2.5 rounded-lg font-semibold transition-all duration-200 ${
-                      period === p
-                        ? 'bg-qiita-green dark:bg-dark-green text-white shadow-md'
-                        : 'bg-qiita-card dark:bg-dark-card text-qiita-text dark:text-dark-text border border-qiita-border dark:border-dark-border hover:bg-qiita-green/10 dark:hover:bg-dark-green/10'
-                    }`}
-                  >
-                    {p === '24h' ? '24時間' : p === '30d' ? '30日間' : '365日間'}
-                  </button>
-                ))}
+              <div className="mb-3 md:mb-4 bg-qiita-card dark:bg-dark-surface rounded-lg border border-qiita-border dark:border-dark-border p-2">
+                <div className="grid grid-cols-3 gap-2">
+                  {(['24h', '30d', '365d'] as RankingPeriod[]).map((p) => (
+                    <button
+                      key={p}
+                      onClick={() => setPeriod(p)}
+                      className={`px-3 md:px-4 py-2 md:py-2.5 text-xs md:text-base rounded-lg font-semibold transition-all ${
+                        period === p
+                          ? 'bg-qiita-green dark:bg-dark-green text-white shadow-sm'
+                          : 'bg-qiita-surface dark:bg-dark-surface-light text-qiita-text-dark dark:text-dark-text hover:bg-qiita-green/10 dark:hover:bg-dark-green/10'
+                      }`}
+                    >
+                      {p === '24h' ? '24時間' : p === '30d' ? '30日間' : '365日間'}
+                    </button>
+                  ))}
+                </div>
               </div>
             ) : (
-              <div className="grid grid-cols-4 gap-2 mb-4">
-                {availableYears.slice(0, 8).map((year) => (
-                  <button
-                    key={year}
-                    onClick={() => setSelectedYear(year)}
-                    className={`px-3 py-2.5 rounded-lg font-semibold transition-all duration-200 ${
-                      selectedYear === year
-                        ? 'bg-qiita-green dark:bg-dark-green text-white shadow-md'
-                        : 'bg-qiita-card dark:bg-dark-card text-qiita-text dark:text-dark-text border border-qiita-border dark:border-dark-border hover:bg-qiita-green/10 dark:hover:bg-dark-green/10'
-                    }`}
-                  >
-                    {year}
-                  </button>
-                ))}
+              <div className="mb-3 md:mb-4 bg-qiita-card dark:bg-dark-surface rounded-lg border border-qiita-border dark:border-dark-border p-2">
+                <div className="grid grid-cols-4 gap-2">
+                  {availableYears.slice(0, 8).map((year) => (
+                    <button
+                      key={year}
+                      onClick={() => setSelectedYear(year)}
+                      className={`px-2 md:px-3 py-2 md:py-2.5 text-xs md:text-base rounded-lg font-semibold transition-all ${
+                        selectedYear === year
+                          ? 'bg-qiita-green dark:bg-dark-green text-white shadow-sm'
+                          : 'bg-qiita-surface dark:bg-dark-surface-light text-qiita-text-dark dark:text-dark-text hover:bg-qiita-green/10 dark:hover:bg-dark-green/10'
+                      }`}
+                    >
+                      {year}
+                    </button>
+                  ))}
+                </div>
               </div>
             )}
 
             {/* ランキングリスト */}
-            <div className="bg-qiita-card dark:bg-dark-card rounded-2xl shadow-xl border border-qiita-border dark:border-dark-border p-6">
-              <div className="flex items-center justify-between mb-4">
-                <h2 className="text-xl font-bold text-qiita-text dark:text-dark-text flex items-center gap-2">
-                  <i className="ri-trophy-line text-yellow-500"></i>
-                  TOP 10 ランキング
-                </h2>
+            <div className="bg-qiita-card dark:bg-dark-surface rounded-lg border border-qiita-border dark:border-dark-border p-3 md:p-6">
+              <div className="flex items-center justify-between mb-3 md:mb-4">
+                <h3 className="text-base md:text-xl font-bold text-qiita-text-dark dark:text-white flex items-center gap-2">
+                  <i className="ri-trophy-line text-qiita-green dark:text-dark-green"></i>
+                  TOP 10
+                </h3>
                 {loading && !bookDetail && (
                   <div className="animate-spin h-5 w-5 border-2 border-qiita-green dark:border-dark-green border-t-transparent rounded-full"></div>
                 )}
               </div>
               
               {rankings.length === 0 && !loading ? (
-                <p className="text-center py-12 text-qiita-text-light dark:text-dark-text-light">
+                <p className="text-center py-8 text-qiita-text dark:text-dark-text text-sm md:text-base">
                   データがありません
                 </p>
               ) : (
-                <div className="space-y-3">
+                <div className="space-y-2 md:space-y-3">
                   {rankings.map((item) => (
                     <button
                       key={item.book.id}
                       onClick={() => selectBook(item.book)}
-                      className={`w-full text-left p-4 rounded-xl border transition-all duration-200 ${
+                      className={`w-full text-left p-3 md:p-4 rounded-lg border transition-all ${
                         bookDetail?.id === item.book.id
-                          ? 'border-qiita-green dark:border-dark-green bg-gradient-to-r from-qiita-green/10 to-emerald-500/5 dark:from-dark-green/20 dark:to-emerald-600/10 shadow-lg'
-                          : 'border-qiita-border dark:border-dark-border hover:border-qiita-green/50 dark:hover:border-dark-green/50 hover:shadow-md hover:bg-qiita-surface dark:hover:bg-dark-surface'
+                          ? 'border-qiita-green dark:border-dark-green bg-qiita-green/5 dark:bg-dark-green/10 shadow-sm'
+                          : 'border-qiita-border dark:border-dark-border hover:border-qiita-green/50 dark:hover:border-dark-green/50 hover:bg-qiita-surface dark:hover:bg-dark-surface-light'
                       }`}
                     >
-                      <div className="flex gap-3">
-                        <div className={`flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm shadow-md ${
-                          item.rank === 1 ? 'bg-gradient-to-br from-yellow-400 to-yellow-600 text-white' :
-                          item.rank === 2 ? 'bg-gradient-to-br from-gray-300 to-gray-500 text-white' :
-                          item.rank === 3 ? 'bg-gradient-to-br from-orange-400 to-orange-600 text-white' :
-                          'bg-gradient-to-br from-qiita-green to-emerald-600 dark:from-dark-green dark:to-emerald-700 text-white'
+                      <div className="flex gap-2 md:gap-3">
+                        <div className={`flex-shrink-0 w-8 h-8 md:w-10 md:h-10 rounded-full flex items-center justify-center font-bold text-xs md:text-sm ${
+                          item.rank === 1 ? 'bg-yellow-500 text-white' :
+                          item.rank === 2 ? 'bg-gray-400 text-white' :
+                          item.rank === 3 ? 'bg-orange-500 text-white' :
+                          'bg-qiita-green dark:bg-dark-green text-white'
                         }`}>
                           {item.rank}
                         </div>
@@ -312,21 +322,21 @@ export default function YouTubeAdminPage() {
                           <img
                             src={item.book.thumbnail_url}
                             alt=""
-                            className="w-14 h-auto rounded-lg shadow-md"
+                            className="w-12 md:w-14 h-auto rounded"
                           />
                         )}
                         <div className="flex-1 min-w-0">
-                          <h3 className="font-semibold text-sm text-qiita-text dark:text-dark-text line-clamp-2 mb-1.5">
+                          <h4 className="font-semibold text-xs md:text-sm text-qiita-text-dark dark:text-white line-clamp-2 mb-1">
                             {item.book.title}
-                          </h3>
-                          <div className="flex gap-3 text-xs text-qiita-text-light dark:text-dark-text-light">
+                          </h4>
+                          <div className="flex gap-2 md:gap-3 text-xs text-qiita-text dark:text-dark-text">
                             <span className="flex items-center gap-1">
                               <i className="ri-article-line"></i>
-                              {item.stats.article_count}記事
+                              {item.stats.article_count}
                             </span>
                             <span className="flex items-center gap-1">
                               <i className="ri-heart-line"></i>
-                              {item.stats.total_likes}いいね
+                              {item.stats.total_likes}
                             </span>
                           </div>
                         </div>
@@ -341,8 +351,7 @@ export default function YouTubeAdminPage() {
           {/* 右側：YouTube管理 (2/5) */}
           <div className="lg:col-span-2">
             {error && (
-              <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-300 px-4 py-3 rounded-xl mb-4 text-sm flex items-center gap-2">
-                <i className="ri-error-warning-line"></i>
+              <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-300 px-3 md:px-4 py-2 md:py-3 rounded-lg mb-3 md:mb-4 text-xs md:text-sm">
                 {error}
               </div>
             )}
@@ -350,22 +359,21 @@ export default function YouTubeAdminPage() {
             {bookDetail ? (
               <>
                 {/* 書籍情報 */}
-                <div className="bg-gradient-to-br from-qiita-card to-qiita-surface dark:from-dark-card dark:to-dark-surface rounded-2xl shadow-xl border border-qiita-border dark:border-dark-border p-6 mb-4">
-                  <div className="flex gap-4 items-start mb-5">
+                <div className="bg-qiita-card dark:bg-dark-surface rounded-lg border border-qiita-border dark:border-dark-border p-3 md:p-6 mb-3 md:mb-4">
+                  <div className="flex gap-3 md:gap-4 items-start mb-4 md:mb-5">
                     {bookDetail.thumbnail_url && (
                       <img
                         src={bookDetail.thumbnail_url}
                         alt={bookDetail.title}
-                        className="w-24 h-auto rounded-lg shadow-lg"
+                        className="w-20 md:w-24 h-auto rounded"
                       />
                     )}
                     <div className="flex-1 min-w-0">
-                      <h2 className="text-lg font-bold text-qiita-text dark:text-dark-text mb-2 line-clamp-3">
+                      <h3 className="text-sm md:text-lg font-bold text-qiita-text-dark dark:text-white mb-1 md:mb-2 line-clamp-3">
                         {bookDetail.title}
-                      </h2>
+                      </h3>
                       {bookDetail.author && (
-                        <p className="text-sm text-qiita-text-light dark:text-dark-text-light flex items-center gap-1">
-                          <i className="ri-user-line"></i>
+                        <p className="text-xs md:text-sm text-qiita-text dark:text-dark-text">
                           {bookDetail.author}
                         </p>
                       )}
@@ -375,59 +383,58 @@ export default function YouTubeAdminPage() {
                   {/* 追加フォーム */}
                   <form onSubmit={handleAddYouTube}>
                     <div className="flex gap-2">
-                      <div className="flex-1 relative">
-                        <i className="ri-youtube-line absolute left-3 top-1/2 -translate-y-1/2 text-qiita-text-light dark:text-dark-text-light"></i>
-                        <input
-                          type="url"
-                          value={newYouTubeUrl}
-                          onChange={(e) => setNewYouTubeUrl(e.target.value)}
-                          placeholder="YouTube URL"
-                          className="w-full pl-10 pr-4 py-2.5 text-sm rounded-lg border border-qiita-border dark:border-dark-border bg-white dark:bg-dark-surface text-qiita-text dark:text-dark-text focus:outline-none focus:ring-2 focus:ring-qiita-green dark:focus:ring-dark-green"
-                        />
-                      </div>
+                      <input
+                        type="url"
+                        value={newYouTubeUrl}
+                        onChange={(e) => setNewYouTubeUrl(e.target.value)}
+                        placeholder="YouTube URL"
+                        className="flex-1 px-3 md:px-4 py-2 md:py-2.5 text-xs md:text-base rounded-lg border border-qiita-border dark:border-dark-border bg-qiita-surface dark:bg-dark-surface-light text-qiita-text-dark dark:text-white focus:outline-none focus:ring-2 focus:ring-qiita-green/50 dark:focus:ring-dark-green/50"
+                      />
                       <button
                         type="submit"
                         disabled={loading || !newYouTubeUrl.trim()}
-                        className="px-5 py-2.5 bg-gradient-to-r from-qiita-green to-emerald-500 dark:from-dark-green dark:to-emerald-600 text-white text-sm rounded-lg hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed font-semibold transition-all duration-200"
+                        className="px-3 md:px-5 py-2 md:py-2.5 bg-qiita-green dark:bg-dark-green text-white text-xs md:text-base rounded-lg hover:opacity-90 disabled:opacity-50 font-semibold transition-all"
                       >
-                        <i className="ri-add-line mr-1"></i>追加
+                        追加
                       </button>
                     </div>
                   </form>
                 </div>
 
                 {/* 動画リスト */}
-                <div className="bg-qiita-card dark:bg-dark-card rounded-2xl shadow-xl border border-qiita-border dark:border-dark-border p-6">
-                  <h3 className="text-lg font-bold text-qiita-text dark:text-dark-text mb-4 flex items-center gap-2">
-                    <i className="ri-play-list-line"></i>
-                    登録済み動画 
-                    <span className="ml-auto text-sm font-normal bg-qiita-green/10 dark:bg-dark-green/20 text-qiita-green dark:text-dark-green px-3 py-1 rounded-full">
+                <div className="bg-qiita-card dark:bg-dark-surface rounded-lg border border-qiita-border dark:border-dark-border p-3 md:p-6">
+                  <h3 className="text-base md:text-lg font-bold text-qiita-text-dark dark:text-white mb-3 md:mb-4 flex items-center justify-between">
+                    <span className="flex items-center gap-2">
+                      <i className="ri-play-list-line"></i>
+                      登録済み動画
+                    </span>
+                    <span className="text-xs md:text-sm font-normal bg-qiita-green/10 dark:bg-dark-green/20 text-qiita-green dark:text-dark-green px-2 md:px-3 py-1 rounded-full">
                       {bookDetail.youtube_links.length}件
                     </span>
                   </h3>
                   
                   {bookDetail.youtube_links.length === 0 ? (
-                    <div className="text-center py-12">
-                      <i className="ri-video-off-line text-4xl text-qiita-text-light dark:text-dark-text-light mb-3 block"></i>
-                      <p className="text-qiita-text-light dark:text-dark-text-light text-sm">
+                    <div className="text-center py-8 md:py-12">
+                      <i className="ri-video-off-line text-3xl md:text-4xl text-qiita-text dark:text-dark-text mb-2 md:mb-3 block"></i>
+                      <p className="text-qiita-text dark:text-dark-text text-xs md:text-sm">
                         動画がまだ登録されていません
                       </p>
                     </div>
                   ) : (
-                    <div className="space-y-3 max-h-[600px] overflow-y-auto pr-2">
+                    <div className="space-y-2 md:space-y-3 max-h-[500px] md:max-h-[600px] overflow-y-auto">
                       {bookDetail.youtube_links
                         .sort((a, b) => a.display_order - b.display_order)
                         .map((link) => (
                           <div
                             key={link.id}
-                            className="border border-qiita-border dark:border-dark-border rounded-xl p-3 hover:shadow-md transition-all duration-200 bg-qiita-surface dark:bg-dark-surface"
+                            className="border border-qiita-border dark:border-dark-border rounded-lg p-2 md:p-3 bg-qiita-surface dark:bg-dark-surface-light"
                           >
-                            <div className="flex gap-2 items-start mb-3">
+                            <div className="flex gap-2 items-start mb-2 md:mb-3">
                               {link.thumbnail_url && (
                                 <img
                                   src={link.thumbnail_url}
                                   alt=""
-                                  className="w-28 h-auto rounded-lg shadow-sm"
+                                  className="w-24 md:w-28 h-auto rounded"
                                 />
                               )}
                               <div className="flex-1 min-w-0">
@@ -435,15 +442,14 @@ export default function YouTubeAdminPage() {
                                   href={link.youtube_url}
                                   target="_blank"
                                   rel="noopener noreferrer"
-                                  className="text-xs text-qiita-green dark:text-dark-green hover:underline block truncate flex items-center gap-1"
+                                  className="text-xs text-qiita-green dark:text-dark-green hover:underline block truncate"
                                 >
-                                  <i className="ri-external-link-line"></i>
                                   {link.youtube_url}
                                 </a>
                               </div>
                             </div>
                             <div className="flex items-center gap-2">
-                              <span className="text-xs text-qiita-text-light dark:text-dark-text-light">
+                              <span className="text-xs text-qiita-text dark:text-dark-text">
                                 順序:
                               </span>
                               <input
@@ -453,14 +459,14 @@ export default function YouTubeAdminPage() {
                                   handleUpdateOrder(link.id, Number(e.target.value))
                                 }
                                 min="1"
-                                className="w-16 px-2 py-1 text-xs text-center rounded-lg border border-qiita-border dark:border-dark-border bg-white dark:bg-dark-surface text-qiita-text dark:text-dark-text focus:outline-none focus:ring-2 focus:ring-qiita-green dark:focus:ring-dark-green"
+                                className="w-14 md:w-16 px-2 py-1 text-xs text-center rounded border border-qiita-border dark:border-dark-border bg-white dark:bg-dark-surface text-qiita-text-dark dark:text-white focus:outline-none focus:ring-2 focus:ring-qiita-green/50 dark:focus:ring-dark-green/50"
                               />
                               <button
                                 onClick={() => handleDeleteYouTube(link.id)}
                                 disabled={loading}
-                                className="ml-auto px-3 py-1.5 bg-red-500 hover:bg-red-600 text-white text-xs rounded-lg disabled:opacity-50 transition-all duration-200 flex items-center gap-1"
+                                className="ml-auto px-2 md:px-3 py-1 md:py-1.5 bg-red-500 hover:bg-red-600 text-white text-xs rounded disabled:opacity-50 transition-all"
                               >
-                                <i className="ri-delete-bin-line"></i>削除
+                                削除
                               </button>
                             </div>
                           </div>
@@ -470,16 +476,18 @@ export default function YouTubeAdminPage() {
                 </div>
               </>
             ) : (
-              <div className="bg-gradient-to-br from-qiita-card to-qiita-surface dark:from-dark-card dark:to-dark-surface rounded-2xl shadow-xl border-2 border-dashed border-qiita-border dark:border-dark-border p-12 text-center">
-                <i className="ri-hand-coin-line text-6xl text-qiita-text-light dark:text-dark-text-light mb-4 block"></i>
-                <p className="text-qiita-text-light dark:text-dark-text-light text-lg">
+              <div className="bg-qiita-card dark:bg-dark-surface rounded-lg border-2 border-dashed border-qiita-border dark:border-dark-border p-8 md:p-12 text-center">
+                <i className="ri-hand-coin-line text-4xl md:text-6xl text-qiita-text dark:text-dark-text mb-3 md:mb-4 block"></i>
+                <p className="text-qiita-text dark:text-dark-text text-sm md:text-lg">
                   左のランキングから書籍を選択してください
                 </p>
               </div>
             )}
           </div>
         </div>
-      </div>
+      </main>
+
+      <Footer />
     </div>
   );
 }
