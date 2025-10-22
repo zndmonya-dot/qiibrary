@@ -43,15 +43,20 @@ async def get_daily_tweet(db: Session = Depends(get_db)):
         ranking_service = RankingService(db)
         rankings_data = ranking_service.get_ranking_fast(days=1, limit=1)
         
-        if not rankings_data or not rankings_data.rankings:
+        if not rankings_data or len(rankings_data) == 0:
             raise HTTPException(
                 status_code=404,
                 detail="24時間以内のランキングデータがありません"
             )
         
         # 1位を取得
-        top_item = rankings_data.rankings[0]
-        book: Book = top_item.book
+        top_item = rankings_data[0]
+        book_id = top_item['book']['id']
+        
+        # 書籍情報を取得
+        book = db.query(Book).filter(Book.id == book_id).first()
+        if not book:
+            raise HTTPException(status_code=404, detail="書籍が見つかりません")
         
         # 累計いいね数を計算
         total_likes = db.query(

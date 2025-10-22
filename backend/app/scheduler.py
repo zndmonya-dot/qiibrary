@@ -76,17 +76,17 @@ def daily_tweet_generation():
         ranking_service = RankingService(db)
         rankings_data = ranking_service.get_ranking_fast(days=1, limit=1)
         
-        if not rankings_data or not rankings_data.rankings:
+        if not rankings_data or len(rankings_data) == 0:
             logger.warning("⚠️  24時間以内のランキングデータがありません")
             return
         
         # 1位を取得
-        top_item = rankings_data.rankings[0]
-        book: Book = top_item.book
+        top_item = rankings_data[0]
+        book_id = top_item['book']['id']
         
         # 書籍の累計データを取得
-        total_articles = db.query(Book).filter(Book.id == book.id).first()
-        if not total_articles:
+        book = db.query(Book).filter(Book.id == book_id).first()
+        if not book:
             logger.error("❌ 書籍データが見つかりません")
             return
         
