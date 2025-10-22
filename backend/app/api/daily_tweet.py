@@ -60,43 +60,25 @@ def get_pattern_config(pattern: RankingPattern) -> dict:
             "period_label": "7日間"
         }
     elif pattern == "monthly":
-        # 先月のデータを取得（月初の場合）
-        if now.day <= 3:  # 月初3日間は先月のランキング
-            last_month = now.replace(day=1) - timedelta(days=1)
-            return {
-                "days": None,
-                "year": last_month.year,
-                "month": last_month.month,
-                "title": f"【Qiita技術書ランキング {last_month.year}年{last_month.month}月の1位】",
-                "period_label": f"{last_month.year}年{last_month.month}月"
-            }
-        else:
-            return {
-                "days": None,
-                "year": now.year,
-                "month": now.month,
-                "title": f"【Qiita技術書ランキング {now.year}年{now.month}月の1位】",
-                "period_label": f"{now.year}年{now.month}月"
-            }
+        # 常に先月のデータを取得（今月はまだデータが完全には揃っていないため）
+        last_month = now.replace(day=1) - timedelta(days=1)
+        return {
+            "days": None,
+            "year": last_month.year,
+            "month": last_month.month,
+            "title": f"【Qiita技術書ランキング {last_month.year}年{last_month.month}月の1位】",
+            "period_label": f"{last_month.year}年{last_month.month}月"
+        }
     else:  # yearly
-        # 年初の場合は去年のランキング
-        if now.month == 1 and now.day <= 7:
-            last_year = now.year - 1
-            return {
-                "days": None,
-                "year": last_year,
-                "month": None,
-                "title": f"【Qiita技術書ランキング {last_year}年の1位】",
-                "period_label": f"{last_year}年"
-            }
-        else:
-            return {
-                "days": None,
-                "year": now.year,
-                "month": None,
-                "title": f"【Qiita技術書ランキング {now.year}年の1位】",
-                "period_label": f"{now.year}年"
-            }
+        # 常に去年のデータを取得（今年はまだデータが完全には揃っていないため）
+        last_year = now.year - 1
+        return {
+            "days": None,
+            "year": last_year,
+            "month": None,
+            "title": f"【Qiita技術書ランキング {last_year}年の1位】",
+            "period_label": f"{last_year}年"
+        }
 
 
 def generate_tweet(book: Book, article_count: int, total_likes: int, pattern_config: dict) -> str:
@@ -133,8 +115,10 @@ async def get_daily_tweet(
     パターン:
     - daily: 24時間ランキング
     - weekly: 7日間ランキング
-    - monthly: カレンダー上の月ランキング（例: 2025年10月1日〜31日、月初は先月）
-    - yearly: カレンダー上の年ランキング（例: 2025年1月1日〜12月31日、年初は去年）
+    - monthly: 先月のカレンダー月ランキング（例: 10月22日なら2025年9月1日〜30日）
+    - yearly: 去年のカレンダー年ランキング（例: 2025年なら2024年1月1日〜12月31日）
+    
+    ※月間・年間は常に完全に終わった期間のデータを集計します
     """
     try:
         # パターン設定を取得

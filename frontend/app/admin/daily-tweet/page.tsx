@@ -24,13 +24,13 @@ const PATTERNS: Record<RankingPattern, PatternInfo> = {
     icon: 'ri-calendar-week-line'
   },
   monthly: {
-    label: '今月の1位',
-    description: 'カレンダー月ランキング（月初は先月）',
+    label: '先月の1位',
+    description: '完全なカレンダー月ランキング',
     icon: 'ri-calendar-2-line'
   },
   yearly: {
-    label: '今年の1位',
-    description: 'カレンダー年ランキング（年初は去年）',
+    label: '去年の1位',
+    description: '完全なカレンダー年ランキング',
     icon: 'ri-calendar-event-line'
   }
 };
