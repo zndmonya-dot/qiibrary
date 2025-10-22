@@ -4,6 +4,7 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
+import Script from 'next/script';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import LoadingSpinner from '@/components/LoadingSpinner';
@@ -80,6 +81,51 @@ export default function BookDetailPage() {
     setTimeout(() => setNewlyAddedStart(null), ANIMATION_TIMEOUT_ALL);
   }, [displayedArticlesCount, book?.qiita_articles]);
 
+  // 構造化データ（JSON-LD）を生成
+  const generateStructuredData = () => {
+    if (!book) return null;
+
+    const totalLikes = book.qiita_articles?.reduce((sum, article) => sum + (article.likes_count || 0), 0) || 0;
+    const articleCount = book.qiita_articles?.length || 0;
+
+    return {
+      '@context': 'https://schema.org',
+      '@type': 'Book',
+      '@id': `https://qiibrary.com/books/${asin}`,
+      name: book.title,
+      author: book.author ? {
+        '@type': 'Person',
+        name: book.author
+      } : undefined,
+      isbn: book.isbn,
+      image: book.thumbnail_url || undefined,
+      publisher: book.publisher ? {
+        '@type': 'Organization',
+        name: book.publisher
+      } : undefined,
+      datePublished: book.published_date || undefined,
+      aggregateRating: totalLikes > 0 ? {
+        '@type': 'AggregateRating',
+        ratingValue: Math.min(5, (totalLikes / articleCount) / 20), // いいね数を5点満点に正規化
+        reviewCount: articleCount,
+        bestRating: 5,
+        worstRating: 1
+      } : undefined,
+      offers: book.amazon_affiliate_url ? {
+        '@type': 'Offer',
+        url: book.amazon_affiliate_url,
+        availability: 'https://schema.org/InStock',
+        seller: {
+          '@type': 'Organization',
+          name: 'Amazon.co.jp'
+        }
+      } : undefined,
+      description: `Qiitaで話題の技術書「${book.title}」。${articleCount}件の記事で紹介され、${totalLikes}のいいねを獲得しています。`,
+      inLanguage: 'ja',
+      genre: '技術書'
+    };
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-qiita-bg dark:bg-dark-bg">
@@ -116,6 +162,17 @@ export default function BookDetailPage() {
 
       return (
         <div className="min-h-screen bg-qiita-bg dark:bg-dark-bg">
+          {/* 構造化データ（JSON-LD） */}
+          {book && (
+            <Script
+              id="structured-data"
+              type="application/ld+json"
+              dangerouslySetInnerHTML={{
+                __html: JSON.stringify(generateStructuredData()),
+              }}
+            />
+          )}
+          
           <Header />
           
           <main className="container mx-auto px-3 md:px-4 pt-6 pb-4 md:py-8">

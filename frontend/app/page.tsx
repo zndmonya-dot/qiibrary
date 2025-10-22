@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import Script from 'next/script';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import BookCard from '@/components/BookCard';
@@ -116,8 +117,37 @@ export default function Home() {
     }
   }, [currentPage]);
 
+  // 構造化データ（JSON-LD）
+  const structuredData = {
+    '@context': 'https://schema.org',
+    '@type': 'WebSite',
+    name: 'Qiibrary - Qiitaで話題の技術書まとめ',
+    url: 'https://qiibrary.com',
+    description: 'エンジニアが実践で使い、Qiita記事で推薦した技術書ライブラリ。開発者コミュニティの知見を集約し、現場で本当に役立つ技術書を厳選してお届けします。',
+    inLanguage: 'ja',
+    publisher: {
+      '@type': 'Organization',
+      name: 'Qiibrary',
+      url: 'https://qiibrary.com'
+    },
+    potentialAction: {
+      '@type': 'SearchAction',
+      target: 'https://qiibrary.com/?q={search_term_string}',
+      'query-input': 'required name=search_term_string'
+    }
+  };
+
   return (
     <div className="min-h-screen bg-qiita-bg dark:bg-dark-bg">
+      {/* 構造化データ（JSON-LD） */}
+      <Script
+        id="structured-data"
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(structuredData),
+        }}
+      />
+      
       <Header />
       
       <main className="container mx-auto px-3 md:px-4 py-3 md:py-8 min-h-[calc(100vh-120px)]">
