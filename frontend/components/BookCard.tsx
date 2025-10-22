@@ -64,9 +64,16 @@ function BookCard({ rank, book, stats, topArticles, onNavigate }: BookCardProps)
           <a
             href={book.amazon_affiliate_url}
             target="_blank"
-            rel="noopener noreferrer"
+            rel="noopener noreferrer nofollow"
             className="block hover-scale"
-            onClick={() => analytics.clickAmazonLink(book.isbn || '', book.title)}
+            onClick={(e) => {
+              analytics.clickAmazonLink(book.isbn || '', book.title);
+              // スマホではアフィリエイトリンクを保持するため、同じタブで開く
+              if (window.innerWidth < 768) {
+                e.preventDefault();
+                window.location.href = book.amazon_affiliate_url || '';
+              }
+            }}
           >
             {book.thumbnail_url ? (
               <div className="relative w-[120px] h-[180px] md:w-[160px] md:h-[240px]">
@@ -124,13 +131,13 @@ function BookCard({ rank, book, stats, topArticles, onNavigate }: BookCardProps)
           </>
         )}
         
-        {/* Amazon書籍詳細ボタン */}
+        {/* Amazon書籍詳細ボタン（デスクトップのみ） */}
         {book.amazon_affiliate_url && (
           <a
             href={book.amazon_affiliate_url}
             target="_blank"
             rel="noopener noreferrer"
-            className="w-[120px] md:w-[160px] inline-flex items-center justify-center gap-1 px-2 py-2 bg-[#FF9900] hover:bg-[#ff8800] text-white rounded-lg font-semibold text-xs transition-all duration-150 shadow-sm"
+            className="hidden md:inline-flex w-[160px] items-center justify-center gap-1 px-2 py-2 bg-[#FF9900] text-white rounded-lg font-semibold text-xs transition-all duration-150 shadow-sm"
             onClick={() => analytics.clickAmazonLink(book.isbn || '', book.title)}
           >
             <i className="ri-amazon-line text-sm"></i>
@@ -148,11 +155,18 @@ function BookCard({ rank, book, stats, topArticles, onNavigate }: BookCardProps)
               <a
                 href={book.amazon_affiliate_url}
                 target="_blank"
-                rel="noopener noreferrer"
+                rel="noopener noreferrer nofollow"
                 className="group inline-block"
-                onClick={() => analytics.clickAmazonLink(book.isbn || '', book.title)}
+                onClick={(e) => {
+                  analytics.clickAmazonLink(book.isbn || '', book.title);
+                  // スマホではアフィリエイトリンクを保持するため、同じタブで開く
+                  if (window.innerWidth < 768) {
+                    e.preventDefault();
+                    window.location.href = book.amazon_affiliate_url || '';
+                  }
+                }}
               >
-                <h3 className="text-base md:text-lg font-bold line-clamp-2 leading-relaxed text-qiita-text-dark dark:text-white group-hover:text-qiita-green dark:group-hover:text-dark-green transition-colors duration-200">
+                <h3 className="text-base md:text-lg font-bold line-clamp-2 leading-relaxed text-qiita-text-dark dark:text-white transition-colors duration-200">
                   {book.title || `ISBN: ${book.isbn} の書籍`}
                 </h3>
               </a>
