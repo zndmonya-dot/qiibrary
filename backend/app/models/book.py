@@ -138,6 +138,12 @@ class BookYouTubeLink(Base):
     title = Column(String(500))
     thumbnail_url = Column(String(500))
     
+    # YouTube動画詳細情報（YouTube API v3から取得）
+    channel_name = Column(String(255))  # チャンネル名
+    view_count = Column(Integer, default=0)  # 再生回数
+    like_count = Column(Integer, default=0)  # いいね数
+    published_at = Column(DateTime)  # 公開日時
+    
     # 表示順序（1, 2, 3）
     display_order = Column(Integer, default=1, nullable=False)
     

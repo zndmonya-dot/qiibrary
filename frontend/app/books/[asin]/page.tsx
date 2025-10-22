@@ -327,10 +327,30 @@ export default function BookDetailPage() {
                             {video.title}
                           </h3>
                           
-                          <div className="flex items-center gap-2 text-xs text-qiita-text dark:text-dark-text">
-                            <i className="ri-youtube-line text-red-500"></i>
-                            <span className="truncate">{video.channel_name}</span>
+                          <div className="flex items-center gap-3 text-xs text-qiita-text dark:text-dark-text mb-2">
+                            <div className="flex items-center gap-1">
+                              <i className="ri-youtube-line text-red-500"></i>
+                              <span className="truncate">{video.channel_name}</span>
+                            </div>
                           </div>
+                          
+                          {/* 再生回数・いいね数 */}
+                          {(video.view_count > 0 || video.like_count > 0) && (
+                            <div className="flex items-center gap-3 text-xs text-qiita-text dark:text-dark-text">
+                              {video.view_count > 0 && (
+                                <div className="flex items-center gap-1">
+                                  <i className="ri-play-circle-line"></i>
+                                  <span>{video.view_count.toLocaleString()}回</span>
+                                </div>
+                              )}
+                              {video.like_count > 0 && (
+                                <div className="flex items-center gap-1">
+                                  <i className="ri-thumb-up-line"></i>
+                                  <span>{video.like_count.toLocaleString()}</span>
+                                </div>
+                              )}
+                            </div>
+                          )}
                         </div>
                       </button>
                     );

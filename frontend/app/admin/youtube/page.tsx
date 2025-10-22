@@ -67,6 +67,10 @@ export default function YouTubeAdminPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState<YouTubeSearchResult[]>([]);
   const [searching, setSearching] = useState(false);
+  
+  // 一括登録用
+  const [selectedVideos, setSelectedVideos] = useState<Set<string>>(new Set());
+  const [batchRegistering, setBatchRegistering] = useState(false);
 
   // 利用可能な年を取得
   useEffect(() => {
@@ -180,12 +184,55 @@ export default function YouTubeAdminPage() {
     }
   };
 
-  // 検索結果から動画を選択
+  // 検索結果から動画を選択（単体登録用）
   const handleSelectVideo = (video: YouTubeSearchResult) => {
     setNewYouTubeUrl(video.youtube_url);
     setShowSearch(false);
     setSearchQuery('');
     setSearchResults([]);
+  };
+  
+  // 検索結果から動画を選択（一括登録用）
+  const handleToggleVideoSelection = (videoUrl: string) => {
+    const newSelection = new Set(selectedVideos);
+    if (newSelection.has(videoUrl)) {
+      newSelection.delete(videoUrl);
+    } else {
+      newSelection.add(videoUrl);
+    }
+    setSelectedVideos(newSelection);
+  };
+  
+  // 選択した動画を一括登録
+  const handleBatchRegister = async () => {
+    if (!bookDetail || selectedVideos.size === 0) return;
+    
+    setBatchRegistering(true);
+    setError('');
+    
+    try {
+      const response = await axios.post(
+        `${API_URL}/api/admin/books/${bookDetail.id}/youtube/batch`,
+        {
+          youtube_urls: Array.from(selectedVideos),
+        }
+      );
+      
+      alert(`✅ ${response.data.added}件の動画を登録しました！${response.data.failed > 0 ? `\n❌ ${response.data.failed}件の登録に失敗しました。` : ''}`);
+      
+      // 選択をクリア
+      setSelectedVideos(new Set());
+      setShowSearch(false);
+      setSearchQuery('');
+      setSearchResults([]);
+      
+      // 書籍詳細を再読み込み
+      await loadBookDetail(bookDetail.id);
+    } catch (err: any) {
+      setError(err.response?.data?.detail || '一括登録に失敗しました');
+    } finally {
+      setBatchRegistering(false);
+    }
   };
 
   // YouTube動画を追加
@@ -623,35 +670,95 @@ export default function YouTubeAdminPage() {
                   </p>
                 </div>
               ) : (
-                <div className="space-y-3">
-                  {searchResults.map((video) => (
-                    <button
-                      key={video.video_id}
-                      onClick={() => handleSelectVideo(video)}
-                      className="w-full text-left p-3 rounded-lg border border-qiita-border dark:border-dark-border hover:border-qiita-green dark:hover:border-dark-green hover:bg-qiita-surface dark:hover:bg-dark-surface-light transition-all group"
-                    >
-                      <div className="flex gap-3">
-                        <img
-                          src={video.thumbnail_url}
-                          alt={video.title}
-                          className="w-32 h-auto rounded"
-                        />
-                        <div className="flex-1 min-w-0">
-                          <h4 className="text-sm font-bold text-qiita-text-dark dark:text-white mb-1.5 line-clamp-2 group-hover:text-qiita-green dark:group-hover:text-dark-green">
-                            {video.title}
-                          </h4>
-                          <div className="flex items-center gap-1 mb-2 text-xs text-qiita-text dark:text-dark-text">
-                            <i className="ri-youtube-line text-red-500"></i>
-                            <span className="truncate">{video.channel_name}</span>
-                          </div>
-                          <p className="text-xs text-qiita-text dark:text-dark-text line-clamp-2">
-                            {video.description}
-                          </p>
-                        </div>
+                <>
+                  {/* 一括選択ヘッダー */}
+                  {searchResults.length > 0 && (
+                    <div className="flex items-center justify-between mb-4 pb-3 border-b border-qiita-border dark:border-dark-border">
+                      <div className="text-sm text-qiita-text dark:text-dark-text">
+                        {selectedVideos.size > 0 ? (
+                          <span className="font-bold text-qiita-green dark:text-dark-green">
+                            {selectedVideos.size}件選択中
+                          </span>
+                        ) : (
+                          <span>動画をクリックして選択</span>
+                        )}
                       </div>
-                    </button>
-                  ))}
-                </div>
+                      <button
+                        onClick={handleBatchRegister}
+                        disabled={selectedVideos.size === 0 || batchRegistering}
+                        className="px-4 py-2 bg-qiita-green hover:bg-qiita-green-dark dark:bg-dark-green dark:hover:bg-dark-green-dark text-white text-sm rounded-lg disabled:opacity-50 disabled:cursor-not-allowed font-semibold transition-all flex items-center gap-2"
+                      >
+                        {batchRegistering ? (
+                          <>
+                            <div className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full"></div>
+                            登録中...
+                          </>
+                        ) : (
+                          <>
+                            <i className="ri-check-double-line"></i>
+                            選択した動画を登録
+                          </>
+                        )}
+                      </button>
+                    </div>
+                  )}
+                  
+                  {/* 検索結果リスト */}
+                  <div className="space-y-3">
+                    {searchResults.map((video) => {
+                      const isSelected = selectedVideos.has(video.youtube_url);
+                      return (
+                        <div
+                          key={video.video_id}
+                          onClick={() => handleToggleVideoSelection(video.youtube_url)}
+                          className={`cursor-pointer p-3 rounded-lg border transition-all ${
+                            isSelected
+                              ? 'border-qiita-green dark:border-dark-green bg-qiita-green/5 dark:bg-dark-green/10'
+                              : 'border-qiita-border dark:border-dark-border hover:border-qiita-green/50 dark:hover:border-dark-green/50 hover:bg-qiita-surface dark:hover:bg-dark-surface-light'
+                          }`}
+                        >
+                          <div className="flex gap-3">
+                            {/* 選択チェックボックス */}
+                            <div className="flex-shrink-0 flex items-start pt-1">
+                              <div
+                                className={`w-5 h-5 rounded border-2 flex items-center justify-center transition-all ${
+                                  isSelected
+                                    ? 'bg-qiita-green dark:bg-dark-green border-qiita-green dark:border-dark-green'
+                                    : 'border-qiita-border dark:border-dark-border'
+                                }`}
+                              >
+                                {isSelected && (
+                                  <i className="ri-check-line text-white text-sm"></i>
+                                )}
+                              </div>
+                            </div>
+                            
+                            {/* サムネイル */}
+                            <img
+                              src={video.thumbnail_url}
+                              alt={video.title}
+                              className="w-32 h-auto rounded flex-shrink-0"
+                            />
+                            
+                            {/* 動画情報 */}
+                            <div className="flex-1 min-w-0">
+                              <h4 className="text-sm font-bold text-qiita-text-dark dark:text-white mb-1.5 line-clamp-2">
+                                {video.title}
+                              </h4>
+                              <div className="flex items-center gap-1 mb-2 text-xs text-qiita-text dark:text-dark-text">
+                                <i className="ri-youtube-line text-red-500"></i>
+                                <span className="truncate">{video.channel_name}</span>
+                              </div>
+                              <p className="text-xs text-qiita-text dark:text-dark-text line-clamp-2">
+                                {video.description}
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </>
               )}
             </div>
           </div>

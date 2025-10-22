@@ -5,6 +5,7 @@
 import logging
 import re
 from typing import List, Optional
+from datetime import datetime
 from fastapi import APIRouter, Depends, HTTPException, Header
 from sqlalchemy.orm import Session
 from pydantic import BaseModel
@@ -12,6 +13,7 @@ from pydantic import BaseModel
 from ..database import SessionLocal
 from ..models.book import Book, BookYouTubeLink
 from ..config.settings import settings
+from ..services.youtube_service import get_video_details
 
 router = APIRouter()
 logger = logging.getLogger(__name__)
@@ -154,8 +156,11 @@ async def add_youtube_link(
     if not video_id:
         raise HTTPException(status_code=400, detail="Invalid YouTube URL")
     
-    # YouTubeサムネイルURL生成
-    thumbnail_url = f"https://img.youtube.com/vi/{video_id}/maxresdefault.jpg"
+    # YouTube APIから詳細情報を取得
+    video_details = get_video_details(video_id)
+    
+    # YouTubeサムネイルURL生成（APIから取得できない場合のフォールバック）
+    thumbnail_url = video_details.get("thumbnail_url") if video_details else f"https://img.youtube.com/vi/{video_id}/maxresdefault.jpg"
     
     # 新しいリンクを作成
     new_link = BookYouTubeLink(
@@ -164,19 +169,29 @@ async def add_youtube_link(
         youtube_video_id=video_id,
         thumbnail_url=thumbnail_url,
         display_order=link_data.display_order,
+        # YouTube APIから取得した詳細情報
+        title=video_details.get("title") if video_details else None,
+        channel_name=video_details.get("channel_name") if video_details else None,
+        view_count=video_details.get("view_count", 0) if video_details else 0,
+        like_count=video_details.get("like_count", 0) if video_details else 0,
+        published_at=datetime.fromisoformat(video_details["published_at"].replace('Z', '+00:00')) if (video_details and video_details.get("published_at")) else None,
     )
     
     db.add(new_link)
     db.commit()
     db.refresh(new_link)
     
-    logger.info(f"YouTube動画追加: book_id={book_id}, video_id={video_id}")
+    logger.info(f"YouTube動画追加: book_id={book_id}, video_id={video_id}, title={new_link.title}")
     
     return {
         "id": new_link.id,
         "youtube_url": new_link.youtube_url,
         "youtube_video_id": new_link.youtube_video_id,
+        "title": new_link.title,
+        "channel_name": new_link.channel_name,
         "thumbnail_url": new_link.thumbnail_url,
+        "view_count": new_link.view_count,
+        "like_count": new_link.like_count,
         "display_order": new_link.display_order,
     }
 
@@ -237,4 +252,82 @@ async def delete_youtube_link(
     logger.info(f"YouTube動画削除: link_id={link_id}")
     
     return {"message": "YouTube link deleted successfully"}
+
+
+# 一括登録用のリクエストモデル
+class YouTubeLinkBatchCreate(BaseModel):
+    youtube_urls: List[str]
+
+
+@router.post("/books/{book_id}/youtube/batch")
+async def add_youtube_links_batch(
+    book_id: int,
+    batch_data: YouTubeLinkBatchCreate,
+    db: Session = Depends(get_db)
+):
+    """書籍にYouTube動画を一括追加"""
+    # 書籍の存在確認
+    book = db.query(Book).filter(Book.id == book_id).first()
+    if not book:
+        raise HTTPException(status_code=404, detail="Book not found")
+    
+    # 現在の最大display_orderを取得
+    max_order = db.query(BookYouTubeLink).filter(
+        BookYouTubeLink.book_id == book_id
+    ).count()
+    
+    added_links = []
+    failed_urls = []
+    
+    for idx, youtube_url in enumerate(batch_data.youtube_urls):
+        try:
+            # YouTube動画IDを抽出
+            video_id = extract_youtube_video_id(youtube_url)
+            if not video_id:
+                failed_urls.append({"url": youtube_url, "reason": "Invalid YouTube URL"})
+                continue
+            
+            # YouTube APIから詳細情報を取得
+            video_details = get_video_details(video_id)
+            
+            # YouTubeサムネイルURL生成
+            thumbnail_url = video_details.get("thumbnail_url") if video_details else f"https://img.youtube.com/vi/{video_id}/maxresdefault.jpg"
+            
+            # 新しいリンクを作成
+            new_link = BookYouTubeLink(
+                book_id=book_id,
+                youtube_url=youtube_url,
+                youtube_video_id=video_id,
+                thumbnail_url=thumbnail_url,
+                display_order=max_order + idx + 1,
+                # YouTube APIから取得した詳細情報
+                title=video_details.get("title") if video_details else None,
+                channel_name=video_details.get("channel_name") if video_details else None,
+                view_count=video_details.get("view_count", 0) if video_details else 0,
+                like_count=video_details.get("like_count", 0) if video_details else 0,
+                published_at=datetime.fromisoformat(video_details["published_at"].replace('Z', '+00:00')) if (video_details and video_details.get("published_at")) else None,
+            )
+            
+            db.add(new_link)
+            added_links.append({
+                "youtube_url": new_link.youtube_url,
+                "youtube_video_id": new_link.youtube_video_id,
+                "title": new_link.title,
+                "channel_name": new_link.channel_name,
+            })
+            
+        except Exception as e:
+            failed_urls.append({"url": youtube_url, "reason": str(e)})
+            logger.error(f"Failed to add YouTube link: {youtube_url}, error: {e}")
+    
+    db.commit()
+    
+    logger.info(f"YouTube動画一括追加: book_id={book_id}, 成功={len(added_links)}件, 失敗={len(failed_urls)}件")
+    
+    return {
+        "added": len(added_links),
+        "failed": len(failed_urls),
+        "added_links": added_links,
+        "failed_urls": failed_urls,
+    }
 
