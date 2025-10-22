@@ -48,6 +48,7 @@ export default function DailyTweetPage() {
     
     const asin = book.isbn?.replace(/-/g, '') || '';
     const bookUrl = asin ? `https://qiibrary.com/books/${asin}` : 'https://qiibrary.com';
+    const amazonUrl = book.amazon_affiliate_url || book.amazon_url || '';
     
     const tweet = `【Qiita技術書ランキング 速報】
 
@@ -56,7 +57,8 @@ ${title}
 ・記事掲載数: ${articleCount}件
 ・総評価数: ${likesDisplay}
 
-${bookUrl}
+詳細: ${bookUrl}
+Amazon: ${amazonUrl}
 
 #技術書 #Qiita`;
     
