@@ -227,7 +227,7 @@ export default function YouTubeAdminPage() {
       setSearchResults([]);
       
       // 書籍詳細を再読み込み
-      await loadBookDetail(bookDetail.id);
+      await reloadBook();
     } catch (err: any) {
       setError(err.response?.data?.detail || '一括登録に失敗しました');
     } finally {
