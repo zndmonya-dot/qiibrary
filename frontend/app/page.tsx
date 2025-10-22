@@ -59,18 +59,6 @@ export default function Home() {
   const [isRestoring, setIsRestoring] = useState(!!initialState);
   const [savedScrollY, setSavedScrollY] = useState<number | null>(initialState?.scrollY || null);
 
-  const savePageState = () => {
-    if (typeof window !== 'undefined') {
-      sessionStorage.setItem('rankingPageState', JSON.stringify({
-        scrollY: window.scrollY,
-        currentPage,
-        period,
-        selectedYear,
-        searchQuery,
-      }));
-    }
-  };
-
   useEffect(() => {
     if (typeof window !== 'undefined' && initialState) {
       sessionStorage.removeItem('rankingPageState');
@@ -401,7 +389,6 @@ export default function Home() {
                         book={item.book}
                         stats={item.stats}
                         topArticles={item.top_articles}
-                        onNavigate={savePageState}
                       />
                     </div>
                   );
