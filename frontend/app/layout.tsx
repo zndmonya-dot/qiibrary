@@ -3,6 +3,7 @@ import './globals.css'
 import PageTransition from '@/components/PageTransition'
 
 export const metadata: Metadata = {
+  metadataBase: new URL('https://qiibrary.com'),
   title: {
     default: 'Qiibrary - Qiitaで話題の技術書まとめ',
     template: '%s | Qiibrary'
@@ -21,7 +22,7 @@ export const metadata: Metadata = {
     type: 'website',
     locale: 'ja_JP',
     alternateLocale: ['en_US'],
-    url: 'https://qiibrary.example.com',
+    url: 'https://qiibrary.com',
     siteName: 'Qiibrary',
     title: 'Qiibrary - Qiitaで話題の技術書まとめ',
     description: 'エンジニアが実践で使い、Qiita記事で推薦した技術書ライブラリ',
