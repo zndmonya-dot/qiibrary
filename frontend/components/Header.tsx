@@ -41,13 +41,6 @@ export default function Header() {
         
         <nav className="flex items-center space-x-3 md:space-x-6">
           <Link 
-            href="/" 
-            prefetch={true}
-            className="hidden md:block text-qiita-text dark:text-dark-text font-semibold"
-          >
-            ランキング
-          </Link>
-          <Link 
             href="/about" 
             prefetch={true}
             className="hidden md:block text-qiita-text dark:text-dark-text font-semibold"
