@@ -92,24 +92,24 @@ def daily_tweet_generation():
         
         # 累計いいね数を計算
         from app.models.qiita_article import QiitaArticle
-        from app.models.book import book_qiita_mentions
+        from app.models.book import BookQiitaMention
         
         total_likes = db.query(
             db.func.sum(QiitaArticle.likes_count)
         ).join(
-            book_qiita_mentions,
-            QiitaArticle.id == book_qiita_mentions.c.article_id
+            BookQiitaMention,
+            QiitaArticle.id == BookQiitaMention.article_id
         ).filter(
-            book_qiita_mentions.c.book_id == book.id
+            BookQiitaMention.book_id == book.id
         ).scalar() or 0
         
         article_count = db.query(
             db.func.count(db.func.distinct(QiitaArticle.id))
         ).join(
-            book_qiita_mentions,
-            QiitaArticle.id == book_qiita_mentions.c.article_id
+            BookQiitaMention,
+            QiitaArticle.id == BookQiitaMention.article_id
         ).filter(
-            book_qiita_mentions.c.book_id == book.id
+            BookQiitaMention.book_id == book.id
         ).scalar() or 0
         
         # ツイート文を生成

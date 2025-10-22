@@ -6,9 +6,8 @@ from sqlalchemy.orm import Session
 
 from ..database import SessionLocal
 from ..services.ranking_service import RankingService
-from ..models.book import Book
+from ..models.book import Book, BookQiitaMention
 from ..models.qiita_article import QiitaArticle
-from ..models.book import book_qiita_mentions
 
 router = APIRouter()
 
@@ -58,20 +57,20 @@ async def get_daily_tweet(db: Session = Depends(get_db)):
         total_likes = db.query(
             db.func.sum(QiitaArticle.likes_count)
         ).join(
-            book_qiita_mentions,
-            QiitaArticle.id == book_qiita_mentions.c.article_id
+            BookQiitaMention,
+            QiitaArticle.id == BookQiitaMention.article_id
         ).filter(
-            book_qiita_mentions.c.book_id == book.id
+            BookQiitaMention.book_id == book.id
         ).scalar() or 0
         
         # 累計記事数を計算
         article_count = db.query(
             db.func.count(db.func.distinct(QiitaArticle.id))
         ).join(
-            book_qiita_mentions,
-            QiitaArticle.id == book_qiita_mentions.c.article_id
+            BookQiitaMention,
+            QiitaArticle.id == BookQiitaMention.article_id
         ).filter(
-            book_qiita_mentions.c.book_id == book.id
+            BookQiitaMention.book_id == book.id
         ).scalar() or 0
         
         # ツイート文を生成
