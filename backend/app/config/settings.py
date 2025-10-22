@@ -8,6 +8,7 @@ class Settings(BaseSettings):
     
     # API Keys
     QIITA_API_TOKEN: str = ""
+    YOUTUBE_API_KEY: str = ""  # YouTube Data API v3
     
     # Affiliate IDs
     AMAZON_ASSOCIATE_TAG: str = ""  # Amazonアフィリエイトタグ

@@ -37,6 +37,15 @@ interface RankingItem {
   };
 }
 
+interface YouTubeSearchResult {
+  video_id: string;
+  title: string;
+  channel_name: string;
+  description: string;
+  thumbnail_url: string;
+  youtube_url: string;
+}
+
 type RankingMode = 'period' | 'year';
 type RankingPeriod = '24h' | '30d' | '365d';
 
@@ -52,6 +61,12 @@ export default function YouTubeAdminPage() {
   
   // 新規追加用
   const [newYouTubeUrl, setNewYouTubeUrl] = useState('');
+  
+  // YouTube検索用
+  const [showSearch, setShowSearch] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [searchResults, setSearchResults] = useState<YouTubeSearchResult[]>([]);
+  const [searching, setSearching] = useState(false);
 
   // 利用可能な年を取得
   useEffect(() => {
@@ -133,6 +148,44 @@ export default function YouTubeAdminPage() {
     } catch (err) {
       console.error('再読み込み失敗:', err);
     }
+  };
+
+  // YouTube検索
+  const handleSearchYouTube = async () => {
+    if (!bookDetail || !searchQuery.trim()) return;
+
+    setSearching(true);
+    setError('');
+
+    try {
+      const response = await axios.get(`${API_URL}/api/youtube/search`, {
+        params: {
+          q: searchQuery.trim(),
+          max_results: 10,
+        },
+      });
+
+      setSearchResults(response.data.videos || []);
+    } catch (err: any) {
+      if (err.response?.status === 503) {
+        setError('YouTube APIキーが設定されていません。管理者に連絡してください。');
+      } else if (err.response?.status === 403) {
+        setError('YouTube APIのクォータ制限に達しました。明日再度お試しください。');
+      } else {
+        setError(err.response?.data?.detail || 'YouTube検索に失敗しました');
+      }
+      setSearchResults([]);
+    } finally {
+      setSearching(false);
+    }
+  };
+
+  // 検索結果から動画を選択
+  const handleSelectVideo = (video: YouTubeSearchResult) => {
+    setNewYouTubeUrl(video.youtube_url);
+    setShowSearch(false);
+    setSearchQuery('');
+    setSearchResults([]);
   };
 
   // YouTube動画を追加
@@ -380,6 +433,18 @@ export default function YouTubeAdminPage() {
                     </div>
                   </div>
 
+                  {/* YouTube検索ボタン */}
+                  <button
+                    onClick={() => {
+                      setShowSearch(true);
+                      setSearchQuery(bookDetail.title);
+                    }}
+                    className="w-full px-3 md:px-4 py-2 md:py-2.5 mb-3 bg-red-500/10 dark:bg-red-500/20 text-red-600 dark:text-red-400 text-xs md:text-sm rounded-lg hover:bg-red-500/20 dark:hover:bg-red-500/30 font-semibold transition-all flex items-center justify-center gap-2"
+                  >
+                    <i className="ri-search-line"></i>
+                    YouTubeで検索
+                  </button>
+
                   {/* 追加フォーム */}
                   <form onSubmit={handleAddYouTube}>
                     <div className="flex gap-2">
@@ -387,7 +452,7 @@ export default function YouTubeAdminPage() {
                         type="url"
                         value={newYouTubeUrl}
                         onChange={(e) => setNewYouTubeUrl(e.target.value)}
-                        placeholder="YouTube URL"
+                        placeholder="YouTube URL（または上の検索で選択）"
                         className="flex-1 px-3 md:px-4 py-2 md:py-2.5 text-xs md:text-base rounded-lg border border-qiita-border dark:border-dark-border bg-qiita-surface dark:bg-dark-surface-light text-qiita-text-dark dark:text-white focus:outline-none focus:ring-2 focus:ring-qiita-green/50 dark:focus:ring-dark-green/50"
                       />
                       <button
@@ -486,6 +551,112 @@ export default function YouTubeAdminPage() {
           </div>
         </div>
       </main>
+
+      {/* YouTube検索モーダル */}
+      {showSearch && bookDetail && (
+        <div
+          className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4"
+          onClick={() => setShowSearch(false)}
+        >
+          <div
+            className="relative w-full max-w-3xl bg-qiita-card dark:bg-dark-surface rounded-lg shadow-2xl max-h-[80vh] overflow-hidden flex flex-col"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* ヘッダー */}
+            <div className="p-4 md:p-6 border-b border-qiita-border dark:border-dark-border">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-lg md:text-xl font-bold text-qiita-text-dark dark:text-white">
+                  YouTube動画を検索
+                </h3>
+                <button
+                  onClick={() => setShowSearch(false)}
+                  className="w-8 h-8 bg-qiita-surface dark:bg-dark-surface-light text-qiita-text dark:text-dark-text rounded-full flex items-center justify-center hover:bg-qiita-border dark:hover:bg-dark-border transition-colors"
+                  aria-label="閉じる"
+                >
+                  <i className="ri-close-line text-xl"></i>
+                </button>
+              </div>
+              
+              {/* 検索フォーム */}
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      e.preventDefault();
+                      handleSearchYouTube();
+                    }
+                  }}
+                  placeholder={`「${bookDetail.title}」で検索`}
+                  className="flex-1 px-4 py-2.5 text-sm rounded-lg border border-qiita-border dark:border-dark-border bg-qiita-surface dark:bg-dark-surface-light text-qiita-text-dark dark:text-white focus:outline-none focus:ring-2 focus:ring-qiita-green/50 dark:focus:ring-dark-green/50"
+                  autoFocus
+                />
+                <button
+                  onClick={handleSearchYouTube}
+                  disabled={searching || !searchQuery.trim()}
+                  className="px-5 py-2.5 bg-red-600 hover:bg-red-700 text-white text-sm rounded-lg disabled:opacity-50 font-semibold transition-all flex items-center gap-2"
+                >
+                  {searching ? (
+                    <>
+                      <div className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full"></div>
+                      検索中...
+                    </>
+                  ) : (
+                    <>
+                      <i className="ri-search-line"></i>
+                      検索
+                    </>
+                  )}
+                </button>
+              </div>
+            </div>
+            
+            {/* 検索結果 */}
+            <div className="flex-1 overflow-y-auto p-4 md:p-6">
+              {searchResults.length === 0 && !searching ? (
+                <div className="text-center py-12">
+                  <i className="ri-search-line text-4xl text-qiita-text dark:text-dark-text mb-3 block"></i>
+                  <p className="text-qiita-text dark:text-dark-text">
+                    検索して動画を探しましょう
+                  </p>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  {searchResults.map((video) => (
+                    <button
+                      key={video.video_id}
+                      onClick={() => handleSelectVideo(video)}
+                      className="w-full text-left p-3 rounded-lg border border-qiita-border dark:border-dark-border hover:border-qiita-green dark:hover:border-dark-green hover:bg-qiita-surface dark:hover:bg-dark-surface-light transition-all group"
+                    >
+                      <div className="flex gap-3">
+                        <img
+                          src={video.thumbnail_url}
+                          alt={video.title}
+                          className="w-32 h-auto rounded"
+                        />
+                        <div className="flex-1 min-w-0">
+                          <h4 className="text-sm font-bold text-qiita-text-dark dark:text-white mb-1.5 line-clamp-2 group-hover:text-qiita-green dark:group-hover:text-dark-green">
+                            {video.title}
+                          </h4>
+                          <div className="flex items-center gap-1 mb-2 text-xs text-qiita-text dark:text-dark-text">
+                            <i className="ri-youtube-line text-red-500"></i>
+                            <span className="truncate">{video.channel_name}</span>
+                          </div>
+                          <p className="text-xs text-qiita-text dark:text-dark-text line-clamp-2">
+                            {video.description}
+                          </p>
+                        </div>
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
 
       <Footer />
     </div>

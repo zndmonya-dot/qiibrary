@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from .api import rankings, books, admin, data_update, daily_tweet
+from .api import rankings, books, admin, data_update, daily_tweet, youtube
 from .scheduler import start_scheduler, stop_scheduler
 import os
 import logging
@@ -74,6 +74,7 @@ app.include_router(books.router, prefix="/api/books", tags=["books"])
 app.include_router(admin.router, prefix="/api/admin", tags=["admin"])
 app.include_router(data_update.router, prefix="/api/admin", tags=["admin"])
 app.include_router(daily_tweet.router, prefix="/api/admin", tags=["admin"])
+app.include_router(youtube.router, prefix="/api/youtube", tags=["youtube"])
 
 
 @app.get("/")
