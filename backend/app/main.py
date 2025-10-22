@@ -1,13 +1,25 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from .api import rankings, books, admin, daily_top, data_update
+from .scheduler import start_scheduler, stop_scheduler
 import os
+import logging
+
+# ロギング設定
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+)
+logger = logging.getLogger(__name__)
 
 app = FastAPI(
     title="Qiibrary API",
     description="Qiita記事で言及されたIT技術書ランキングAPI",
     version="0.1.0"
 )
+
+# スケジューラーのインスタンスを保持
+scheduler = None
 
 # CORS設定
 frontend_url = os.getenv("FRONTEND_URL", "http://localhost:3000")
@@ -76,4 +88,26 @@ async def root():
 @app.get("/health")
 async def health_check():
     return {"status": "healthy"}
+
+
+@app.on_event("startup")
+async def startup_event():
+    """
+    アプリケーション起動時にスケジューラーを開始
+    """
+    global scheduler
+    logger.info("🚀 アプリケーション起動中...")
+    scheduler = start_scheduler()
+    logger.info("✅ アプリケーション起動完了")
+
+
+@app.on_event("shutdown")
+async def shutdown_event():
+    """
+    アプリケーション終了時にスケジューラーを停止
+    """
+    global scheduler
+    logger.info("🛑 アプリケーション終了中...")
+    stop_scheduler(scheduler)
+    logger.info("✅ アプリケーション終了完了")
 
