@@ -4,6 +4,7 @@ import { useState } from 'react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import LoadingSpinner from '@/components/LoadingSpinner';
+import { getRankings, Book, BookStats, TopArticle } from '@/lib/api';
 
 interface BookData {
   id: number;
@@ -31,21 +32,75 @@ export default function DailyTweetPage() {
   const [error, setError] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
 
+  const formatNumber = (num: number): string => {
+    if (num >= 1000000) return `${(num / 1000000).toFixed(1)}M`;
+    if (num >= 1000) return `${(num / 1000).toFixed(1)}K`;
+    return String(num);
+  };
+
+  const generateTweetText = (book: Book, stats: BookStats): string => {
+    const title = book.title;
+    const articleCount = stats.article_count;
+    const totalLikes = stats.total_likes;
+    const likesDisplay = formatNumber(totalLikes);
+    
+    const asin = book.isbn?.replace(/-/g, '') || '';
+    const bookUrl = asin ? `https://qiibrary.com/books/${asin}` : 'https://qiibrary.com';
+    
+    const tweet = `📚 本日の24時間ランキング1位 📚
+
+『${title}』
+
+👥 ${articleCount}件のQiita記事で紹介
+❤️ 総いいね数: ${likesDisplay}
+
+詳しくはこちら👇
+${bookUrl}
+
+#プログラミング #技術書 #Qiita #エンジニア`;
+    
+    return tweet;
+  };
+
   const fetchDailyTop = async () => {
     setLoading(true);
     setError(null);
     setCopied(false);
 
     try {
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
-      const response = await fetch(`${apiUrl}/api/daily-top`);
+      // 24時間ランキングを取得
+      const rankings = await getRankings.daily();
       
-      if (!response.ok) {
-        throw new Error('データの取得に失敗しました');
+      if (!rankings || rankings.rankings.length === 0) {
+        throw new Error('24時間以内のランキングデータがありません');
       }
 
-      const result = await response.json();
-      setData(result);
+      // 1位を取得
+      const topItem = rankings.rankings[0];
+      
+      // ツイート文を生成
+      const tweetText = generateTweetText(topItem.book, topItem.stats);
+      
+      // データを整形
+      const bookData: BookData = {
+        id: topItem.book.id,
+        isbn: topItem.book.isbn || '',
+        title: topItem.book.title,
+        author: topItem.book.author || '',
+        publisher: topItem.book.publisher || '',
+        thumbnail_url: topItem.book.thumbnail_url,
+        amazon_affiliate_url: topItem.book.amazon_affiliate_url,
+        article_count: topItem.stats.article_count,
+        unique_user_count: topItem.stats.unique_user_count,
+        total_likes: topItem.stats.total_likes,
+        mention_count: topItem.stats.mention_count,
+      };
+      
+      setData({
+        book: bookData,
+        tweet: tweetText,
+        generated_at: new Date().toISOString()
+      });
     } catch (err) {
       setError(err instanceof Error ? err.message : '不明なエラーが発生しました');
     } finally {
