@@ -302,7 +302,7 @@ export default function BookDetailPage() {
                       <button
                         key={video.video_id}
                         onClick={() => setSelectedVideoId(video.video_id)}
-                        className="group block rounded-lg bg-qiita-surface dark:bg-[#2f3232] hover-card overflow-hidden w-full text-left"
+                        className="block rounded-lg bg-qiita-surface dark:bg-[#2f3232] overflow-hidden w-full text-left border border-qiita-border dark:border-dark-border"
                         style={style}
                       >
                         {/* サムネイル */}
@@ -311,11 +311,11 @@ export default function BookDetailPage() {
                             <img
                               src={video.thumbnail_url}
                               alt={video.title}
-                              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                              className="w-full h-full object-cover"
                             />
                           )}
-                          <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors flex items-center justify-center">
-                            <div className="w-12 h-12 md:w-16 md:h-16 bg-red-600 rounded-full flex items-center justify-center opacity-80 group-hover:opacity-100 transition-opacity shadow-lg">
+                          <div className="absolute inset-0 flex items-center justify-center">
+                            <div className="w-12 h-12 md:w-16 md:h-16 bg-red-600 rounded-full flex items-center justify-center shadow-lg">
                               <i className="ri-play-fill text-white text-2xl md:text-3xl ml-1"></i>
                             </div>
                           </div>
@@ -323,7 +323,7 @@ export default function BookDetailPage() {
                         
                         {/* 動画情報 */}
                         <div className="p-3 md:p-4">
-                          <h3 className="text-sm md:text-base font-bold text-qiita-text-dark dark:text-white mb-2 group-hover-text-green line-clamp-2 leading-relaxed">
+                          <h3 className="text-sm md:text-base font-bold text-qiita-text-dark dark:text-white mb-2 line-clamp-2 leading-relaxed">
                             {video.title}
                           </h3>
                           
