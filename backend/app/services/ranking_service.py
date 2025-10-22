@@ -73,7 +73,7 @@ class RankingService:
                 FROM books b
                 JOIN book_qiita_mentions bqm ON b.id = bqm.book_id
                 JOIN qiita_articles qa ON bqm.article_id = qa.id
-                WHERE 1=1
+                WHERE b.total_mentions > 0
                 {date_condition}
                 {tag_condition}
                 GROUP BY b.id, b.isbn, b.title, b.author, b.publisher, b.publication_date,
