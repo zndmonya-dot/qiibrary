@@ -360,18 +360,20 @@ export default function BookDetailPage() {
             )}
 
             {/* Amazonで購入ボタン */}
-            <div className="mt-8 md:mt-12 flex justify-center">
-              <a
-                href={book.amazon_affiliate_url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-3 px-6 md:px-8 py-3 md:py-4 bg-gradient-to-r from-[#FF9900] to-[#FFB84D] hover:from-[#FFB84D] hover:to-[#FF9900] text-white font-bold text-base md:text-lg rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
-              >
-                <i className="ri-shopping-cart-line text-xl md:text-2xl"></i>
-                <span>Amazonで購入する</span>
-                <i className="ri-external-link-line text-lg"></i>
-              </a>
-            </div>
+            {book.amazon_affiliate_url && (
+              <div className="mt-8 md:mt-12 flex justify-center">
+                <a
+                  href={book.amazon_affiliate_url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-3 px-6 md:px-8 py-3 md:py-4 bg-gradient-to-r from-[#FF9900] to-[#FFB84D] hover:from-[#FFB84D] hover:to-[#FF9900] text-white font-bold text-base md:text-lg rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
+                >
+                  <i className="ri-shopping-cart-line text-xl md:text-2xl"></i>
+                  <span>Amazonで購入する</span>
+                  <i className="ri-external-link-line text-lg"></i>
+                </a>
+              </div>
+            )}
 
             {/* 動画再生モーダル */}
             {selectedVideoId && (
