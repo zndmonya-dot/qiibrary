@@ -58,8 +58,8 @@ export default function YouTubeAdminPage() {
 
     try {
       const days = period === '24h' ? 1 : period === '30d' ? 30 : 365;
-      const response = await axios.get(`${API_URL}/api/rankings/fast?days=${days}&limit=10`);
-      setRankings(response.data || []);
+      const response = await axios.get(`${API_URL}/api/rankings/?days=${days}&limit=10`);
+      setRankings(response.data.rankings || []);
     } catch (err: any) {
       setError('ランキングの取得に失敗しました');
       setRankings([]);
