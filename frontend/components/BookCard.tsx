@@ -129,20 +129,6 @@ function BookCard({ rank, book, stats, topArticles }: BookCardProps) {
             )}
           </>
         )}
-        
-        {/* Amazon書籍詳細ボタン（デスクトップのみ） */}
-        {book.amazon_affiliate_url && (
-          <a
-            href={book.amazon_affiliate_url}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="hidden md:inline-flex w-[160px] items-center justify-center gap-1 px-2 py-2 bg-[#FF9900] text-white rounded-lg font-semibold text-xs shadow-sm"
-            onClick={() => analytics.clickAmazonLink(book.isbn || '', book.title)}
-          >
-            <i className="ri-amazon-line text-sm"></i>
-            <span>書籍詳細</span>
-          </a>
-        )}
       </div>
       
       {/* 上部：タイトルと著者情報 */}
