@@ -57,10 +57,12 @@ ${title}
 ・記事掲載数: ${articleCount}件
 ・総評価数: ${likesDisplay}
 
-詳細: ${bookUrl}
+Qiitaで話題の技術書をランキング化
+👉 ${bookUrl}
+
 Amazon: ${amazonUrl}
 
-#技術書 #Qiita`;
+#技術書 #Qiita #Qiibrary`;
     
     return tweet;
   };
