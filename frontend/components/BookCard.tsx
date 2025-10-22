@@ -251,13 +251,13 @@ function BookCard({ rank, book, stats, topArticles }: BookCardProps) {
               <Link
                 href={`/books/${book.isbn}#qiita-articles`}
                 prefetch={true}
-                className="inline-flex items-center gap-1.5 md:gap-1 text-sm md:text-xs text-qiita-green dark:text-dark-green font-medium py-2 px-3 md:py-0 md:px-0"
+                className="inline-flex items-center gap-1.5 md:gap-1.5 text-base md:text-base text-qiita-green dark:text-dark-green font-bold py-2 px-3 md:py-0 md:px-0"
                 onClick={() => {
                   analytics.clickBook(book.isbn || '', book.title, rank);
                 }}
               >
                 <span>すべての記事を見る</span>
-                <i className="ri-arrow-right-line text-base md:text-sm"></i>
+                <i className="ri-arrow-right-line text-lg md:text-base"></i>
               </Link>
             </div>
           </div>
