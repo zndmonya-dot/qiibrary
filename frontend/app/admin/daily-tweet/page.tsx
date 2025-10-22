@@ -48,19 +48,18 @@ export default function DailyTweetPage() {
     
     const asin = book.isbn?.replace(/-/g, '') || '';
     const bookUrl = asin ? `https://qiibrary.com/books/${asin}` : 'https://qiibrary.com';
-    const amazonUrl = book.amazon_affiliate_url || book.amazon_url || '';
     
-    const tweet = `【Qiita技術書ランキング 速報】
+    const tweet = `【Qiita技術書ランキング 本日の1位】
 
 ${title}
 
-・記事掲載数: ${articleCount}件
-・総評価数: ${likesDisplay}
+📝 記事掲載数: ${articleCount}件
+❤️ 総評価数: ${likesDisplay}
 
 Qiitaで話題の技術書をランキング化
-👉 ${bookUrl}
 
-Amazon: ${amazonUrl}
+詳細: ${bookUrl}
+購入: ${book.amazon_affiliate_url}
 
 #技術書 #Qiita #Qiibrary`;
     
