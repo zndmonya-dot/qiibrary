@@ -157,8 +157,8 @@ export default function Home() {
         {/* ヘッダー */}
         <div className={`mb-3 md:mb-8 bg-qiita-card dark:bg-dark-surface rounded-xl p-3 md:p-8 border-l-4 border-qiita-green dark:border-dark-green shadow-sm ${!isRestoring ? 'animate-fade-in-up' : ''}`}>
           <div className="flex items-start justify-between">
-            <div className="w-full text-center md:text-left">
-              <h2 className="text-lg md:text-3xl font-bold mb-1.5 md:mb-3 flex items-center justify-center md:justify-start gap-2 md:gap-3 text-qiita-text-dark dark:text-white">
+            <div className="w-full text-left">
+              <h2 className="text-lg md:text-3xl font-bold mb-1.5 md:mb-3 flex items-center justify-start gap-2 md:gap-3 text-qiita-text-dark dark:text-white">
                 <i className="ri-trophy-line text-qiita-green dark:text-dark-green text-xl md:text-3xl"></i>
                 Qiitaで話題の技術書まとめ
               </h2>
