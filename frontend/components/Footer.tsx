@@ -29,7 +29,7 @@ export default function Footer() {
               <li>
                 <Link 
                   href="/privacy" 
-                  className="text-gray-300 hover:text-white transition-colors duration-150 flex items-center gap-2"
+                  className="text-gray-300 hover-text-white flex items-center gap-2"
                 >
                   <i className="ri-shield-check-line text-gray-400"></i>
                   <span>プライバシーポリシー</span>
@@ -38,7 +38,7 @@ export default function Footer() {
               <li>
                 <Link 
                   href="/terms" 
-                  className="text-gray-300 hover:text-white transition-colors duration-150 flex items-center gap-2"
+                  className="text-gray-300 hover-text-white flex items-center gap-2"
                 >
                   <i className="ri-file-text-line text-gray-400"></i>
                   <span>利用規約</span>
@@ -47,7 +47,7 @@ export default function Footer() {
               <li>
                 <Link 
                   href="/legal" 
-                  className="text-gray-300 hover:text-white transition-colors duration-150 flex items-center gap-2"
+                  className="text-gray-300 hover-text-white flex items-center gap-2"
                 >
                   <i className="ri-scales-3-line text-gray-400"></i>
                   <span>特定商取引法</span>
@@ -65,7 +65,7 @@ export default function Footer() {
               <li>
                 <Link 
                   href="/about" 
-                  className="text-gray-300 hover:text-white transition-colors duration-150 flex items-center gap-2"
+                  className="text-gray-300 hover-text-white flex items-center gap-2"
                 >
                   <i className="ri-information-line text-gray-400"></i>
                   <span>このサイトについて</span>
@@ -74,7 +74,7 @@ export default function Footer() {
               <li>
                 <Link 
                   href="/contact" 
-                  className="text-gray-300 hover:text-white transition-colors duration-150 flex items-center gap-2"
+                  className="text-gray-300 hover-text-white flex items-center gap-2"
                 >
                   <i className="ri-mail-line text-gray-400"></i>
                   <span>お問い合わせ</span>
@@ -93,7 +93,7 @@ export default function Footer() {
                 href="https://twitter.com/your_account"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-12 h-12 bg-gray-700 hover:bg-gray-600 rounded-lg flex items-center justify-center transition-colors duration-150"
+                className="w-12 h-12 bg-gray-700 hover-footer-icon rounded-lg flex items-center justify-center"
                 aria-label="X (Twitter)"
               >
                 <i className="ri-twitter-x-line text-xl text-white"></i>
@@ -102,7 +102,7 @@ export default function Footer() {
                 href="https://github.com/your_account"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-12 h-12 bg-gray-700 hover:bg-gray-600 rounded-lg flex items-center justify-center transition-colors duration-150"
+                className="w-12 h-12 bg-gray-700 hover-footer-icon rounded-lg flex items-center justify-center"
                 aria-label="GitHub"
               >
                 <i className="ri-github-line text-xl text-white"></i>

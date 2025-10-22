@@ -48,7 +48,7 @@ export default function StarRating({ rating, reviewCount, bookUrl, size = 'md' }
         href={`${bookUrl}#review`}
         target="_blank"
         rel="noopener noreferrer"
-        className="hover:opacity-80 transition-opacity duration-200 cursor-pointer"
+        className="hover-opacity-80 cursor-pointer"
       >
         {content}
       </a>

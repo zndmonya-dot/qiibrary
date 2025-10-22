@@ -118,7 +118,7 @@ export default function PrivacyPage() {
                     技術記事の情報を取得するために、Qiita株式会社が提供するAPIを利用しています。
                     当サイトからQiita APIへのリクエストには、利用者の個人情報は含まれません。
                     Qiitaのプライバシーポリシーについては、
-                    <a href="https://qiita.com/privacy" target="_blank" rel="noopener noreferrer" className="text-qiita-green hover:underline mx-1">
+                    <a href="https://qiita.com/privacy" target="_blank" rel="noopener noreferrer" className="text-qiita-green hover-underline mx-1">
                       Qiita公式サイト
                     </a>
                     をご確認ください。
@@ -266,7 +266,7 @@ export default function PrivacyPage() {
               </h2>
               <p>
                 本プライバシーポリシーに関するご質問やご不明な点がございましたら、
-                <Link href="/contact" className="text-qiita-green hover:underline mx-1 font-semibold">
+                <Link href="/contact" className="text-qiita-green hover-underline mx-1 font-semibold">
                   お問い合わせページ
                 </Link>
                 からご連絡ください。
@@ -281,7 +281,7 @@ export default function PrivacyPage() {
                 <div>制定日: 2025年10月20日</div>
                 <div>最終更新日: 2025年10月20日</div>
               </div>
-              <Link href="/" className="text-qiita-green hover:underline flex items-center gap-1">
+              <Link href="/" className="text-qiita-green hover-underline flex items-center gap-1">
                 <i className="ri-home-line"></i>
                 トップに戻る
               </Link>

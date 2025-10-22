@@ -207,7 +207,7 @@ export default function TermsPage() {
               <div className="bg-qiita-surface dark:bg-dark-surface-light rounded-lg p-4">
                 <p>
                   当サイトは、本サービスの利用によって取得する個人情報については、当サイト
-                  <Link href="/privacy" className="text-qiita-green hover:underline mx-1 font-semibold">
+                  <Link href="/privacy" className="text-qiita-green hover-underline mx-1 font-semibold">
                     「プライバシーポリシー」
                   </Link>
                   に従い適切に取り扱うものとします。
@@ -237,7 +237,7 @@ export default function TermsPage() {
                 <div>制定日: 2025年10月20日</div>
                 <div>最終更新日: 2025年10月20日</div>
               </div>
-              <Link href="/" className="text-qiita-green hover:underline flex items-center gap-1">
+              <Link href="/" className="text-qiita-green hover-underline flex items-center gap-1">
                 <i className="ri-home-line"></i>
                 トップに戻る
               </Link>

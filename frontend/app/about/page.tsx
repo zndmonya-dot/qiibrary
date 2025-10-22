@@ -250,7 +250,7 @@ export default function AboutPage() {
                 </p>
                 <Link
                   href="/contact"
-                  className="inline-flex items-center gap-2 bg-qiita-green hover:bg-qiita-green-dark text-white px-4 py-2.5 rounded-lg transition-all duration-200 font-semibold shadow-sm"
+                  className="inline-flex items-center gap-2 bg-qiita-green hover-bg-green-dark text-white px-4 py-2.5 rounded-lg font-semibold shadow-sm"
                 >
                   <i className="ri-mail-send-line"></i>
                   お問い合わせページへ
@@ -265,7 +265,7 @@ export default function AboutPage() {
               <div>
                 <div>最終更新日: 2025年10月20日</div>
               </div>
-              <Link href="/" className="text-qiita-green hover:underline flex items-center gap-1">
+              <Link href="/" className="text-qiita-green hover-underline flex items-center gap-1">
                 <i className="ri-home-line"></i>
                 トップに戻る
               </Link>

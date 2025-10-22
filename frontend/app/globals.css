@@ -273,5 +273,49 @@ html {
       @apply hover:bg-qiita-green/10 dark:hover:bg-qiita-green/20 
              transition-all duration-200;
     }
+
+    /* Footer links */
+    .hover-footer-link {
+      @apply hover:text-white transition-colors duration-150;
+    }
+
+    .hover-footer-icon {
+      @apply hover:bg-gray-600 transition-colors duration-150;
+    }
+
+    /* Book detail page */
+    .hover-text-green {
+      @apply hover:text-qiita-green dark:hover:text-dark-green transition-colors duration-200;
+    }
+
+    .hover-text-white {
+      @apply hover:text-white transition-colors duration-150;
+    }
+
+    /* Contact & other pages */
+    .hover-bg-green-dark {
+      @apply hover:bg-qiita-green-dark transition-all duration-200;
+    }
+
+    .hover-bg-surface {
+      @apply hover:bg-qiita-green/10 dark:hover:bg-qiita-green/20 transition-all duration-200;
+    }
+
+    .hover-underline {
+      @apply hover:underline;
+    }
+
+    .hover-opacity-90 {
+      @apply hover:opacity-90 transition-opacity;
+    }
+
+    .hover-opacity-80 {
+      @apply hover:opacity-80 transition-opacity duration-200;
+    }
+
+    /* Group hover for nested elements */
+    .group:hover .group-hover-text-green {
+      @apply text-qiita-green dark:text-dark-green transition-colors;
+    }
   }
 }

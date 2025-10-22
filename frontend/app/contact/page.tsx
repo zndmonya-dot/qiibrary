@@ -39,7 +39,7 @@ export default function ContactPage() {
               </p>
               <a
                 href="mailto:contact@qiibrary.com"
-                className="inline-flex items-center gap-2 bg-qiita-green hover:bg-qiita-green-dark text-white px-4 py-2.5 rounded-lg transition-all duration-200 font-semibold shadow-sm"
+                className="inline-flex items-center gap-2 bg-qiita-green hover-bg-green-dark text-white px-4 py-2.5 rounded-lg font-semibold shadow-sm"
               >
                 <i className="ri-mail-send-line"></i>
                 メールを送る
@@ -64,7 +64,7 @@ export default function ContactPage() {
                 href="https://twitter.com/qiibrary"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 bg-qiita-surface dark:bg-dark-surface-light hover:bg-qiita-green/10 dark:hover:bg-qiita-green/20 border border-qiita-border dark:border-dark-border text-qiita-text-dark dark:text-white px-4 py-2.5 rounded-lg transition-all duration-200 font-semibold shadow-sm"
+                className="inline-flex items-center gap-2 bg-qiita-surface dark:bg-dark-surface-light hover-bg-surface border border-qiita-border dark:border-dark-border text-qiita-text-dark dark:text-white px-4 py-2.5 rounded-lg font-semibold shadow-sm"
               >
                 <i className="ri-external-link-line"></i>
                 Xでフォロー / 連絡する
@@ -89,7 +89,7 @@ export default function ContactPage() {
                 href="https://github.com/yourusername/qiibrary/issues"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 bg-qiita-surface dark:bg-dark-surface-light hover:bg-qiita-green/10 dark:hover:bg-qiita-green/20 border border-qiita-border dark:border-dark-border text-qiita-text-dark dark:text-white px-4 py-2.5 rounded-lg transition-all duration-200 font-semibold shadow-sm"
+                className="inline-flex items-center gap-2 bg-qiita-surface dark:bg-dark-surface-light hover-bg-surface border border-qiita-border dark:border-dark-border text-qiita-text-dark dark:text-white px-4 py-2.5 rounded-lg font-semibold shadow-sm"
               >
                 <i className="ri-external-link-line"></i>
                 Issueを作成する
@@ -166,7 +166,7 @@ export default function ContactPage() {
                   <p className="text-sm ml-6">
                     A. 当サイトはAmazonアソシエイト・プログラムに参加申請中であり、審査承認後は
                     書籍購入リンクからの紹介料によって運営されます。詳しくは
-                    <Link href="/privacy" className="text-qiita-green hover:underline mx-1 font-semibold">プライバシーポリシー</Link>
+                    <Link href="/privacy" className="text-qiita-green hover-underline mx-1 font-semibold">プライバシーポリシー</Link>
                     をご覧ください。
                   </p>
                 </div>
@@ -194,7 +194,7 @@ export default function ContactPage() {
               <div>
                 <div>最終更新日: 2025年10月20日</div>
               </div>
-              <Link href="/" className="text-qiita-green hover:underline flex items-center gap-1">
+              <Link href="/" className="text-qiita-green hover-underline flex items-center gap-1">
                 <i className="ri-home-line"></i>
                 トップに戻る
               </Link>

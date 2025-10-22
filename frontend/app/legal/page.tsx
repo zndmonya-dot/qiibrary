@@ -72,7 +72,7 @@ export default function LegalPage() {
                 <div className="flex flex-col md:flex-row gap-2">
                   <span className="font-semibold min-w-[140px]">お問い合わせ:</span>
                   <span>
-                    <Link href="/contact" className="text-qiita-green hover:underline font-semibold">
+                    <Link href="/contact" className="text-qiita-green hover-underline font-semibold">
                       お問い合わせページ
                     </Link>
                     からご連絡ください
@@ -239,7 +239,7 @@ export default function LegalPage() {
               <div className="bg-qiita-surface dark:bg-dark-surface-light rounded-lg p-4">
                 <p className="mb-2">
                   著作権者ご本人から、書籍情報の削除または修正のご要望がある場合は、
-                  <Link href="/contact" className="text-qiita-green hover:underline mx-1 font-semibold">
+                  <Link href="/contact" className="text-qiita-green hover-underline mx-1 font-semibold">
                     お問い合わせページ
                   </Link>
                   よりご連絡ください。
@@ -272,7 +272,7 @@ export default function LegalPage() {
                 <div>制定日: 2025年10月20日</div>
                 <div>最終更新日: 2025年10月20日</div>
               </div>
-              <Link href="/" className="text-qiita-green hover:underline flex items-center gap-1">
+              <Link href="/" className="text-qiita-green hover-underline flex items-center gap-1">
                 <i className="ri-home-line"></i>
                 トップに戻る
               </Link>

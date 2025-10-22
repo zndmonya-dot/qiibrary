@@ -100,7 +100,7 @@ export default function BookDetailPage() {
           </div>
           <button
             onClick={() => router.push('/')}
-            className="mt-4 text-qiita-green dark:text-dark-green hover:text-qiita-green-dark dark:hover:text-dark-green transition-colors duration-200 inline-flex items-center gap-1"
+            className="mt-4 text-qiita-green dark:text-dark-green hover-text-green inline-flex items-center gap-1"
           >
             <i className="ri-arrow-left-line"></i>
             ランキングに戻る
@@ -118,7 +118,7 @@ export default function BookDetailPage() {
             {/* 戻るボタン */}
             <button
               onClick={() => router.push('/')}
-              className="flex items-center gap-1.5 md:gap-2 text-qiita-text dark:text-dark-text hover:text-qiita-green dark:hover:text-dark-green mb-4 md:mb-8 transition-colors duration-200 text-xs md:text-sm font-medium"
+              className="flex items-center gap-1.5 md:gap-2 text-qiita-text dark:text-dark-text hover-text-green mb-4 md:mb-8 text-xs md:text-sm font-medium"
             >
               <i className="ri-arrow-left-line text-sm md:text-base"></i>
               <span>ランキングに戻る</span>
@@ -185,7 +185,7 @@ export default function BookDetailPage() {
                         </div>
                         
                         <div className="flex-1 min-w-0">
-                          <h3 className="text-sm md:text-base font-bold text-qiita-text-dark dark:text-white mb-1.5 md:mb-2 group-hover:text-qiita-green dark:group-hover:text-dark-green transition-colors line-clamp-2 leading-relaxed">
+                          <h3 className="text-sm md:text-base font-bold text-qiita-text-dark dark:text-white mb-1.5 md:mb-2 group-hover-text-green line-clamp-2 leading-relaxed">
                             {article.title}
                           </h3>
                           
@@ -239,7 +239,7 @@ export default function BookDetailPage() {
                         </div>
                         
                         <div className="flex-shrink-0 pt-0.5 md:pt-1">
-                          <i className="ri-external-link-line text-qiita-text-light dark:text-dark-text-light group-hover:text-qiita-green dark:group-hover:text-dark-green text-sm md:text-base transition-colors"></i>
+                          <i className="ri-external-link-line text-qiita-text-light dark:text-dark-text-light group-hover-text-green text-sm md:text-base"></i>
                         </div>
                       </div>
                     </a>
@@ -252,7 +252,7 @@ export default function BookDetailPage() {
                   <div className="mt-4 md:mt-6 flex gap-2 md:gap-3 justify-center flex-wrap">
                     <button
                       onClick={() => handleShowMore(SHOW_MORE_INCREMENT)}
-                      className="px-3 md:px-4 py-1.5 md:py-2 text-xs md:text-sm bg-qiita-green dark:bg-dark-green text-white rounded-lg hover:opacity-90 transition-opacity font-medium"
+                      className="px-3 md:px-4 py-1.5 md:py-2 text-xs md:text-sm bg-qiita-green dark:bg-dark-green text-white rounded-lg hover-opacity-90 font-medium"
                     >
                       もっと見る（+{SHOW_MORE_INCREMENT}件）
                     </button>
