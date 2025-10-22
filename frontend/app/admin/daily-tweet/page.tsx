@@ -31,6 +31,8 @@ export default function DailyTweetPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
+  const [updating, setUpdating] = useState(false);
+  const [updateSuccess, setUpdateSuccess] = useState(false);
 
   const formatNumber = (num: number): string => {
     if (num >= 1000000) return `${(num / 1000000).toFixed(1)}M`;
@@ -126,6 +128,31 @@ ${bookUrl}
     window.open(tweetUrl, '_blank');
   };
 
+  const updateData = async (days: number = 7) => {
+    setUpdating(true);
+    setUpdateSuccess(false);
+    setError(null);
+
+    try {
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+      const response = await fetch(`${apiUrl}/api/admin/update-data?days=${days}`, {
+        method: 'POST'
+      });
+      
+      if (!response.ok) {
+        throw new Error('データ更新の開始に失敗しました');
+      }
+
+      const result = await response.json();
+      setUpdateSuccess(true);
+      alert(`データ更新を開始しました！\n期間: ${result.start_date} 〜 ${result.end_date}\n\nバックグラウンドで処理中です。数分後に再度「今日の1位を取得」してください。`);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : '不明なエラーが発生しました');
+    } finally {
+      setUpdating(false);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-qiita-bg dark:bg-dark-bg">
       <Header />
@@ -141,13 +168,33 @@ ${bookUrl}
         </div>
 
         <div className="bg-qiita-card dark:bg-dark-surface rounded-lg p-6 border border-qiita-border dark:border-dark-border shadow-sm mb-6">
-          <button
-            onClick={fetchDailyTop}
-            disabled={loading}
-            className="w-full bg-qiita-green dark:bg-dark-green text-white px-6 py-3 rounded-lg font-semibold hover-opacity-90 disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            {loading ? '取得中...' : '今日の1位を取得'}
-          </button>
+          <div className="flex flex-col md:flex-row gap-3">
+            <button
+              onClick={fetchDailyTop}
+              disabled={loading}
+              className="flex-1 bg-qiita-green dark:bg-dark-green text-white px-6 py-3 rounded-lg font-semibold hover-opacity-90 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {loading ? '取得中...' : '今日の1位を取得'}
+            </button>
+            
+            <button
+              onClick={() => updateData(7)}
+              disabled={updating}
+              className="flex-1 bg-blue-600 dark:bg-blue-500 text-white px-6 py-3 rounded-lg font-semibold hover-opacity-90 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+            >
+              <i className="ri-refresh-line"></i>
+              {updating ? 'データ更新中...' : '過去7日分のデータを更新'}
+            </button>
+          </div>
+          
+          {updateSuccess && (
+            <div className="mt-4 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-3">
+              <div className="flex items-center gap-2 text-green-600 dark:text-green-400 text-sm">
+                <i className="ri-check-line text-lg"></i>
+                <span>データ更新を開始しました。バックグラウンドで処理中です。</span>
+              </div>
+            </div>
+          )}
         </div>
 
         {error && (
