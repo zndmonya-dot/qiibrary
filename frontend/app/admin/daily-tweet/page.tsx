@@ -4,7 +4,7 @@ import { useState } from 'react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import LoadingSpinner from '@/components/LoadingSpinner';
-import { getRankings, Book, BookStats, TopArticle } from '@/lib/api';
+import { getRankings, getBookDetail, Book, BookStats, TopArticle } from '@/lib/api';
 
 interface BookData {
   id: number;
@@ -83,22 +83,36 @@ Amazon: ${amazonUrl}
       // 1位を取得
       const topItem = rankings.rankings[0];
       
-      // ツイート文を生成
-      const tweetText = generateTweetText(topItem.book, topItem.stats);
+      // 書籍詳細を取得して累計データを計算
+      const asin = topItem.book.isbn?.replace(/-/g, '') || '';
+      const bookDetail = await getBookDetail(asin);
       
-      // データを整形
+      // 累計いいね数を計算
+      const totalLikes = bookDetail.qiita_articles.reduce((sum, article) => sum + article.likes_count, 0);
+      
+      // 累計データで統計情報を上書き
+      const cumulativeStats: BookStats = {
+        ...topItem.stats,
+        article_count: bookDetail.qiita_articles.length, // 累計記事数
+        total_likes: totalLikes, // 累計いいね数
+      };
+      
+      // ツイート文を生成
+      const tweetText = generateTweetText(bookDetail, cumulativeStats);
+      
+      // データを整形（累計データを使用）
       const bookData: BookData = {
-        id: topItem.book.id,
-        isbn: topItem.book.isbn || '',
-        title: topItem.book.title,
-        author: topItem.book.author || '',
-        publisher: topItem.book.publisher || '',
-        thumbnail_url: topItem.book.thumbnail_url,
-        amazon_affiliate_url: topItem.book.amazon_affiliate_url,
-        article_count: topItem.stats.article_count,
-        unique_user_count: topItem.stats.unique_user_count,
-        total_likes: topItem.stats.total_likes,
-        mention_count: topItem.stats.mention_count,
+        id: bookDetail.id,
+        isbn: bookDetail.isbn || '',
+        title: bookDetail.title,
+        author: bookDetail.author || '',
+        publisher: bookDetail.publisher || '',
+        thumbnail_url: bookDetail.thumbnail_url,
+        amazon_affiliate_url: bookDetail.amazon_affiliate_url,
+        article_count: cumulativeStats.article_count,
+        unique_user_count: cumulativeStats.unique_user_count,
+        total_likes: cumulativeStats.total_likes,
+        mention_count: cumulativeStats.mention_count,
       };
       
       setData({
