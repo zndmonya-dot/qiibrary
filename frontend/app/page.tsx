@@ -11,25 +11,6 @@ import { ITEMS_PER_PAGE } from '@/lib/constants';
 
 type PeriodType = 'daily' | 'monthly' | 'yearly' | 'all' | 'year';
 
-interface PageState {
-  scrollY: number;
-  currentPage: number;
-  period: PeriodType;
-  selectedYear: number | null;
-  searchQuery: string;
-}
-
-const getInitialState = (): PageState | null => {
-  if (typeof window === 'undefined') return null;
-  const savedState = sessionStorage.getItem('rankingPageState');
-  if (!savedState) return null;
-  try {
-    return JSON.parse(savedState);
-  } catch {
-    return null;
-  }
-};
-
 const getPeriodLabel = (period: PeriodType, selectedYear: number | null): string => {
   if (period === 'daily') return '24時間';
   if (period === 'monthly') return '30日間';
@@ -45,25 +26,15 @@ const getAnimationStyle = (index: number): React.CSSProperties => ({
 });
 
 export default function Home() {
-  const initialState = getInitialState();
-
-  const [period, setPeriod] = useState<PeriodType>(initialState?.period || 'yearly');
-  const [selectedYear, setSelectedYear] = useState<number | null>(initialState?.selectedYear || null);
+  const [period, setPeriod] = useState<PeriodType>('yearly');
+  const [selectedYear, setSelectedYear] = useState<number | null>(null);
   const [availableYears, setAvailableYears] = useState<number[]>([]);
   const [rankings, setRankings] = useState<RankingResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [currentPage, setCurrentPage] = useState(initialState?.currentPage || 1);
-  const [searchQuery, setSearchQuery] = useState(initialState?.searchQuery || '');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [searchQuery, setSearchQuery] = useState('');
   const [showAllYears, setShowAllYears] = useState(false);
-  const [isRestoring, setIsRestoring] = useState(!!initialState);
-  const [savedScrollY, setSavedScrollY] = useState<number | null>(initialState?.scrollY || null);
-
-  useEffect(() => {
-    if (typeof window !== 'undefined' && initialState) {
-      sessionStorage.removeItem('rankingPageState');
-    }
-  }, []);
 
   useEffect(() => {
     const fetchYears = async () => {
@@ -77,18 +48,6 @@ export default function Home() {
     fetchYears();
   }, []);
 
-  useEffect(() => {
-    if (isRestoring && !loading && savedScrollY !== null) {
-      requestAnimationFrame(() => {
-        requestAnimationFrame(() => {
-          window.scrollTo({ top: savedScrollY, behavior: 'smooth' });
-          setSavedScrollY(null);
-          setIsRestoring(false);
-        });
-      });
-    }
-  }, [isRestoring, loading, savedScrollY]);
-
   const sortedYears = [...availableYears].sort((a, b) => b - a);
   const recentYears = sortedYears.slice(0, 5);
   const olderYears = sortedYears.slice(5);
@@ -97,7 +56,7 @@ export default function Home() {
     const fetchRankings = async () => {
       setLoading(true);
       setError(null);
-      if (!isRestoring) setCurrentPage(1);
+      setCurrentPage(1);
       
       try {
         const data = period === 'daily' ? await getRankings.daily()
@@ -155,7 +114,7 @@ export default function Home() {
       
       <main className="container mx-auto px-3 md:px-4 py-3 md:py-8 min-h-[calc(100vh-120px)]">
         {/* ヘッダー */}
-        <div className={`mb-3 md:mb-8 bg-qiita-card dark:bg-dark-surface rounded-xl p-3 md:p-8 border-l-4 border-qiita-green dark:border-dark-green shadow-sm ${!isRestoring ? 'animate-fade-in-up' : ''}`}>
+        <div className="mb-3 md:mb-8 bg-qiita-card dark:bg-dark-surface rounded-xl p-3 md:p-8 border-l-4 border-qiita-green dark:border-dark-green shadow-sm animate-fade-in-up">
           <div className="flex items-start justify-between">
             <div className="w-full text-left">
               <h2 className="text-lg md:text-3xl font-bold mb-1.5 md:mb-3 flex items-center justify-start gap-2 md:gap-3 text-qiita-text-dark dark:text-white">
@@ -170,7 +129,7 @@ export default function Home() {
         </div>
         
         {/* 検索バー */}
-        <div className={`mb-4 md:mb-6 bg-qiita-card dark:bg-dark-surface rounded-lg border border-qiita-border dark:border-dark-border p-3 md:p-4 ${!isRestoring ? 'animate-fade-in-up' : ''}`}>
+        <div className="mb-4 md:mb-6 bg-qiita-card dark:bg-dark-surface rounded-lg border border-qiita-border dark:border-dark-border p-3 md:p-4 animate-fade-in-up">
           <div className="relative">
             <i className="ri-search-line absolute left-3 md:left-4 top-1/2 -translate-y-1/2 text-qiita-text dark:text-dark-text text-lg md:text-xl"></i>
             <input
@@ -214,7 +173,7 @@ export default function Home() {
         </div>
         
         {/* タブ */}
-        <div className={`relative mb-3 md:mb-6 bg-qiita-card dark:bg-dark-surface rounded-lg border border-qiita-border dark:border-dark-border p-2 md:p-4 overflow-x-auto ${!isRestoring ? 'animate-fade-in-up animate-delay-50' : ''}`}>
+        <div className="relative mb-3 md:mb-6 bg-qiita-card dark:bg-dark-surface rounded-lg border border-qiita-border dark:border-dark-border p-2 md:p-4 overflow-x-auto animate-fade-in-up animate-delay-50">
           <div className="flex flex-nowrap md:flex-wrap gap-1.5 md:gap-2 min-w-max md:min-w-0">
             <button
               onClick={() => {
@@ -365,7 +324,7 @@ export default function Home() {
 
         {!error && rankings && !loading && (
           <div>
-            <div className={`mb-3 md:mb-6 flex items-center justify-between bg-qiita-card dark:bg-dark-surface p-2.5 md:p-4 rounded-lg shadow-sm border border-qiita-border dark:border-dark-border ${!isRestoring ? 'animate-fade-in-up animate-delay-100' : ''}`}>
+            <div className="mb-3 md:mb-6 flex items-center justify-between bg-qiita-card dark:bg-dark-surface p-2.5 md:p-4 rounded-lg shadow-sm border border-qiita-border dark:border-dark-border animate-fade-in-up animate-delay-100">
               <div className="flex items-center gap-1.5 md:gap-2">
                 <i className="ri-trophy-line text-qiita-green dark:text-dark-green text-lg md:text-2xl"></i>
                 <h2 className="text-sm md:text-lg font-semibold text-qiita-text-dark dark:text-white">
@@ -380,7 +339,7 @@ export default function Home() {
             <div className="space-y-2 md:space-y-4 mb-4 md:mb-8">
               {paginatedRankings.length > 0 ? (
                 paginatedRankings.map((item, index) => {
-                  const style = isRestoring ? undefined : getAnimationStyle(index);
+                  const style = getAnimationStyle(index);
                   
                   return (
                     <div key={item.book.id} style={style}>
