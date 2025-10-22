@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from .api import rankings, books, admin
+from .api import rankings, books, admin, daily_top
 import os
 
 app = FastAPI(
@@ -60,6 +60,7 @@ app.add_middleware(
 app.include_router(rankings.router, prefix="/api/rankings", tags=["rankings"])
 app.include_router(books.router, prefix="/api/books", tags=["books"])
 app.include_router(admin.router, prefix="/api/admin", tags=["admin"])
+app.include_router(daily_top.router, prefix="/api", tags=["daily-top"])
 
 
 @app.get("/")
