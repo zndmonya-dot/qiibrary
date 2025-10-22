@@ -162,7 +162,7 @@ export default function Home() {
                 <i className="ri-trophy-line text-qiita-green dark:text-dark-green text-xl md:text-3xl"></i>
                 Qiitaで話題の技術書まとめ
               </h2>
-              <p className="text-left text-qiita-text dark:text-dark-text font-medium text-xs md:text-base leading-relaxed">
+              <p className="text-qiita-text dark:text-dark-text font-medium text-xs md:text-base leading-relaxed" style={{ textAlign: 'left' }}>
                 おすすめ書籍をランキング形式でわかりやすく紹介！
               </p>
             </div>
