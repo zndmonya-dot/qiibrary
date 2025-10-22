@@ -262,7 +262,7 @@ export default function BookDetailPage() {
                     </button>
                     <button
                       onClick={handleShowAll}
-                      className="px-4 md:px-5 py-2.5 md:py-3 text-sm md:text-base bg-qiita-surface dark:bg-dark-surface-light text-qiita-text-dark dark:text-white rounded-lg hover-primary font-semibold"
+                      className="px-5 md:px-6 py-2.5 md:py-3 text-base md:text-lg bg-qiita-surface dark:bg-dark-surface-light text-qiita-text-dark dark:text-white rounded-lg hover-primary font-bold"
                     >
                       すべて表示（全{book.qiita_articles.length}件）
                     </button>
