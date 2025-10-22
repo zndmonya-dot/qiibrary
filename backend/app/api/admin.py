@@ -141,8 +141,7 @@ async def get_youtube_links(
 async def add_youtube_link(
     book_id: int,
     link_data: YouTubeLinkCreate,
-    db: Session = Depends(get_db),
-    _: bool = Depends(verify_admin_token)
+    db: Session = Depends(get_db)
 ):
     """書籍にYouTube動画を追加"""
     # 書籍の存在確認
@@ -186,8 +185,7 @@ async def add_youtube_link(
 async def update_youtube_link(
     link_id: int,
     link_data: YouTubeLinkUpdate,
-    db: Session = Depends(get_db),
-    _: bool = Depends(verify_admin_token)
+    db: Session = Depends(get_db)
 ):
     """YouTube動画を更新"""
     link = db.query(BookYouTubeLink).filter(BookYouTubeLink.id == link_id).first()
@@ -225,8 +223,7 @@ async def update_youtube_link(
 @router.delete("/youtube/{link_id}")
 async def delete_youtube_link(
     link_id: int,
-    db: Session = Depends(get_db),
-    _: bool = Depends(verify_admin_token)
+    db: Session = Depends(get_db)
 ):
     """YouTube動画を削除"""
     link = db.query(BookYouTubeLink).filter(BookYouTubeLink.id == link_id).first()
