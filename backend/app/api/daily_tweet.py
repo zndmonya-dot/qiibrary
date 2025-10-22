@@ -1,15 +1,28 @@
 """
 本日のツイート文を返すAPIエンドポイント
 """
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, HTTPException, Depends
 from sqlalchemy.orm import Session
-from app.database import get_db
-from app.services.ranking_service import RankingService
-from app.models.book import Book
-from app.models.qiita_article import QiitaArticle
-from app.models.book import book_qiita_mentions
+
+from ..database import SessionLocal
+from ..services.ranking_service import RankingService
+from ..models.book import Book
+from ..models.qiita_article import QiitaArticle
+from ..models.book import book_qiita_mentions
 
 router = APIRouter()
+
+
+# データベース依存性
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        try:
+            db.close()
+        except Exception:
+            pass
 
 
 def format_number(num: int) -> str:
