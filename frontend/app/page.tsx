@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import BookCard from '@/components/BookCard';
@@ -48,9 +48,9 @@ export default function Home() {
     fetchYears();
   }, []);
 
-  const sortedYears = [...availableYears].sort((a, b) => b - a);
-  const recentYears = sortedYears.slice(0, 5);
-  const olderYears = sortedYears.slice(5);
+  const sortedYears = useMemo(() => [...availableYears].sort((a, b) => b - a), [availableYears]);
+  const recentYears = useMemo(() => sortedYears.slice(0, 5), [sortedYears]);
+  const olderYears = useMemo(() => sortedYears.slice(5), [sortedYears]);
 
   useEffect(() => {
     const fetchRankings = async () => {
@@ -77,36 +77,44 @@ export default function Home() {
     fetchRankings();
   }, [period, selectedYear]);
 
-  const filteredRankings = rankings ? rankings.rankings.filter(item => {
-    if (!searchQuery) return true;
-    const query = searchQuery.toLowerCase();
-    return (
-      item.book.title?.toLowerCase().includes(query) ||
-      item.book.author?.toLowerCase().includes(query) ||
-      item.book.publisher?.toLowerCase().includes(query) ||
-      item.book.isbn?.toLowerCase().includes(query)
-    );
-  }) : [];
+  const filteredRankings = useMemo(() => {
+    if (!rankings) return [];
+    return rankings.rankings.filter(item => {
+      if (!searchQuery) return true;
+      const query = searchQuery.toLowerCase();
+      return (
+        item.book.title?.toLowerCase().includes(query) ||
+        item.book.author?.toLowerCase().includes(query) ||
+        item.book.publisher?.toLowerCase().includes(query) ||
+        item.book.isbn?.toLowerCase().includes(query)
+      );
+    });
+  }, [rankings, searchQuery]);
 
-  const paginatedRankings = filteredRankings.slice(
-    (currentPage - 1) * ITEMS_PER_PAGE,
-    currentPage * ITEMS_PER_PAGE
-  );
-  const totalPages = Math.ceil(filteredRankings.length / ITEMS_PER_PAGE);
+  const paginatedRankings = useMemo(() => {
+    return filteredRankings.slice(
+      (currentPage - 1) * ITEMS_PER_PAGE,
+      currentPage * ITEMS_PER_PAGE
+    );
+  }, [filteredRankings, currentPage]);
+
+  const totalPages = useMemo(() => {
+    return Math.ceil(filteredRankings.length / ITEMS_PER_PAGE);
+  }, [filteredRankings.length]);
   
-  const handleNextPage = () => {
+  const handleNextPage = useCallback(() => {
     if (currentPage < totalPages) {
       setCurrentPage(currentPage + 1);
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
-  };
+  }, [currentPage, totalPages]);
   
-  const handlePrevPage = () => {
+  const handlePrevPage = useCallback(() => {
     if (currentPage > 1) {
       setCurrentPage(currentPage - 1);
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
-  };
+  }, [currentPage]);
 
   return (
     <div className="min-h-screen bg-qiita-bg dark:bg-dark-bg">

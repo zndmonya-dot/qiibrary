@@ -10,8 +10,8 @@ import LoadingSpinner from '@/components/LoadingSpinner';
 import { getBookDetail, BookDetail } from '@/lib/api';
 import { formatNumber, formatPublicationDate } from '@/lib/utils';
 
-const INITIAL_ARTICLES_COUNT = 10;
-const SHOW_MORE_INCREMENT = 10;
+const INITIAL_ARTICLES_COUNT = 20;
+const SHOW_MORE_INCREMENT = 20;
 const ANIMATION_TIMEOUT_MORE = 1200;
 const ANIMATION_TIMEOUT_ALL = 2000;
 const MIN_LOADING_DELAY = 300;
