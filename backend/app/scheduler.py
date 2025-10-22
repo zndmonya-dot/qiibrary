@@ -93,9 +93,10 @@ def daily_tweet_generation():
         # 累計いいね数を計算
         from app.models.qiita_article import QiitaArticle
         from app.models.book import BookQiitaMention
+        from sqlalchemy import func
         
         total_likes = db.query(
-            db.func.sum(QiitaArticle.likes_count)
+            func.sum(QiitaArticle.likes_count)
         ).join(
             BookQiitaMention,
             QiitaArticle.id == BookQiitaMention.article_id
@@ -104,7 +105,7 @@ def daily_tweet_generation():
         ).scalar() or 0
         
         article_count = db.query(
-            db.func.count(db.func.distinct(QiitaArticle.id))
+            func.count(func.distinct(QiitaArticle.id))
         ).join(
             BookQiitaMention,
             QiitaArticle.id == BookQiitaMention.article_id

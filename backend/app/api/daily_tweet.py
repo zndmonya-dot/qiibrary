@@ -3,6 +3,7 @@
 """
 from fastapi import APIRouter, HTTPException, Depends
 from sqlalchemy.orm import Session
+from sqlalchemy import func
 
 from ..database import SessionLocal
 from ..services.ranking_service import RankingService
@@ -60,7 +61,7 @@ async def get_daily_tweet(db: Session = Depends(get_db)):
         
         # 累計いいね数を計算
         total_likes = db.query(
-            db.func.sum(QiitaArticle.likes_count)
+            func.sum(QiitaArticle.likes_count)
         ).join(
             BookQiitaMention,
             QiitaArticle.id == BookQiitaMention.article_id
@@ -70,7 +71,7 @@ async def get_daily_tweet(db: Session = Depends(get_db)):
         
         # 累計記事数を計算
         article_count = db.query(
-            db.func.count(db.func.distinct(QiitaArticle.id))
+            func.count(func.distinct(QiitaArticle.id))
         ).join(
             BookQiitaMention,
             QiitaArticle.id == BookQiitaMention.article_id
