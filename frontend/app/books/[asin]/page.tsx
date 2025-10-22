@@ -366,7 +366,7 @@ export default function BookDetailPage() {
                   href={book.amazon_affiliate_url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 md:gap-3 px-6 md:px-8 py-3 md:py-3.5 bg-qiita-surface dark:bg-dark-surface-light border-2 border-qiita-green dark:border-dark-green text-qiita-green dark:text-dark-green hover:bg-qiita-green dark:hover:bg-dark-green hover:text-white dark:hover:text-white font-bold text-sm md:text-base rounded-lg transition-all duration-200"
+                  className="inline-flex items-center gap-2 md:gap-3 px-6 md:px-8 py-3 md:py-3.5 bg-[#FF9900] hover:bg-[#E88B00] text-white font-bold text-sm md:text-base rounded-lg transition-colors duration-200"
                 >
                   <i className="ri-shopping-cart-line text-lg md:text-xl"></i>
                   <span>Amazonで購入する</span>
@@ -382,7 +382,7 @@ export default function BookDetailPage() {
                 onClick={() => setSelectedVideoId(null)}
               >
                 <div
-                  className="relative w-full max-w-5xl aspect-video bg-black rounded-lg overflow-hidden shadow-2xl"
+                  className="relative w-full max-w-3xl aspect-video bg-black rounded-lg overflow-hidden shadow-2xl"
                   onClick={(e) => e.stopPropagation()}
                 >
                   {/* 閉じるボタン */}
