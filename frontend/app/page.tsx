@@ -371,26 +371,26 @@ export default function Home() {
                         window.scrollTo({ top: 0, behavior: 'smooth' });
                       }}
                       disabled={currentPage === 1}
-                      className={`flex items-center justify-center w-8 h-8 md:w-10 md:h-10 rounded-lg font-medium transition-all duration-150 ${
+                      className={`flex items-center justify-center w-10 h-10 md:w-11 md:h-11 rounded-lg font-medium transition-all duration-150 ${
                         currentPage === 1
                           ? 'bg-qiita-surface dark:bg-dark-surface-light text-qiita-text-light dark:text-dark-text-light cursor-not-allowed opacity-50'
                           : 'bg-qiita-surface dark:bg-dark-surface-light text-qiita-text dark:text-dark-text hover-primary'
                       }`}
                       title="最初のページ"
                     >
-                      <i className="ri-skip-back-mini-line text-base md:text-lg"></i>
+                      <i className="ri-skip-back-mini-line text-lg md:text-xl"></i>
                     </button>
                     
                     <button
                       onClick={handlePrevPage}
                       disabled={currentPage === 1}
-                      className={`flex items-center gap-0.5 md:gap-1 px-2 md:px-4 h-8 md:h-10 rounded-lg font-medium text-sm md:text-base transition-all duration-150 ${
+                      className={`flex items-center gap-1 px-3 md:px-4 h-10 md:h-11 rounded-lg font-semibold text-sm md:text-base transition-all duration-150 ${
                         currentPage === 1
                           ? 'bg-qiita-surface dark:bg-dark-surface-light text-qiita-text-light dark:text-dark-text-light cursor-not-allowed opacity-50'
                           : 'bg-qiita-surface dark:bg-dark-surface-light text-qiita-text dark:text-dark-text hover-primary'
                       }`}
                     >
-                      <i className="ri-arrow-left-s-line text-base md:text-lg"></i>
+                      <i className="ri-arrow-left-s-line text-lg md:text-xl"></i>
                       <span className="hidden sm:inline">前へ</span>
                     </button>
                     
@@ -440,7 +440,7 @@ export default function Home() {
                               setCurrentPage(page);
                               window.scrollTo({ top: 0, behavior: 'smooth' });
                             }}
-                            className={`flex items-center justify-center w-8 h-8 md:w-10 md:h-10 rounded-lg font-medium text-xs md:text-base transition-all duration-150 ${
+                            className={`flex items-center justify-center w-10 h-10 md:w-11 md:h-11 rounded-lg font-semibold text-sm md:text-base transition-all duration-150 ${
                               currentPage === page
                                 ? 'bg-qiita-green dark:bg-dark-green text-white shadow-sm'
                                 : 'bg-qiita-surface dark:bg-dark-surface-light text-qiita-text dark:text-dark-text hover-primary'
@@ -449,7 +449,7 @@ export default function Home() {
                             {page}
                           </button>
                         ) : (
-                          <span key={index} className="flex items-center justify-center w-6 md:w-10 h-8 md:h-10 text-qiita-text-light dark:text-dark-text-light text-xs md:text-base">
+                          <span key={index} className="flex items-center justify-center w-8 md:w-10 h-10 md:h-11 text-qiita-text-light dark:text-dark-text-light text-sm md:text-base">
                             {page}
                           </span>
                         )
@@ -459,14 +459,14 @@ export default function Home() {
                     <button
                       onClick={handleNextPage}
                       disabled={currentPage === totalPages}
-                      className={`flex items-center gap-0.5 md:gap-1 px-2 md:px-4 h-8 md:h-10 rounded-lg font-medium text-sm md:text-base transition-all duration-150 ${
+                      className={`flex items-center gap-1 px-3 md:px-4 h-10 md:h-11 rounded-lg font-semibold text-sm md:text-base transition-all duration-150 ${
                         currentPage === totalPages
                           ? 'bg-qiita-surface dark:bg-dark-surface-light text-qiita-text-light dark:text-dark-text-light cursor-not-allowed opacity-50'
                           : 'bg-qiita-surface dark:bg-dark-surface-light text-qiita-text dark:text-dark-text hover-primary'
                       }`}
                     >
                       <span className="hidden sm:inline">次へ</span>
-                      <i className="ri-arrow-right-s-line text-base md:text-lg"></i>
+                      <i className="ri-arrow-right-s-line text-lg md:text-xl"></i>
                     </button>
                     
                     <button
@@ -475,14 +475,14 @@ export default function Home() {
                         window.scrollTo({ top: 0, behavior: 'smooth' });
                       }}
                       disabled={currentPage === totalPages}
-                      className={`flex items-center justify-center w-8 h-8 md:w-10 md:h-10 rounded-lg font-medium transition-all duration-150 ${
+                      className={`flex items-center justify-center w-10 h-10 md:w-11 md:h-11 rounded-lg font-medium transition-all duration-150 ${
                         currentPage === totalPages
                           ? 'bg-qiita-surface dark:bg-dark-surface-light text-qiita-text-light dark:text-dark-text-light cursor-not-allowed opacity-50'
                           : 'bg-qiita-surface dark:bg-dark-surface-light text-qiita-text dark:text-dark-text hover-primary'
                       }`}
                       title="最後のページ"
                     >
-                      <i className="ri-skip-forward-mini-line text-base md:text-lg"></i>
+                      <i className="ri-skip-forward-mini-line text-lg md:text-xl"></i>
                     </button>
                   </div>
                   

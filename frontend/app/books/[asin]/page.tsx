@@ -121,9 +121,9 @@ export default function BookDetailPage() {
             {/* 戻るボタン */}
             <button
               onClick={() => router.push('/')}
-              className="flex items-center gap-1.5 md:gap-2 text-qiita-text dark:text-dark-text hover-text-green mb-4 md:mb-8 text-xs md:text-sm font-medium"
+              className="flex items-center gap-2 text-qiita-text dark:text-dark-text hover-text-green mb-4 md:mb-8 text-sm md:text-base font-medium py-2 px-3 md:px-0 md:py-0"
             >
-              <i className="ri-arrow-left-line text-sm md:text-base"></i>
+              <i className="ri-arrow-left-line text-base md:text-lg"></i>
               <span>ランキングに戻る</span>
             </button>
             
@@ -252,16 +252,16 @@ export default function BookDetailPage() {
                 
                 {/* もっと見る / すべて表示ボタン */}
                 {book.qiita_articles.length > displayedArticlesCount && (
-                  <div className="mt-4 md:mt-6 flex gap-2 md:gap-3 justify-center flex-wrap">
+                  <div className="mt-4 md:mt-6 flex gap-3 justify-center flex-wrap">
                     <button
                       onClick={() => handleShowMore(SHOW_MORE_INCREMENT)}
-                      className="px-3 md:px-4 py-1.5 md:py-2 text-xs md:text-sm bg-qiita-green dark:bg-dark-green text-white rounded-lg hover-opacity-90 font-medium"
+                      className="px-4 md:px-5 py-2.5 md:py-3 text-sm md:text-base bg-qiita-green dark:bg-dark-green text-white rounded-lg hover-opacity-90 font-semibold"
                     >
                       もっと見る（+{SHOW_MORE_INCREMENT}件）
                     </button>
                     <button
                       onClick={handleShowAll}
-                      className="px-3 md:px-4 py-1.5 md:py-2 text-xs md:text-sm bg-qiita-surface dark:bg-dark-surface-light text-qiita-text-dark dark:text-white rounded-lg hover-primary font-medium"
+                      className="px-4 md:px-5 py-2.5 md:py-3 text-sm md:text-base bg-qiita-surface dark:bg-dark-surface-light text-qiita-text-dark dark:text-white rounded-lg hover-primary font-semibold"
                     >
                       すべて表示（全{book.qiita_articles.length}件）
                     </button>
