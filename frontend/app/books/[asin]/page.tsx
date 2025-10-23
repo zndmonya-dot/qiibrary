@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { useParams, useRouter } from 'next/navigation';
+import { useParams } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
 import Script from 'next/script';
@@ -24,7 +24,6 @@ const MIN_LOADING_DELAY = 300;
 
 export default function BookDetailPage() {
   const params = useParams();
-  const router = useRouter();
   const asin = params.asin as string;
   
   const [book, setBook] = useState<BookDetail | null>(null);
@@ -130,19 +129,11 @@ export default function BookDetailPage() {
   
   // ページから離れる時にスクロール位置を保存
   useEffect(() => {
-    const handleBeforeUnload = () => {
+    // クリーンアップ関数でスクロール位置を保存
+    return () => {
       // sessionStorageに保存（ブラウザの戻る・進む用）
       sessionStorage.setItem(`book_scroll_${asin}`, window.scrollY.toString());
       // メモリキャッシュにも保存
-      scrollPositionCache.set(asin, window.scrollY);
-    };
-
-    // pagehideイベントで保存（より確実）
-    window.addEventListener('pagehide', handleBeforeUnload);
-    
-    return () => {
-      window.removeEventListener('pagehide', handleBeforeUnload);
-      // コンポーネントのアンマウント時にも保存
       scrollPositionCache.set(asin, window.scrollY);
     };
   }, [asin]);
@@ -261,7 +252,7 @@ export default function BookDetailPage() {
             </div>
           </div>
           <button
-            onClick={() => router.back()}
+            onClick={() => window.history.back()}
             className="mt-4 text-qiita-green dark:text-dark-green hover-text-green inline-flex items-center gap-1"
           >
             <i className="ri-arrow-left-line"></i>
@@ -290,7 +281,7 @@ export default function BookDetailPage() {
           <main className="container mx-auto px-3 md:px-4 pt-6 pb-4 md:py-8">
             {/* 戻るボタン */}
             <button
-              onClick={() => router.back()}
+              onClick={() => window.history.back()}
               className="flex items-center gap-2 text-qiita-text dark:text-dark-text hover-text-green mb-4 md:mb-8 text-sm md:text-base font-medium py-2 px-3 md:px-0 md:py-0"
             >
               <i className="ri-arrow-left-line text-base md:text-lg"></i>

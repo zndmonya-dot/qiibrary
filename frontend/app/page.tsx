@@ -180,19 +180,11 @@ export default function Home() {
   useEffect(() => {
     const cacheKey = period === 'year' ? `${period}-${selectedYear}` : period;
     
-    const handleBeforeUnload = () => {
+    // クリーンアップ関数でスクロール位置を保存
+    return () => {
       // sessionStorageに保存（ブラウザの戻る・進む用）
       sessionStorage.setItem('homepage_scroll', window.scrollY.toString());
       // メモリキャッシュにも保存（タブ切り替え用）
-      scrollPositionCache.set(cacheKey, window.scrollY);
-    };
-
-    // pagehideイベントで保存（より確実）
-    window.addEventListener('pagehide', handleBeforeUnload);
-    
-    return () => {
-      window.removeEventListener('pagehide', handleBeforeUnload);
-      // コンポーネントのアンマウント時にも保存
       scrollPositionCache.set(cacheKey, window.scrollY);
     };
   }, [period, selectedYear]);
