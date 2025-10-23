@@ -3,19 +3,17 @@
 import Link from 'next/link';
 import { useEffect } from 'react';
 import { usePathname } from 'next/navigation';
-import { applyTheme, watchSystemTheme } from '@/lib/theme';
+import { applySystemTheme, watchSystemTheme } from '@/lib/theme';
 
 export default function Header() {
   const pathname = usePathname();
 
   useEffect(() => {
-    // 常にAutoモード（OSに従う）
-    applyTheme('auto');
+    // OSのテーマ設定を適用
+    applySystemTheme();
     
     // システム設定の変更を監視
-    const unwatch = watchSystemTheme(() => {
-      applyTheme('auto');
-    });
+    const unwatch = watchSystemTheme(applySystemTheme);
     
     return unwatch;
   }, []);
