@@ -2,7 +2,7 @@
 
 ## 概要
 
-Qiibraryは**毎日深夜3時（日本時間）**に自動的にQiitaから新しい記事データを収集します。
+Qiibraryは**毎日深夜0時（日本時間）**に自動的にQiitaから新しい記事データを収集します。
 
 ---
 
@@ -10,13 +10,13 @@ Qiibraryは**毎日深夜3時（日本時間）**に自動的にQiitaから新�
 
 ### スケジュール
 ```
-毎日 03:00 (JST) - データ更新
+毎日 00:00 (JST) - データ更新
 毎日 08:00 (JST) - ツイート文生成
 ```
 
 ### 実行内容
 
-#### 深夜3時: データ更新
+#### 深夜0時: データ更新
 1. **前日のQiita記事**を検索
 2. IT技術書のISBNを抽出
 3. 記事とのリレーションを保存
@@ -89,7 +89,7 @@ git push origin main
 🚀 アプリケーション起動中...
 =" * 80
 🚀 スケジューラー起動完了
-⏰ 毎日 03:00 (JST) にデータ更新を実行します
+⏰ 毎日 00:00 (JST) にデータ更新を実行します
 ⏰ 毎日 08:00 (JST) にツイート文生成を実行します
 =" * 80
 ✅ アプリケーション起動完了
@@ -176,10 +176,10 @@ python -m scripts.collect_books_by_date_range --start 2025-10-15 --end 2025-10-2
 `backend/app/scheduler.py` を編集：
 
 ```python
-# 毎日深夜3時 → 毎日午前6時に変更
+# 毎日深夜0時 → 毎日午前6時に変更
 scheduler.add_job(
     daily_data_update,
-    trigger=CronTrigger(hour=6, minute=0, timezone=JST),  # hour=3 → hour=6
+    trigger=CronTrigger(hour=6, minute=0, timezone=JST),  # hour=0 → hour=6
     id='daily_update',
     name='毎日のQiitaデータ更新',
     replace_existing=True
@@ -272,7 +272,7 @@ curl http://localhost:8000/health
 
 3. **API制限に注意**
    - Qiita API: 1000リクエスト/時間
-   - 深夜3時は比較的空いている時間帯
+   - 深夜0時は比較的空いている時間帯
 
 4. **データベースバックアップ**
    - Neonの自動バックアップ機能を有効化

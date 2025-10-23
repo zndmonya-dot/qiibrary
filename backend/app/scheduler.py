@@ -161,10 +161,10 @@ def start_scheduler():
     
     scheduler = BackgroundScheduler(timezone=JST)
     
-    # 毎日深夜3時（日本時間）にデータ更新を実行
+    # 毎日深夜0時（日本時間）にデータ更新を実行
     scheduler.add_job(
         daily_data_update,
-        trigger=CronTrigger(hour=3, minute=0, timezone=JST),
+        trigger=CronTrigger(hour=0, minute=0, timezone=JST),
         id='daily_update',
         name='毎日のQiitaデータ更新',
         replace_existing=True
@@ -183,7 +183,7 @@ def start_scheduler():
     
     logger.info("=" * 80)
     logger.info("🚀 スケジューラー起動完了")
-    logger.info("⏰ 毎日 03:00 (JST) にデータ更新を実行します")
+    logger.info("⏰ 毎日 00:00 (JST) にデータ更新を実行します")
     logger.info("⏰ 毎日 08:00 (JST) にツイート文生成を実行します")
     logger.info("=" * 80)
     
