@@ -50,8 +50,8 @@ export default function Home() {
   }, []);
 
   const sortedYears = useMemo(() => [...availableYears].sort((a, b) => b - a), [availableYears]);
-  const recentYears = useMemo(() => sortedYears.slice(0, 5), [sortedYears]);
-  const olderYears = useMemo(() => sortedYears.slice(5), [sortedYears]);
+  const recentYears = useMemo(() => sortedYears.slice(0, 6), [sortedYears]);
+  const olderYears = useMemo(() => sortedYears.slice(6), [sortedYears]);
 
   useEffect(() => {
     const fetchRankings = async () => {
