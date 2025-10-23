@@ -126,8 +126,23 @@ export default function PrivacyPage() {
                 </div>
                 <div className="bg-qiita-surface dark:bg-dark-surface-light rounded-lg p-4">
                   <h3 className="font-semibold text-qiita-text-dark dark:text-white mb-2 flex items-center gap-2">
+                    <i className="ri-youtube-line text-red-500"></i>
+                    5.2 YouTube Data API
+                  </h3>
+                  <p className="text-sm">
+                    技術書を紹介するYouTube動画の情報を取得するために、Google LLCが提供するYouTube Data APIを利用しています。
+                    当サイトからYouTube Data APIへのリクエストには、利用者の個人情報は含まれません。
+                    YouTubeのプライバシーポリシーについては、
+                    <a href="https://www.youtube.com/intl/ja/howyoutubeworks/our-commitments/protecting-user-data/" target="_blank" rel="noopener noreferrer" className="text-qiita-green hover-underline mx-1">
+                      YouTube公式サイト
+                    </a>
+                    をご確認ください。
+                  </p>
+                </div>
+                <div className="bg-qiita-surface dark:bg-dark-surface-light rounded-lg p-4">
+                  <h3 className="font-semibold text-qiita-text-dark dark:text-white mb-2 flex items-center gap-2">
                     <i className="ri-book-line text-qiita-green dark:text-dark-green"></i>
-                    5.2 書籍情報の取得
+                    5.3 書籍情報の取得
                   </h3>
                   <p className="text-sm mb-2">
                     書籍情報を取得するために、以下のサービスを利用しています：
@@ -140,17 +155,6 @@ export default function PrivacyPage() {
                     当サイトからこれらのAPIへのリクエストには、利用者の個人情報は含まれません。
                   </p>
                 </div>
-                <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-4">
-                  <h3 className="font-semibold text-yellow-800 dark:text-yellow-300 mb-2 flex items-center gap-2">
-                    <i className="ri-error-warning-line"></i>
-                    5.3 Amazon Product Advertising API（準備中）
-                  </h3>
-                  <p className="text-sm text-yellow-700 dark:text-yellow-400">
-                    当サイトは現在、Amazonアソシエイト・プログラムの審査中です。
-                    審査承認後は、Amazon Product Advertising APIを使用して、より正確な書籍情報と価格情報を提供する予定です。
-                    現在は上記の代替サービスを使用しているため、一部の書籍情報が不正確または不完全な場合がございます。
-                  </p>
-                </div>
               </div>
             </section>
 
@@ -160,13 +164,9 @@ export default function PrivacyPage() {
               </h2>
               <div className="bg-qiita-surface dark:bg-dark-surface-light rounded-lg p-4 mb-3">
                 <p className="mb-3">
-                  当サイトは、Amazon.co.jpを宣伝しリンクすることによってサイトが紹介料を獲得できる手段を提供することを目的に設定されたアフィリエイトプログラムである、Amazonアソシエイト・プログラムに参加申請中です。
+                  当サイトは、Amazon.co.jpを宣伝しリンクすることによってサイトが紹介料を獲得できる手段を提供することを目的に設定されたアフィリエイトプログラムである、Amazonアソシエイト・プログラムの参加者です。
                 </p>
                 <div className="space-y-3 text-sm">
-                  <div>
-                    <strong className="text-qiita-text-dark dark:text-white">審査状況：</strong>
-                    <span className="ml-2">現在審査中のため、Amazon Product Advertising APIは使用できません。審査承認後、速やかにAPIを使用するようシステム改修を行います。</span>
-                  </div>
                   <div>
                     <strong className="text-qiita-text-dark dark:text-white">価格と在庫について：</strong>
                     <span className="ml-2">当サイトに掲載されている書籍情報は、OpenBDおよびGoogle Books APIから取得しており、Amazon.co.jpの最新の価格や在庫状況とは異なる場合があります。
@@ -174,7 +174,7 @@ export default function PrivacyPage() {
                   </div>
                   <div>
                     <strong className="text-qiita-text-dark dark:text-white">紹介料について：</strong>
-                    <span className="ml-2">審査承認後、利用者が当サイト経由でAmazon.co.jpにアクセスし商品を購入した場合、当サイトはAmazonから紹介料を受け取ることがあります。
+                    <span className="ml-2">利用者が当サイト経由でAmazon.co.jpにアクセスし商品を購入した場合、当サイトはAmazonから紹介料を受け取ることがあります。
                     これにより利用者に追加の費用が発生することはありません。</span>
                   </div>
                   <div>
@@ -230,7 +230,7 @@ export default function PrivacyPage() {
                 10. 外部リンク
               </h2>
               <p>
-                当サイトには、Amazon.co.jp、Qiitaなどの外部サイトへのリンクが含まれています。
+                当サイトには、Amazon.co.jp、Qiita、YouTubeなどの外部サイトへのリンクが含まれています。
                 これらの外部サイトには、それぞれ独自のプライバシーポリシーが適用されます。
                 当サイトは、外部サイトにおける情報の取り扱いについて責任を負いません。
               </p>
@@ -278,8 +278,8 @@ export default function PrivacyPage() {
           <div className="mt-8 pt-6 border-t border-qiita-border dark:border-dark-border text-sm text-qiita-text-light dark:text-dark-text-light">
             <div className="flex items-center justify-between">
               <div>
-                <div>制定日: 2025年10月20日</div>
-                <div>最終更新日: 2025年10月20日</div>
+                <div>制定日: 2024年10月20日</div>
+                <div>最終更新日: 2024年10月23日</div>
               </div>
               <Link href="/" className="text-qiita-green hover-underline flex items-center gap-1">
                 <i className="ri-home-line"></i>

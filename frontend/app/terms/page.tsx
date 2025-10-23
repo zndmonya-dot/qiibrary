@@ -44,11 +44,13 @@ export default function TermsPage() {
               <div className="bg-qiita-surface dark:bg-dark-surface-light rounded-lg p-4">
                 <p className="mb-3">本サービスは、以下の機能を提供します：</p>
                 <ul className="list-disc list-inside space-y-2 ml-4">
-                  <li>Qiitaで話題のIT技術書のランキング表示</li>
+                  <li>Qiita記事で言及されたIT技術書のランキング表示（24時間・30日間・365日間・年別・全期間）</li>
+                  <li>YouTube動画で紹介されたIT技術書の情報表示</li>
                   <li>書籍の詳細情報の提供（OpenBD、Google Books APIを利用）</li>
-                  <li>関連するQiita記事の紹介</li>
+                  <li>関連するQiita記事の一覧表示と外部リンク</li>
+                  <li>関連するYouTube動画の一覧表示と視聴機能</li>
                   <li>Amazon.co.jpへのアフィリエイトリンクの提供</li>
-                  <li>書籍検索機能</li>
+                  <li>書籍名・著者・出版社・ISBNによる検索機能</li>
                 </ul>
                 <p className="mt-3 text-sm bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded p-2">
                   <i className="ri-information-line text-blue-600 dark:text-blue-400 mr-1"></i>
@@ -58,12 +60,11 @@ export default function TermsPage() {
               <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-4 mt-3">
                 <h3 className="font-semibold text-yellow-800 dark:text-yellow-300 mb-2 flex items-center gap-2">
                   <i className="ri-error-warning-line"></i>
-                  書籍情報の精度について
+                  書籍情報について
                 </h3>
                 <p className="text-sm text-yellow-700 dark:text-yellow-400">
-                  現在、Amazonアソシエイト・プログラムの審査中のため、Amazon Product Advertising APIは使用できません。
-                  そのため、OpenBDおよびGoogle Books APIを代替として使用しており、一部の書籍情報が不正確または不完全な場合があります。
-                  審査承認後は、速やかにAmazon APIを使用するようシステム改修を行い、より正確な情報を提供いたします。
+                  書籍情報は、OpenBDおよびGoogle Books APIから取得しており、一部の書籍情報が不正確または不完全な場合があります。
+                  最新かつ正確な情報は、購入前に必ずAmazon.co.jpの商品ページでご確認ください。
                 </p>
               </div>
             </section>
@@ -141,13 +142,14 @@ export default function TermsPage() {
                   <li>本サービスに事実上または法律上の瑕疵（安全性、信頼性、正確性、完全性、有効性、特定の目的への適合性、セキュリティなどに関する欠陥、エラーやバグ、権利侵害などを含みます）がないこと</li>
                   <li>本サービスの中断、停止、終了、利用不能または変更</li>
                   <li>本サービスの利用により利用者に発生したいかなる損害</li>
-                  <li>外部サービス（Amazon.co.jp、Qiita、OpenBD、Google Booksなど）で発生したトラブル</li>
+                  <li>外部サービス（Amazon.co.jp、Qiita、YouTube、OpenBD、Google Booksなど）で発生したトラブル</li>
+                  <li>YouTube動画の視聴や、外部リンクへのアクセスにより発生したトラブル</li>
                   <li>アフィリエイトリンクを通じた購入取引に関する一切の事項</li>
                   <li>利用者間または利用者と第三者との間で生じたトラブル</li>
                 </ul>
                 <p className="mt-3 text-sm bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded p-2">
                   <i className="ri-alert-line text-red-600 dark:text-red-400 mr-1"></i>
-                  特に、Amazonアソシエイト審査中のため、書籍情報の精度が低い場合があります。購入前に必ずAmazon.co.jpで最新情報をご確認ください。
+                  書籍情報は外部APIから取得しているため、情報の精度が低い場合があります。購入前に必ずAmazon.co.jpで最新情報をご確認ください。
                 </p>
               </div>
             </section>
@@ -158,10 +160,10 @@ export default function TermsPage() {
               </h2>
               <div className="bg-qiita-surface dark:bg-dark-surface-light rounded-lg p-4">
                 <p className="mb-3">
-                  当サイトは、Amazon.co.jpを宣伝しリンクすることによってサイトが紹介料を獲得できる手段を提供することを目的に設定されたアフィリエイトプログラムである、Amazonアソシエイト・プログラムに参加申請中です。
+                  当サイトは、Amazon.co.jpを宣伝しリンクすることによってサイトが紹介料を獲得できる手段を提供することを目的に設定されたアフィリエイトプログラムである、Amazonアソシエイト・プログラムの参加者です。
                 </p>
                 <p className="mb-3">
-                  審査承認後、利用者が当サイトのリンクを通じて商品を購入された場合、当サイトは紹介料を受け取ることがあります。これにより利用者に追加の費用が発生することはありません。
+                  利用者が当サイトのリンクを通じて商品を購入された場合、当サイトは紹介料を受け取ることがあります。これにより利用者に追加の費用が発生することはありません。
                 </p>
                 <p className="text-sm">
                   書籍の価格、在庫状況、配送などの取引条件は、すべてAmazon.co.jpが定めるものであり、当サイトは一切の責任を負いません。
@@ -234,8 +236,8 @@ export default function TermsPage() {
           <div className="mt-8 pt-6 border-t border-qiita-border dark:border-dark-border text-sm text-qiita-text-light dark:text-dark-text-light">
             <div className="flex items-center justify-between">
               <div>
-                <div>制定日: 2025年10月20日</div>
-                <div>最終更新日: 2025年10月20日</div>
+                <div>制定日: 2024年10月20日</div>
+                <div>最終更新日: 2024年10月23日</div>
               </div>
               <Link href="/" className="text-qiita-green hover-underline flex items-center gap-1">
                 <i className="ri-home-line"></i>
