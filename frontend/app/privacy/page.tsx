@@ -63,56 +63,34 @@ export default function PrivacyPage() {
 
             <section>
               <h2 className="text-lg md:text-xl font-bold text-qiita-text-dark dark:text-white mb-4 pb-2 border-b border-qiita-border/50 dark:border-dark-border/50">
-                3. ブラウザストレージの使用
+                3. テーマ設定について
               </h2>
-              <p className="mb-3">
-                当サイトでは、ユーザーエクスペリエンスの向上のために、ブラウザのlocalStorageおよびsessionStorageを使用しています。
-              </p>
-              <div className="space-y-3 ml-4">
-                <div className="bg-qiita-surface dark:bg-dark-surface-light rounded-lg p-4">
-                  <h3 className="font-semibold text-qiita-text-dark dark:text-white mb-2">localStorage（永続的な保存）</h3>
-                  <ul className="list-disc list-inside space-y-1 ml-4 text-sm">
-                    <li>テーマ設定（ライトモード/ダークモード）の保存</li>
-                  </ul>
-                </div>
-                <div className="bg-qiita-surface dark:bg-dark-surface-light rounded-lg p-4">
-                  <h3 className="font-semibold text-qiita-text-dark dark:text-white mb-2">sessionStorage（セッション中のみ保存）</h3>
-                  <ul className="list-disc list-inside space-y-1 ml-4 text-sm">
-                    <li>ページ遷移時のスクロール位置の一時保存</li>
-                    <li>ランキングページの状態（現在のページ番号、検索クエリなど）の一時保存</li>
-                  </ul>
-                </div>
+              <div className="bg-qiita-surface dark:bg-dark-surface-light rounded-lg p-4">
+                <p className="mb-2">
+                  当サイトでは、ダークモード/ライトモードの表示設定について、ブラウザストレージ（localStorageやsessionStorage）は使用していません。
+                </p>
+                <p className="text-sm">
+                  テーマ設定は、利用者のデバイスのシステム設定（OSのダークモード設定）を自動的に検出して適用します。
+                  これにより、利用者の情報をブラウザに保存することなく、快適な表示環境を提供しています。
+                </p>
               </div>
-              <p className="mt-3 text-sm bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-3">
-                <i className="ri-information-line text-blue-600 dark:text-blue-400 mr-1"></i>
-                これらの情報は利用者のブラウザ内にのみ保存され、当サイトのサーバーには送信されません。
-                利用者はブラウザの設定でこれらのストレージをクリアすることができます。
-              </p>
             </section>
 
             <section>
               <h2 className="text-lg md:text-xl font-bold text-qiita-text-dark dark:text-white mb-4 pb-2 border-b border-qiita-border/50 dark:border-dark-border/50">
-                4. アクセス解析について
-              </h2>
-              <p className="mb-2">
-                当サイトでは、サービスの改善とユーザー体験の向上のために、将来的にアクセス解析ツール（Google Analytics等）を導入する可能性があります。
-              </p>
-              <p className="text-sm">
-                アクセス解析ツールを導入した場合、収集される情報は統計的な分析のみに使用され、個人を特定する目的では使用されません。
-                導入時には本ポリシーを更新し、利用者に通知いたします。
-              </p>
-            </section>
-
-            <section>
-              <h2 className="text-lg md:text-xl font-bold text-qiita-text-dark dark:text-white mb-4 pb-2 border-b border-qiita-border/50 dark:border-dark-border/50">
-                5. 外部サービスの利用
+                4. 外部サービスの利用
               </h2>
               <p className="mb-3">当サイトでは、以下の外部サービスを利用しています：</p>
+              <p className="mb-3 text-sm bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-3">
+                <i className="ri-information-line text-blue-600 dark:text-blue-400 mr-1"></i>
+                <strong>アクセス解析について:</strong> 現在、Google Analytics等のアクセス解析ツールは使用していません。
+                将来的に導入する場合は、本ポリシーを更新し、利用者に通知いたします。
+              </p>
               <div className="space-y-4 ml-4">
                 <div className="bg-qiita-surface dark:bg-dark-surface-light rounded-lg p-4">
                   <h3 className="font-semibold text-qiita-text-dark dark:text-white mb-2 flex items-center gap-2">
                     <i className="ri-article-line text-qiita-green dark:text-dark-green"></i>
-                    5.1 Qiita API
+                    4.1 Qiita API
                   </h3>
                   <p className="text-sm">
                     技術記事の情報を取得するために、Qiita株式会社が提供するAPIを利用しています。
@@ -127,7 +105,7 @@ export default function PrivacyPage() {
                 <div className="bg-qiita-surface dark:bg-dark-surface-light rounded-lg p-4">
                   <h3 className="font-semibold text-qiita-text-dark dark:text-white mb-2 flex items-center gap-2">
                     <i className="ri-youtube-line text-red-500"></i>
-                    5.2 YouTube Data API
+                    4.2 YouTube Data API
                   </h3>
                   <p className="text-sm">
                     技術書を紹介するYouTube動画の情報を取得するために、Google LLCが提供するYouTube Data APIを利用しています。
@@ -142,7 +120,7 @@ export default function PrivacyPage() {
                 <div className="bg-qiita-surface dark:bg-dark-surface-light rounded-lg p-4">
                   <h3 className="font-semibold text-qiita-text-dark dark:text-white mb-2 flex items-center gap-2">
                     <i className="ri-book-line text-qiita-green dark:text-dark-green"></i>
-                    5.3 書籍情報の取得
+                    4.3 書籍情報の取得
                   </h3>
                   <p className="text-sm mb-2">
                     書籍情報を取得するために、以下のサービスを利用しています：
@@ -160,7 +138,7 @@ export default function PrivacyPage() {
 
             <section>
               <h2 className="text-lg md:text-xl font-bold text-qiita-text-dark dark:text-white mb-4 pb-2 border-b border-qiita-border/50 dark:border-dark-border/50">
-                6. Amazonアソシエイトプログラムについて
+                5. Amazonアソシエイトプログラムについて
               </h2>
               <div className="bg-qiita-surface dark:bg-dark-surface-light rounded-lg p-4 mb-3">
                 <p className="mb-3">
@@ -188,7 +166,7 @@ export default function PrivacyPage() {
 
             <section>
               <h2 className="text-lg md:text-xl font-bold text-qiita-text-dark dark:text-white mb-4 pb-2 border-b border-qiita-border/50 dark:border-dark-border/50">
-                7. 情報の利用目的
+                6. 情報の利用目的
               </h2>
               <p className="mb-2">収集した情報は、以下の目的で利用します：</p>
               <ul className="list-disc list-inside space-y-1 ml-4 bg-qiita-surface dark:bg-dark-surface-light rounded-lg p-4">
@@ -202,7 +180,7 @@ export default function PrivacyPage() {
 
             <section>
               <h2 className="text-lg md:text-xl font-bold text-qiita-text-dark dark:text-white mb-4 pb-2 border-b border-qiita-border/50 dark:border-dark-border/50">
-                8. 情報の第三者提供
+                7. 情報の第三者提供
               </h2>
               <p className="mb-2">
                 当サイトは、以下の場合を除き、利用者の同意なく個人情報を第三者に提供することはありません：
@@ -217,7 +195,7 @@ export default function PrivacyPage() {
 
             <section>
               <h2 className="text-lg md:text-xl font-bold text-qiita-text-dark dark:text-white mb-4 pb-2 border-b border-qiita-border/50 dark:border-dark-border/50">
-                9. 情報の安全管理
+                8. 情報の安全管理
               </h2>
               <p>
                 当サイトは、収集した情報の漏洩、滅失または毀損の防止その他の安全管理のために必要かつ適切な措置を講じます。
@@ -227,7 +205,7 @@ export default function PrivacyPage() {
 
             <section>
               <h2 className="text-lg md:text-xl font-bold text-qiita-text-dark dark:text-white mb-4 pb-2 border-b border-qiita-border/50 dark:border-dark-border/50">
-                10. 外部リンク
+                9. 外部リンク
               </h2>
               <p>
                 当サイトには、Amazon.co.jp、Qiita、YouTubeなどの外部サイトへのリンクが含まれています。
@@ -238,7 +216,7 @@ export default function PrivacyPage() {
 
             <section>
               <h2 className="text-lg md:text-xl font-bold text-qiita-text-dark dark:text-white mb-4 pb-2 border-b border-qiita-border/50 dark:border-dark-border/50">
-                11. 子どもの個人情報
+                10. 子どもの個人情報
               </h2>
               <p>
                 当サイトは、13歳未満の子どもから故意に個人情報を収集することはありません。
@@ -248,7 +226,7 @@ export default function PrivacyPage() {
 
             <section>
               <h2 className="text-lg md:text-xl font-bold text-qiita-text-dark dark:text-white mb-4 pb-2 border-b border-qiita-border/50 dark:border-dark-border/50">
-                12. プライバシーポリシーの変更
+                11. プライバシーポリシーの変更
               </h2>
               <p>
                 当サイトは、必要に応じて本プライバシーポリシーを変更することがあります。
@@ -262,7 +240,7 @@ export default function PrivacyPage() {
 
             <section>
               <h2 className="text-lg md:text-xl font-bold text-qiita-text-dark dark:text-white mb-4 pb-2 border-b border-qiita-border/50 dark:border-dark-border/50">
-                13. お問い合わせ
+                12. お問い合わせ
               </h2>
               <p>
                 本プライバシーポリシーに関するご質問やご不明な点がございましたら、
