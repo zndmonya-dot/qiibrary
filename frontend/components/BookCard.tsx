@@ -151,7 +151,7 @@ function BookCard({ rank, book, stats, topArticles }: BookCardProps) {
                   }
                 }}
               >
-                <h3 className="text-lg md:text-lg font-bold line-clamp-2 leading-relaxed text-qiita-text-dark dark:text-white">
+                <h3 className="text-lg md:text-lg font-bold line-clamp-2 leading-relaxed text-qiita-text-dark dark:text-white md:group-hover:text-qiita-green dark:md:group-hover:text-dark-green transition-colors duration-200">
                   {book.title || `ISBN: ${book.isbn} の書籍`}
                 </h3>
               </a>
