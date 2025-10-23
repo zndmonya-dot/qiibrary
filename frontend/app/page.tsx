@@ -13,6 +13,9 @@ import { ITEMS_PER_PAGE } from '@/lib/constants';
 
 type PeriodType = 'daily' | 'monthly' | 'yearly' | 'all' | 'year';
 
+// グローバルキャッシュ（コンポーネント外で管理）
+const rankingsCache = new Map<string, RankingResponse>();
+
 const getPeriodLabel = (period: PeriodType, selectedYear: number | null): string => {
   if (period === 'daily') return '24時間';
   if (period === 'monthly') return '30日間';
@@ -40,8 +43,6 @@ export default function Home() {
   const [rankings, setRankings] = useState<RankingResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  // データキャッシュ（期間/年ごとにキャッシュ）
-  const [rankingsCache, setRankingsCache] = useState<Map<string, RankingResponse>>(new Map());
   const [currentPage, setCurrentPage] = useState(
     searchParams.get('page') ? parseInt(searchParams.get('page')!) : 1
   );
@@ -105,8 +106,8 @@ export default function Home() {
         
         setRankings(data);
         
-        // データをキャッシュに保存
-        setRankingsCache(prev => new Map(prev).set(cacheKey, data));
+        // データをグローバルキャッシュに保存
+        rankingsCache.set(cacheKey, data);
       } catch (err) {
         setError('ランキングの取得に失敗しました');
         console.error(err);
