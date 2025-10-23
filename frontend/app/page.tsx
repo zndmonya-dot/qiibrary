@@ -131,6 +131,13 @@ export default function Home() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [period, selectedYear]);
 
+  // ブラウザのネイティブなスクロール復元を有効化
+  useEffect(() => {
+    if ('scrollRestoration' in window.history) {
+      window.history.scrollRestoration = 'auto';
+    }
+  }, []);
+
   // スクロール位置の復元と保存
   useEffect(() => {
     const cacheKey = period === 'year' ? `${period}-${selectedYear}` : period;
@@ -138,11 +145,6 @@ export default function Home() {
     // キャッシュから復元した場合のみスクロール位置を復元
     if (isFromCache && rankings) {
       const savedScrollPosition = scrollPositionCache.get(cacheKey) || 0;
-      
-      // ブラウザのデフォルトのスクロール復元を無効化
-      if ('scrollRestoration' in window.history) {
-        window.history.scrollRestoration = 'manual';
-      }
       
       // DOMが完全にレンダリングされた後に復元（より確実に）
       const scrollTimeout = setTimeout(() => {

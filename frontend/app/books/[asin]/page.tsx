@@ -85,16 +85,18 @@ export default function BookDetailPage() {
     fetchBook();
   }, [asin]);
 
+  // ブラウザのネイティブなスクロール復元を有効化
+  useEffect(() => {
+    if ('scrollRestoration' in window.history) {
+      window.history.scrollRestoration = 'auto';
+    }
+  }, []);
+
   // スクロール位置の復元と保存
   useEffect(() => {
     // キャッシュから復元した場合のみスクロール位置を復元
     if (isFromCache && book) {
       const savedScrollPosition = scrollPositionCache.get(asin) || 0;
-      
-      // ブラウザのデフォルトのスクロール復元を無効化
-      if ('scrollRestoration' in window.history) {
-        window.history.scrollRestoration = 'manual';
-      }
       
       // DOMが完全にレンダリングされた後に復元（より確実に）
       const scrollTimeout = setTimeout(() => {
