@@ -29,10 +29,6 @@ const getPeriodLabel = (period: PeriodType, selectedYear: number | null): string
   return '365日間';
 };
 
-const getAnimationStyle = (index: number): React.CSSProperties => ({
-  animation: `fadeInUp 0.4s ease-out ${0.2 + index * 0.05}s forwards`,
-  opacity: 0
-});
 
 export default function Home() {
   const router = useRouter();
@@ -47,18 +43,11 @@ export default function Home() {
   const [rankings, setRankings] = useState<RankingResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [isFromCache, setIsFromCache] = useState(false);
   const [currentPage, setCurrentPage] = useState(
     searchParams.get('page') ? parseInt(searchParams.get('page')!) : 1
   );
   const [searchQuery, setSearchQuery] = useState(searchParams.get('search') || '');
   const [showAllYears, setShowAllYears] = useState(false);
-  
-  // スクロール位置を保存するヘルパー関数
-  const saveScrollPosition = useCallback(() => {
-    const cacheKey = period === 'year' ? `${period}-${selectedYear}` : period;
-    scrollPositionCache.set(cacheKey, window.scrollY);
-  }, [period, selectedYear]);
   
   // URLを更新するヘルパー関数
   const updateURL = useCallback((params: Record<string, string | number | null>) => {
@@ -110,13 +99,11 @@ export default function Home() {
       if (cachedData) {
         setRankings(cachedData);
         setLoading(false);
-        setIsFromCache(true); // キャッシュから復元したことを記録
         return;
       }
       
       setLoading(true);
       setError(null);
-      setIsFromCache(false); // 新規取得
       
       try {
         const data = period === 'daily' ? await getRankings.daily()
@@ -141,51 +128,37 @@ export default function Home() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [period, selectedYear]);
 
-  // スクロール復元の制御
+  // スクロール位置の保存と復元（シンプル版）
   useEffect(() => {
+    // ブラウザのデフォルト復元を無効化
     if ('scrollRestoration' in window.history) {
       window.history.scrollRestoration = 'manual';
     }
-  }, []);
 
-  // ランキングデータ表示後にスクロール位置を復元
-  useEffect(() => {
-    if (!rankings || !isFromCache) return;
-    
     const cacheKey = period === 'year' ? `${period}-${selectedYear}` : period;
     
-    // 優先順位: sessionStorage（戻る・進む） > メモリキャッシュ（タブ切り替え）
-    const sessionPosition = sessionStorage.getItem('homepage_scroll');
-    const cachePosition = scrollPositionCache.get(cacheKey);
-    
-    const position = sessionPosition 
-      ? parseInt(sessionPosition, 10) 
-      : (cachePosition || 0);
-    
-    if (position > 0) {
-      // DOMレンダリング完了後に復元
-      setTimeout(() => {
-        window.scrollTo({ top: position, behavior: 'auto' });
-        // sessionStorageから削除（1回のみ使用）
-        if (sessionPosition) {
-          sessionStorage.removeItem('homepage_scroll');
-        }
-      }, 0);
+    // 復元：ランキングデータ表示後
+    if (rankings) {
+      const savedPosition = scrollPositionCache.get(cacheKey) || 0;
+      if (savedPosition > 0) {
+        requestAnimationFrame(() => {
+          window.scrollTo(0, savedPosition);
+        });
+      }
     }
-  }, [period, selectedYear, rankings, isFromCache]);
-  
-  // ページから離れる時にスクロール位置を保存
-  useEffect(() => {
-    const cacheKey = period === 'year' ? `${period}-${selectedYear}` : period;
-    
-    // クリーンアップ関数でスクロール位置を保存
-    return () => {
-      // sessionStorageに保存（ブラウザの戻る・進む用）
-      sessionStorage.setItem('homepage_scroll', window.scrollY.toString());
-      // メモリキャッシュにも保存（タブ切り替え用）
+
+    // 保存：スクロールイベント
+    const saveScroll = () => {
       scrollPositionCache.set(cacheKey, window.scrollY);
     };
-  }, [period, selectedYear]);
+
+    window.addEventListener('scroll', saveScroll, { passive: true });
+    
+    return () => {
+      window.removeEventListener('scroll', saveScroll);
+      saveScroll(); // 最後に保存
+    };
+  }, [period, selectedYear, rankings]);
 
   const filteredRankings = useMemo(() => {
     if (!rankings) return [];
@@ -265,7 +238,7 @@ export default function Home() {
       
       <main className="container mx-auto px-3 md:px-4 py-3 md:py-8 min-h-[calc(100vh-120px)]">
         {/* ヘッダー */}
-        <div className={`mb-3 md:mb-8 bg-qiita-card dark:bg-dark-surface rounded-xl p-3 md:p-8 border-l-4 border-qiita-green dark:border-dark-green shadow-sm ${!isFromCache ? 'animate-fade-in-up' : ''}`}>
+        <div className="mb-3 md:mb-8 bg-qiita-card dark:bg-dark-surface rounded-xl p-3 md:p-8 border-l-4 border-qiita-green dark:border-dark-green shadow-sm">
           <div className="flex items-start justify-between">
             <div className="w-full text-left">
               <h2 className="text-lg md:text-3xl font-bold mb-1.5 md:mb-3 flex items-center justify-start gap-2 md:gap-3 text-qiita-text-dark dark:text-white">
@@ -280,7 +253,7 @@ export default function Home() {
         </div>
         
         {/* 検索バー */}
-        <div className={`mb-4 md:mb-6 bg-qiita-card dark:bg-dark-surface rounded-lg border border-qiita-border dark:border-dark-border p-3 md:p-4 ${!isFromCache ? 'animate-fade-in-up' : ''}`}>
+        <div className="mb-4 md:mb-6 bg-qiita-card dark:bg-dark-surface rounded-lg border border-qiita-border dark:border-dark-border p-3 md:p-4">
           <div className="relative">
             {/* デスクトップ: 左側の虫眼鏡アイコン */}
             <i className="ri-search-line absolute left-3 md:left-4 top-1/2 -translate-y-1/2 text-qiita-text dark:text-dark-text text-lg md:text-xl hidden md:block"></i>
@@ -350,11 +323,10 @@ export default function Home() {
         </div>
         
         {/* タブ */}
-        <div className={`relative mb-3 md:mb-6 bg-qiita-card dark:bg-dark-surface rounded-lg border border-qiita-border dark:border-dark-border p-2 md:p-4 overflow-x-auto ${!isFromCache ? 'animate-fade-in-up animate-delay-50' : ''}`}>
+        <div className="relative mb-3 md:mb-6 bg-qiita-card dark:bg-dark-surface rounded-lg border border-qiita-border dark:border-dark-border p-2 md:p-4 overflow-x-auto">
           <div className="flex flex-nowrap md:flex-wrap gap-1.5 md:gap-2 min-w-max md:min-w-0">
             <button
               onClick={() => {
-                saveScrollPosition();
                 setPeriod('daily');
                 setSelectedYear(null);
                 updateURL({ period: 'daily', year: null, page: 1 });
@@ -372,7 +344,6 @@ export default function Home() {
             </button>
             <button
               onClick={() => {
-                saveScrollPosition();
                 setPeriod('monthly');
                 setSelectedYear(null);
                 updateURL({ period: 'monthly', year: null, page: 1 });
@@ -389,7 +360,6 @@ export default function Home() {
             </button>
             <button
               onClick={() => {
-                saveScrollPosition();
                 setPeriod('yearly');
                 setSelectedYear(null);
                 updateURL({ period: 'yearly', year: null, page: 1 });
@@ -406,7 +376,6 @@ export default function Home() {
             </button>
             <button
               onClick={() => {
-                saveScrollPosition();
                 setPeriod('all');
                 setSelectedYear(null);
                 updateURL({ period: 'all', year: null, page: 1 });
@@ -430,7 +399,6 @@ export default function Home() {
               <button
                 key={year}
                 onClick={() => {
-                  saveScrollPosition();
                   setSelectedYear(year);
                   setPeriod('year');
                   updateURL({ period: 'year', year: year, page: 1 });
@@ -474,7 +442,6 @@ export default function Home() {
                 <button
                   key={year}
                   onClick={() => {
-                    saveScrollPosition();
                     setSelectedYear(year);
                     setPeriod('year');
                     updateURL({ period: 'year', year: year, page: 1 });
@@ -513,7 +480,7 @@ export default function Home() {
 
         {!error && rankings && !loading && (
           <div>
-            <div className={`mb-3 md:mb-6 flex items-center justify-between bg-qiita-card dark:bg-dark-surface p-2.5 md:p-4 rounded-lg shadow-sm border border-qiita-border dark:border-dark-border ${!isFromCache ? 'animate-fade-in-up animate-delay-100' : ''}`}>
+            <div className="mb-3 md:mb-6 flex items-center justify-between bg-qiita-card dark:bg-dark-surface p-2.5 md:p-4 rounded-lg shadow-sm border border-qiita-border dark:border-dark-border">
               <div className="flex items-center gap-1.5 md:gap-2">
                 <i className="ri-trophy-line text-qiita-green dark:text-dark-green text-lg md:text-2xl"></i>
                 <h2 className="text-sm md:text-lg font-semibold text-qiita-text-dark dark:text-white">
@@ -527,22 +494,16 @@ export default function Home() {
             
             <div className="space-y-2 md:space-y-4 mb-4 md:mb-8">
               {paginatedRankings.length > 0 ? (
-                paginatedRankings.map((item, index) => {
-                  // キャッシュから復元時はアニメーションをスキップ
-                  const style = isFromCache ? {} : getAnimationStyle(index);
-                  
-                  return (
-                    <div key={item.book.id} style={style}>
+                paginatedRankings.map((item, index) => (
+                    <div key={item.book.id}>
                       <BookCard
                         rank={item.rank}
                         book={item.book}
                         stats={item.stats}
                         topArticles={item.top_articles}
-                        onNavigate={saveScrollPosition}
                       />
                     </div>
-                  );
-                })
+                  ))
               ) : (
                 <div className="bg-qiita-card dark:bg-dark-surface rounded-lg p-12 text-center border border-qiita-border dark:border-dark-border shadow-sm animate-fade-in-up">
                   <i className="ri-inbox-line text-6xl text-qiita-text-light dark:text-dark-text-light mb-4"></i>

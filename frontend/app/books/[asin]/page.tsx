@@ -29,7 +29,6 @@ export default function BookDetailPage() {
   const [book, setBook] = useState<BookDetail | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [isFromCache, setIsFromCache] = useState(false);
   const [displayedArticlesCount, setDisplayedArticlesCount] = useState(INITIAL_ARTICLES_COUNT);
   const previousCountRef = useRef(INITIAL_ARTICLES_COUNT);
   const [newlyAddedStart, setNewlyAddedStart] = useState<number | null>(null);
@@ -44,7 +43,6 @@ export default function BookDetailPage() {
       if (cachedData) {
         setBook(cachedData);
         setLoading(false);
-        setIsFromCache(true); // キャッシュから復元
         setDisplayedArticlesCount(INITIAL_ARTICLES_COUNT);
         previousCountRef.current = INITIAL_ARTICLES_COUNT;
         setNewlyAddedStart(null);
@@ -58,7 +56,6 @@ export default function BookDetailPage() {
       
       setLoading(true);
       setError(null);
-      setIsFromCache(false); // 新規取得
       setDisplayedArticlesCount(INITIAL_ARTICLES_COUNT);
       previousCountRef.current = INITIAL_ARTICLES_COUNT;
       setNewlyAddedStart(null);
@@ -84,47 +81,35 @@ export default function BookDetailPage() {
     fetchBook();
   }, [asin]);
 
-  // スクロール復元の制御
+  // スクロール位置の保存と復元（シンプル版）
   useEffect(() => {
+    // ブラウザのデフォルト復元を無効化
     if ('scrollRestoration' in window.history) {
       window.history.scrollRestoration = 'manual';
     }
-  }, []);
 
-  // 書籍データ表示後にスクロール位置を復元
-  useEffect(() => {
-    if (!book || !isFromCache) return;
-    
-    // 優先順位: sessionStorage（戻る・進む） > メモリキャッシュ（直接戻る）
-    const sessionPosition = sessionStorage.getItem(`book_scroll_${asin}`);
-    const cachePosition = scrollPositionCache.get(asin);
-    
-    const position = sessionPosition 
-      ? parseInt(sessionPosition, 10) 
-      : (cachePosition || 0);
-    
-    if (position > 0) {
-      // DOMレンダリング完了後に復元
-      setTimeout(() => {
-        window.scrollTo({ top: position, behavior: 'auto' });
-        // sessionStorageから削除（1回のみ使用）
-        if (sessionPosition) {
-          sessionStorage.removeItem(`book_scroll_${asin}`);
-        }
-      }, 0);
+    // 復元：書籍データ表示後
+    if (book) {
+      const savedPosition = scrollPositionCache.get(asin) || 0;
+      if (savedPosition > 0) {
+        requestAnimationFrame(() => {
+          window.scrollTo(0, savedPosition);
+        });
+      }
     }
-  }, [asin, book, isFromCache]);
-  
-  // ページから離れる時にスクロール位置を保存
-  useEffect(() => {
-    // クリーンアップ関数でスクロール位置を保存
-    return () => {
-      // sessionStorageに保存（ブラウザの戻る・進む用）
-      sessionStorage.setItem(`book_scroll_${asin}`, window.scrollY.toString());
-      // メモリキャッシュにも保存
+
+    // 保存：スクロールイベント
+    const saveScroll = () => {
       scrollPositionCache.set(asin, window.scrollY);
     };
-  }, [asin]);
+
+    window.addEventListener('scroll', saveScroll, { passive: true });
+    
+    return () => {
+      window.removeEventListener('scroll', saveScroll);
+      saveScroll(); // 最後に保存
+    };
+  }, [asin, book]);
 
   const handleShowMore = useCallback((increment: number) => {
     const currentCount = displayedArticlesCount;
@@ -310,37 +295,13 @@ export default function BookDetailPage() {
                 </div>
                 
                 <div className="space-y-1.5 md:space-y-2">
-                  {book.qiita_articles.slice(0, displayedArticlesCount).map((article, index) => {
-                    let style: React.CSSProperties = {};
-                    
-                    // キャッシュから復元時はアニメーションをスキップ
-                    if (!isFromCache) {
-                      if (newlyAddedStart !== null && index >= newlyAddedStart) {
-                        const relativeIndex = index - newlyAddedStart;
-                        const delayMs = Math.min(relativeIndex, 9) * 100;
-                        style = {
-                          animation: `fadeInUp 0.5s ease-out ${delayMs}ms forwards`,
-                          opacity: 0,
-                          transform: 'translateY(20px)'
-                        };
-                      } else if (index < INITIAL_ARTICLES_COUNT && displayedArticlesCount === INITIAL_ARTICLES_COUNT) {
-                        const delayMs = index * 100;
-                        style = {
-                          animation: `fadeInUp 0.5s ease-out ${delayMs}ms forwards`,
-                          opacity: 0,
-                          transform: 'translateY(20px)'
-                        };
-                      }
-                    }
-                    
-                    return (
+                  {book.qiita_articles.slice(0, displayedArticlesCount).map((article, index) => (
                     <a
                       key={article.id}
                       href={article.url}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="group block p-2 md:p-3 rounded-lg bg-qiita-surface dark:bg-[#2f3232] hover-card"
-                      style={style}
                     >
                       <div className="flex gap-2 md:gap-3">
                         <div className="flex-shrink-0 pt-0.5 md:pt-1">
@@ -406,8 +367,7 @@ export default function BookDetailPage() {
                         </div>
                       </div>
                     </a>
-                    );
-                  })}
+                  ))}
                 </div>
                 
                 {/* もっと見る / すべて表示ボタン */}
@@ -449,35 +409,11 @@ export default function BookDetailPage() {
                 </div>
                 
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-3">
-                  {book.youtube_videos.slice(0, displayedVideosCount).map((video, index) => {
-                    let style: React.CSSProperties = {};
-                    
-                    // キャッシュから復元時はアニメーションをスキップ
-                    if (!isFromCache) {
-                      if (newlyAddedVideosStart !== null && index >= newlyAddedVideosStart) {
-                        const relativeIndex = index - newlyAddedVideosStart;
-                        const delayMs = Math.min(relativeIndex, 8) * 100;
-                        style = {
-                          animation: `fadeInUp 0.5s ease-out ${delayMs}ms forwards`,
-                          opacity: 0,
-                          transform: 'translateY(20px)'
-                        };
-                      } else if (index < 8 && displayedVideosCount === 8) {
-                        const delayMs = index * 100;
-                        style = {
-                          animation: `fadeInUp 0.5s ease-out ${delayMs}ms forwards`,
-                          opacity: 0,
-                          transform: 'translateY(20px)'
-                        };
-                      }
-                    }
-
-                    return (
+                  {book.youtube_videos.slice(0, displayedVideosCount).map((video, index) => (
                       <button
                         key={video.video_id}
                         onClick={() => setSelectedVideoId(video.video_id)}
                         className="block rounded-lg bg-qiita-surface dark:bg-[#2f3232] overflow-hidden w-full text-left border border-qiita-border dark:border-dark-border hover-card"
-                        style={style}
                       >
                         {/* サムネイル */}
                         <div className="relative aspect-video bg-gray-200 dark:bg-gray-800 overflow-hidden">
@@ -527,8 +463,7 @@ export default function BookDetailPage() {
                           )}
                         </div>
                       </button>
-                    );
-                  })}
+                  ))}
                 </div>
                 
                 {/* もっと見る / すべて表示ボタン */}
