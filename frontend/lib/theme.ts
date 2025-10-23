@@ -12,10 +12,8 @@ function getSystemTheme(): 'light' | 'dark' {
   
   try {
     const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    console.log('[getSystemTheme] System prefers-color-scheme:', isDark ? 'dark' : 'light');
     return isDark ? 'dark' : 'light';
   } catch (e) {
-    console.error('[getSystemTheme] Error:', e);
     return 'dark';
   }
 }
@@ -55,10 +53,7 @@ function saveTheme(theme: Theme): void {
  * テーマをDOMに適用してローカルストレージに保存
  */
 export function applyTheme(theme: Theme): void {
-  console.log('[applyTheme] Setting theme:', theme);
-  
   const effectiveTheme = theme === 'auto' ? getSystemTheme() : theme;
-  console.log('[applyTheme] Effective theme:', effectiveTheme);
   
   if (effectiveTheme === 'dark') {
     document.documentElement.classList.add('dark');
@@ -68,7 +63,6 @@ export function applyTheme(theme: Theme): void {
   
   // ローカルストレージに保存
   saveTheme(theme);
-  console.log('[applyTheme] Saved to localStorage:', theme);
 }
 
 /**
@@ -79,9 +73,7 @@ export function getCurrentTheme(): Theme {
   
   // ローカルストレージから取得（auto, light, dark）
   const stored = getStoredTheme();
-  const result = stored || DEFAULT_THEME;
-  console.log('[getCurrentTheme] Stored:', stored, '→ Result:', result);
-  return result;
+  return stored || DEFAULT_THEME;
 }
 
 /**

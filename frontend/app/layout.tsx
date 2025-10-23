@@ -74,35 +74,19 @@ export default function RootLayout({
     <html lang="ja" suppressHydrationWarning>
       <head />
       <body>
-        {/* ローカルストレージからテーマを読み込み（ちらつき防止） */}
+        {/* OSのカラースキーム設定に従う（ちらつき防止） */}
         <script
           dangerouslySetInnerHTML={{
             __html: `
               (function() {
                 try {
-                  // ローカルストレージから取得（デフォルト: auto）
-                  const stored = localStorage.getItem('qiibrary-theme');
-                  const theme = stored || 'auto';
-                  
-                  // autoの場合はシステム設定を取得
-                  let effectiveTheme = theme;
-                  if (theme === 'auto') {
-                    const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-                    effectiveTheme = isDark ? 'dark' : 'light';
-                  }
-                  
-                  // DOMに適用
-                  if (effectiveTheme === 'dark') {
+                  const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+                  if (isDark) {
                     document.documentElement.classList.add('dark');
                   } else {
                     document.documentElement.classList.remove('dark');
                   }
-                  
-                  // デバッグ用（本番環境では削除可能）
-                  console.log('[Theme] Loaded:', theme, '→', effectiveTheme);
                 } catch (e) {
-                  console.error('[Theme] Error:', e);
-                  // エラー時はダークモードをデフォルトに
                   document.documentElement.classList.add('dark');
                 }
               })();
