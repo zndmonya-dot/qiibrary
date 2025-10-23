@@ -13,6 +13,7 @@ export default function Header() {
   useEffect(() => {
     // DOMから現在のテーマ設定を取得
     const current = getCurrentTheme();
+    console.log('[Header] Initial theme:', current);
     setThemeState(current);
   }, []);
 
@@ -29,6 +30,7 @@ export default function Header() {
   }, [theme]);
 
   const handleThemeChange = (newTheme: Theme) => {
+    console.log('[Header] User clicked theme button:', newTheme);
     applyTheme(newTheme);
     setThemeState(newTheme);
   };
