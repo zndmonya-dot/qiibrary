@@ -29,6 +29,11 @@ const getPeriodLabel = (period: PeriodType, selectedYear: number | null): string
   return '365日間';
 };
 
+const getAnimationStyle = (index: number): React.CSSProperties => ({
+  animation: `fadeInUp 0.4s ease-out ${0.2 + index * 0.05}s forwards`,
+  opacity: 0
+});
+
 
 export default function Home() {
   const router = useRouter();
@@ -43,6 +48,7 @@ export default function Home() {
   const [rankings, setRankings] = useState<RankingResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [isFromCache, setIsFromCache] = useState(false);
   const [currentPage, setCurrentPage] = useState(
     searchParams.get('page') ? parseInt(searchParams.get('page')!) : 1
   );
@@ -99,11 +105,13 @@ export default function Home() {
       if (cachedData) {
         setRankings(cachedData);
         setLoading(false);
+        setIsFromCache(true);
         return;
       }
       
       setLoading(true);
       setError(null);
+      setIsFromCache(false);
       
       try {
         const data = period === 'daily' ? await getRankings.daily()
@@ -241,7 +249,7 @@ export default function Home() {
       
       <main className="container mx-auto px-3 md:px-4 py-3 md:py-8 min-h-[calc(100vh-120px)]">
         {/* ヘッダー */}
-        <div className="mb-3 md:mb-8 bg-qiita-card dark:bg-dark-surface rounded-xl p-3 md:p-8 border-l-4 border-qiita-green dark:border-dark-green shadow-sm">
+        <div className={`mb-3 md:mb-8 bg-qiita-card dark:bg-dark-surface rounded-xl p-3 md:p-8 border-l-4 border-qiita-green dark:border-dark-green shadow-sm ${!isFromCache ? 'animate-fade-in-up' : ''}`}>
           <div className="flex items-start justify-between">
             <div className="w-full text-left">
               <h2 className="text-lg md:text-3xl font-bold mb-1.5 md:mb-3 flex items-center justify-start gap-2 md:gap-3 text-qiita-text-dark dark:text-white">
@@ -256,7 +264,7 @@ export default function Home() {
         </div>
         
         {/* 検索バー */}
-        <div className="mb-4 md:mb-6 bg-qiita-card dark:bg-dark-surface rounded-lg border border-qiita-border dark:border-dark-border p-3 md:p-4">
+        <div className={`mb-4 md:mb-6 bg-qiita-card dark:bg-dark-surface rounded-lg border border-qiita-border dark:border-dark-border p-3 md:p-4 ${!isFromCache ? 'animate-fade-in-up' : ''}`}>
           <div className="relative">
             {/* デスクトップ: 左側の虫眼鏡アイコン */}
             <i className="ri-search-line absolute left-3 md:left-4 top-1/2 -translate-y-1/2 text-qiita-text dark:text-dark-text text-lg md:text-xl hidden md:block"></i>
@@ -326,7 +334,7 @@ export default function Home() {
         </div>
         
         {/* タブ */}
-        <div className="relative mb-3 md:mb-6 bg-qiita-card dark:bg-dark-surface rounded-lg border border-qiita-border dark:border-dark-border p-2 md:p-4 overflow-x-auto">
+        <div className={`relative mb-3 md:mb-6 bg-qiita-card dark:bg-dark-surface rounded-lg border border-qiita-border dark:border-dark-border p-2 md:p-4 overflow-x-auto ${!isFromCache ? 'animate-fade-in-up animate-delay-50' : ''}`}>
           <div className="flex flex-nowrap md:flex-wrap gap-1.5 md:gap-2 min-w-max md:min-w-0">
             <button
               onClick={() => {
@@ -483,7 +491,7 @@ export default function Home() {
 
         {!error && rankings && !loading && (
           <div>
-            <div className="mb-3 md:mb-6 flex items-center justify-between bg-qiita-card dark:bg-dark-surface p-2.5 md:p-4 rounded-lg shadow-sm border border-qiita-border dark:border-dark-border">
+            <div className={`mb-3 md:mb-6 flex items-center justify-between bg-qiita-card dark:bg-dark-surface p-2.5 md:p-4 rounded-lg shadow-sm border border-qiita-border dark:border-dark-border ${!isFromCache ? 'animate-fade-in-up animate-delay-100' : ''}`}>
               <div className="flex items-center gap-1.5 md:gap-2">
                 <i className="ri-trophy-line text-qiita-green dark:text-dark-green text-lg md:text-2xl"></i>
                 <h2 className="text-sm md:text-lg font-semibold text-qiita-text-dark dark:text-white">
@@ -497,8 +505,10 @@ export default function Home() {
             
             <div className="space-y-2 md:space-y-4 mb-4 md:mb-8">
               {paginatedRankings.length > 0 ? (
-                paginatedRankings.map((item, index) => (
-                    <div key={item.book.id}>
+                paginatedRankings.map((item, index) => {
+                  const style = isFromCache ? {} : getAnimationStyle(index);
+                  return (
+                    <div key={item.book.id} style={style}>
                       <BookCard
                         rank={item.rank}
                         book={item.book}
@@ -506,7 +516,8 @@ export default function Home() {
                         topArticles={item.top_articles}
                       />
                     </div>
-                  ))
+                  );
+                })
               ) : (
                 <div className="bg-qiita-card dark:bg-dark-surface rounded-lg p-12 text-center border border-qiita-border dark:border-dark-border shadow-sm animate-fade-in-up">
                   <i className="ri-inbox-line text-6xl text-qiita-text-light dark:text-dark-text-light mb-4"></i>
