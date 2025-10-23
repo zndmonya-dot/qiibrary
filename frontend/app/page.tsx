@@ -148,15 +148,26 @@ export default function Home() {
     }
 
     const handlePopState = () => {
-      // 戻る・進むが発生した瞬間、描画直前に復元
+      // 戻る・進むが発生した瞬間、スクロール位置を復元
       const savedScrollPosition = sessionStorage.getItem('homepage_scroll');
       if (savedScrollPosition) {
         const position = parseInt(savedScrollPosition, 10);
         
-        // 次のフレームで即座に復元（描画直前）
+        // 複数のタイミングで復元を試みる（確実性を高める）
+        // 1. 即座に復元
+        window.scrollTo({ top: position, behavior: 'auto' });
+        
+        // 2. 次のフレームで復元
         requestAnimationFrame(() => {
           window.scrollTo({ top: position, behavior: 'auto' });
-          sessionStorage.removeItem('homepage_scroll');
+        });
+        
+        // 3. さらに次のフレームで復元（念のため）
+        requestAnimationFrame(() => {
+          requestAnimationFrame(() => {
+            window.scrollTo({ top: position, behavior: 'auto' });
+            sessionStorage.removeItem('homepage_scroll');
+          });
         });
       }
     };
