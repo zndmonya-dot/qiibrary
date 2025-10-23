@@ -13,6 +13,8 @@ import { formatNumber, formatPublicationDate } from '@/lib/utils';
 
 // グローバルキャッシュ（コンポーネント外で管理）
 const bookDetailsCache = new Map<string, BookDetail>();
+// スクロール位置キャッシュ
+const scrollPositionCache = new Map<string, number>();
 
 const INITIAL_ARTICLES_COUNT = 20;
 const SHOW_MORE_INCREMENT = 20;
@@ -28,6 +30,7 @@ export default function BookDetailPage() {
   const [book, setBook] = useState<BookDetail | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [isFromCache, setIsFromCache] = useState(false);
   const [displayedArticlesCount, setDisplayedArticlesCount] = useState(INITIAL_ARTICLES_COUNT);
   const previousCountRef = useRef(INITIAL_ARTICLES_COUNT);
   const [newlyAddedStart, setNewlyAddedStart] = useState<number | null>(null);
@@ -36,25 +39,34 @@ export default function BookDetailPage() {
   const [newlyAddedVideosStart, setNewlyAddedVideosStart] = useState<number | null>(null);
 
   useEffect(() => {
-    // ページトップにスクロール
-    window.scrollTo(0, 0);
-    
     const fetchBook = async () => {
       // キャッシュにデータがあればそれを使用
       const cachedData = bookDetailsCache.get(asin);
       if (cachedData) {
         setBook(cachedData);
         setLoading(false);
+        setIsFromCache(true); // キャッシュから復元
         setDisplayedArticlesCount(INITIAL_ARTICLES_COUNT);
         previousCountRef.current = INITIAL_ARTICLES_COUNT;
         setNewlyAddedStart(null);
         setDisplayedVideosCount(8);
         setNewlyAddedVideosStart(null);
+        
+        // スクロール位置を復元（次のフレームで実行）
+        requestAnimationFrame(() => {
+          const savedScrollPosition = scrollPositionCache.get(asin) || 0;
+          window.scrollTo(0, savedScrollPosition);
+        });
+        
         return;
       }
       
+      // 新規取得時のみページトップにスクロール
+      window.scrollTo(0, 0);
+      
       setLoading(true);
       setError(null);
+      setIsFromCache(false); // 新規取得
       setDisplayedArticlesCount(INITIAL_ARTICLES_COUNT);
       previousCountRef.current = INITIAL_ARTICLES_COUNT;
       setNewlyAddedStart(null);
@@ -194,7 +206,10 @@ export default function BookDetailPage() {
             </div>
           </div>
           <button
-            onClick={() => router.back()}
+            onClick={() => {
+              scrollPositionCache.set(asin, window.scrollY);
+              router.back();
+            }}
             className="mt-4 text-qiita-green dark:text-dark-green hover-text-green inline-flex items-center gap-1"
           >
             <i className="ri-arrow-left-line"></i>
@@ -223,7 +238,10 @@ export default function BookDetailPage() {
           <main className="container mx-auto px-3 md:px-4 pt-6 pb-4 md:py-8">
             {/* 戻るボタン */}
             <button
-              onClick={() => router.back()}
+              onClick={() => {
+                scrollPositionCache.set(asin, window.scrollY);
+                router.back();
+              }}
               className="flex items-center gap-2 text-qiita-text dark:text-dark-text hover-text-green mb-4 md:mb-8 text-sm md:text-base font-medium py-2 px-3 md:px-0 md:py-0"
             >
               <i className="ri-arrow-left-line text-base md:text-lg"></i>
@@ -259,21 +277,24 @@ export default function BookDetailPage() {
                   {book.qiita_articles.slice(0, displayedArticlesCount).map((article, index) => {
                     let style: React.CSSProperties = {};
                     
-                    if (newlyAddedStart !== null && index >= newlyAddedStart) {
-                      const relativeIndex = index - newlyAddedStart;
-                      const delayMs = Math.min(relativeIndex, 9) * 100;
-                      style = {
-                        animation: `fadeInUp 0.5s ease-out ${delayMs}ms forwards`,
-                        opacity: 0,
-                        transform: 'translateY(20px)'
-                      };
-                    } else if (index < INITIAL_ARTICLES_COUNT && displayedArticlesCount === INITIAL_ARTICLES_COUNT) {
-                      const delayMs = index * 100;
-                      style = {
-                        animation: `fadeInUp 0.5s ease-out ${delayMs}ms forwards`,
-                        opacity: 0,
-                        transform: 'translateY(20px)'
-                      };
+                    // キャッシュから復元時はアニメーションをスキップ
+                    if (!isFromCache) {
+                      if (newlyAddedStart !== null && index >= newlyAddedStart) {
+                        const relativeIndex = index - newlyAddedStart;
+                        const delayMs = Math.min(relativeIndex, 9) * 100;
+                        style = {
+                          animation: `fadeInUp 0.5s ease-out ${delayMs}ms forwards`,
+                          opacity: 0,
+                          transform: 'translateY(20px)'
+                        };
+                      } else if (index < INITIAL_ARTICLES_COUNT && displayedArticlesCount === INITIAL_ARTICLES_COUNT) {
+                        const delayMs = index * 100;
+                        style = {
+                          animation: `fadeInUp 0.5s ease-out ${delayMs}ms forwards`,
+                          opacity: 0,
+                          transform: 'translateY(20px)'
+                        };
+                      }
                     }
                     
                     return (
@@ -395,21 +416,24 @@ export default function BookDetailPage() {
                   {book.youtube_videos.slice(0, displayedVideosCount).map((video, index) => {
                     let style: React.CSSProperties = {};
                     
-                    if (newlyAddedVideosStart !== null && index >= newlyAddedVideosStart) {
-                      const relativeIndex = index - newlyAddedVideosStart;
-                      const delayMs = Math.min(relativeIndex, 8) * 100;
-                      style = {
-                        animation: `fadeInUp 0.5s ease-out ${delayMs}ms forwards`,
-                        opacity: 0,
-                        transform: 'translateY(20px)'
-                      };
-                    } else if (index < 8 && displayedVideosCount === 8) {
-                      const delayMs = index * 100;
-                      style = {
-                        animation: `fadeInUp 0.5s ease-out ${delayMs}ms forwards`,
-                        opacity: 0,
-                        transform: 'translateY(20px)'
-                      };
+                    // キャッシュから復元時はアニメーションをスキップ
+                    if (!isFromCache) {
+                      if (newlyAddedVideosStart !== null && index >= newlyAddedVideosStart) {
+                        const relativeIndex = index - newlyAddedVideosStart;
+                        const delayMs = Math.min(relativeIndex, 8) * 100;
+                        style = {
+                          animation: `fadeInUp 0.5s ease-out ${delayMs}ms forwards`,
+                          opacity: 0,
+                          transform: 'translateY(20px)'
+                        };
+                      } else if (index < 8 && displayedVideosCount === 8) {
+                        const delayMs = index * 100;
+                        style = {
+                          animation: `fadeInUp 0.5s ease-out ${delayMs}ms forwards`,
+                          opacity: 0,
+                          transform: 'translateY(20px)'
+                        };
+                      }
                     }
 
                     return (
