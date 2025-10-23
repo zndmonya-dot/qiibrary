@@ -5,6 +5,19 @@ import { Theme, DEFAULT_THEME } from './constants';
 const THEME_STORAGE_KEY = 'qiibrary-theme';
 
 /**
+ * システムのカラースキーム設定を取得
+ */
+function getSystemTheme(): 'light' | 'dark' {
+  if (typeof window === 'undefined') return 'dark';
+  
+  try {
+    return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+  } catch (e) {
+    return 'dark';
+  }
+}
+
+/**
  * ローカルストレージからテーマを読み込む
  */
 function getStoredTheme(): Theme | null {
@@ -12,7 +25,7 @@ function getStoredTheme(): Theme | null {
   
   try {
     const stored = localStorage.getItem(THEME_STORAGE_KEY);
-    if (stored === 'dark' || stored === 'light') {
+    if (stored === 'dark' || stored === 'light' || stored === 'auto') {
       return stored;
     }
   } catch (e) {
@@ -39,7 +52,9 @@ function saveTheme(theme: Theme): void {
  * テーマをDOMに適用してローカルストレージに保存
  */
 export function applyTheme(theme: Theme): void {
-  if (theme === 'dark') {
+  const effectiveTheme = theme === 'auto' ? getSystemTheme() : theme;
+  
+  if (effectiveTheme === 'dark') {
     document.documentElement.classList.add('dark');
   } else {
     document.documentElement.classList.remove('dark');
@@ -81,10 +96,32 @@ export function toggleTheme(): Theme {
 export function initTheme(): void {
   const stored = getStoredTheme();
   const theme = stored || DEFAULT_THEME;
+  const effectiveTheme = theme === 'auto' ? getSystemTheme() : theme;
   
-  if (theme === 'dark') {
+  if (effectiveTheme === 'dark') {
     document.documentElement.classList.add('dark');
   } else {
     document.documentElement.classList.remove('dark');
+  }
+}
+
+/**
+ * システム設定の変更を監視
+ */
+export function watchSystemTheme(callback: (theme: 'light' | 'dark') => void): () => void {
+  if (typeof window === 'undefined') return () => {};
+  
+  try {
+    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+    const listener = (e: MediaQueryListEvent) => {
+      callback(e.matches ? 'dark' : 'light');
+    };
+    
+    mediaQuery.addEventListener('change', listener);
+    
+    // クリーンアップ関数を返す
+    return () => mediaQuery.removeEventListener('change', listener);
+  } catch (e) {
+    return () => {};
   }
 }

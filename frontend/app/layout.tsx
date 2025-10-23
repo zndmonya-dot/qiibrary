@@ -81,8 +81,14 @@ export default function RootLayout({
               (function() {
                 try {
                   const stored = localStorage.getItem('qiibrary-theme');
-                  const theme = stored || 'dark';
-                  if (theme === 'dark') {
+                  const theme = stored || 'auto';
+                  
+                  let effectiveTheme = theme;
+                  if (theme === 'auto') {
+                    effectiveTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+                  }
+                  
+                  if (effectiveTheme === 'dark') {
                     document.documentElement.classList.add('dark');
                   } else {
                     document.documentElement.classList.remove('dark');

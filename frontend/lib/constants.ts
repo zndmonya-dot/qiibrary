@@ -16,9 +16,9 @@ export const DEFAULT_RANKING_LIMIT = 50;
 // ========================================
 // テーマ設定
 // ========================================
-export const VALID_THEMES = ['light', 'dark'] as const;
+export const VALID_THEMES = ['light', 'dark', 'auto'] as const;
 export type Theme = typeof VALID_THEMES[number];
-export const DEFAULT_THEME: Theme = 'dark'; // デフォルトはダークモード
+export const DEFAULT_THEME: Theme = 'auto'; // デフォルトはOSに従う
 
 // ========================================
 // カラー設定
