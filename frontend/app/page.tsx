@@ -17,6 +17,8 @@ type PeriodType = 'daily' | 'monthly' | 'yearly' | 'all' | 'year';
 const rankingsCache = new Map<string, RankingResponse>();
 // スクロール位置キャッシュ
 const scrollPositionCache = new Map<string, number>();
+// 利用可能な年のキャッシュ
+let availableYearsCache: number[] | null = null;
 
 const getPeriodLabel = (period: PeriodType, selectedYear: number | null): string => {
   if (period === 'daily') return '24時間';
@@ -76,9 +78,17 @@ export default function Home() {
 
   useEffect(() => {
     const fetchYears = async () => {
+      // キャッシュがあればそれを使用
+      if (availableYearsCache) {
+        setAvailableYears(availableYearsCache);
+        return;
+      }
+      
       try {
         const years = await getAvailableYears();
         setAvailableYears(years);
+        // グローバルキャッシュに保存
+        availableYearsCache = years;
       } catch (err) {
         console.error('Failed to fetch available years:', err);
       }

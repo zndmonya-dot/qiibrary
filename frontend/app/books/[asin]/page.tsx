@@ -254,13 +254,17 @@ export default function BookDetailPage() {
               <span>{error || '書籍が見つかりませんでした'}</span>
             </div>
           </div>
-          <button
-            onClick={() => window.history.back()}
-            className="mt-4 text-qiita-green dark:text-dark-green hover-text-green inline-flex items-center gap-1"
+          <a
+            href="/"
+            className="mt-4 text-qiita-green dark:text-dark-green hover-text-green inline-flex items-center gap-1 cursor-pointer"
+            onClick={(e) => {
+              e.preventDefault();
+              window.history.back();
+            }}
           >
             <i className="ri-arrow-left-line"></i>
             ランキングに戻る
-          </button>
+          </a>
         </div>
       </div>
     );
@@ -283,13 +287,17 @@ export default function BookDetailPage() {
           
           <main className="container mx-auto px-3 md:px-4 pt-6 pb-4 md:py-8">
             {/* 戻るボタン */}
-            <button
-              onClick={() => window.history.back()}
-              className="flex items-center gap-2 text-qiita-text dark:text-dark-text hover-text-green mb-4 md:mb-8 text-sm md:text-base font-medium py-2 px-3 md:px-0 md:py-0"
+            <a
+              href="/"
+              className="flex items-center gap-2 text-qiita-text dark:text-dark-text hover-text-green mb-4 md:mb-8 text-sm md:text-base font-medium py-2 px-3 md:px-0 md:py-0 cursor-pointer"
+              onClick={(e) => {
+                e.preventDefault();
+                window.history.back();
+              }}
             >
               <i className="ri-arrow-left-line text-base md:text-lg"></i>
               <span>ランキングに戻る</span>
-            </button>
+            </a>
             
             {/* タイトル */}
             <div className="mb-4 md:mb-8">
