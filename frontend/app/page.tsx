@@ -128,7 +128,7 @@ export default function Home() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [period, selectedYear]);
 
-  // スクロール位置の保存と復元（シンプル版）
+  // スクロール位置の保存と復元（ちらつき防止版）
   useEffect(() => {
     // ブラウザのデフォルト復元を無効化
     if ('scrollRestoration' in window.history) {
@@ -137,16 +137,6 @@ export default function Home() {
 
     const cacheKey = period === 'year' ? `${period}-${selectedYear}` : period;
     
-    // 復元：ランキングデータ表示後
-    if (rankings) {
-      const savedPosition = scrollPositionCache.get(cacheKey) || 0;
-      if (savedPosition > 0) {
-        requestAnimationFrame(() => {
-          window.scrollTo(0, savedPosition);
-        });
-      }
-    }
-
     // 保存：スクロールイベント
     const saveScroll = () => {
       scrollPositionCache.set(cacheKey, window.scrollY);
@@ -158,6 +148,19 @@ export default function Home() {
       window.removeEventListener('scroll', saveScroll);
       saveScroll(); // 最後に保存
     };
+  }, [period, selectedYear]);
+
+  // 復元：データ表示直後（ちらつき防止のため即座に実行）
+  useEffect(() => {
+    if (!rankings) return;
+    
+    const cacheKey = period === 'year' ? `${period}-${selectedYear}` : period;
+    const savedPosition = scrollPositionCache.get(cacheKey) || 0;
+    
+    if (savedPosition > 0) {
+      // 同期的に即座に復元
+      window.scrollTo(0, savedPosition);
+    }
   }, [period, selectedYear, rankings]);
 
   const filteredRankings = useMemo(() => {

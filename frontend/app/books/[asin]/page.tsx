@@ -81,21 +81,11 @@ export default function BookDetailPage() {
     fetchBook();
   }, [asin]);
 
-  // スクロール位置の保存と復元（シンプル版）
+  // スクロール位置の保存と復元（ちらつき防止版）
   useEffect(() => {
     // ブラウザのデフォルト復元を無効化
     if ('scrollRestoration' in window.history) {
       window.history.scrollRestoration = 'manual';
-    }
-
-    // 復元：書籍データ表示後
-    if (book) {
-      const savedPosition = scrollPositionCache.get(asin) || 0;
-      if (savedPosition > 0) {
-        requestAnimationFrame(() => {
-          window.scrollTo(0, savedPosition);
-        });
-      }
     }
 
     // 保存：スクロールイベント
@@ -109,6 +99,18 @@ export default function BookDetailPage() {
       window.removeEventListener('scroll', saveScroll);
       saveScroll(); // 最後に保存
     };
+  }, [asin]);
+
+  // 復元：データ表示直後（ちらつき防止のため即座に実行）
+  useEffect(() => {
+    if (!book) return;
+    
+    const savedPosition = scrollPositionCache.get(asin) || 0;
+    
+    if (savedPosition > 0) {
+      // 同期的に即座に復元
+      window.scrollTo(0, savedPosition);
+    }
   }, [asin, book]);
 
   const handleShowMore = useCallback((increment: number) => {
