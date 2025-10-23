@@ -11,6 +11,9 @@ import LoadingSpinner from '@/components/LoadingSpinner';
 import { getBookDetail, BookDetail } from '@/lib/api';
 import { formatNumber, formatPublicationDate } from '@/lib/utils';
 
+// グローバルキャッシュ（コンポーネント外で管理）
+const bookDetailsCache = new Map<string, BookDetail>();
+
 const INITIAL_ARTICLES_COUNT = 20;
 const SHOW_MORE_INCREMENT = 20;
 const ANIMATION_TIMEOUT_MORE = 1200;
@@ -37,6 +40,19 @@ export default function BookDetailPage() {
     window.scrollTo(0, 0);
     
     const fetchBook = async () => {
+      // キャッシュにデータがあればそれを使用
+      const cachedData = bookDetailsCache.get(asin);
+      if (cachedData) {
+        setBook(cachedData);
+        setLoading(false);
+        setDisplayedArticlesCount(INITIAL_ARTICLES_COUNT);
+        previousCountRef.current = INITIAL_ARTICLES_COUNT;
+        setNewlyAddedStart(null);
+        setDisplayedVideosCount(8);
+        setNewlyAddedVideosStart(null);
+        return;
+      }
+      
       setLoading(true);
       setError(null);
       setDisplayedArticlesCount(INITIAL_ARTICLES_COUNT);
@@ -50,6 +66,9 @@ export default function BookDetailPage() {
         const minDelay = new Promise(resolve => setTimeout(resolve, MIN_LOADING_DELAY));
         await Promise.all([data, minDelay]);
         setBook(data);
+        
+        // データをグローバルキャッシュに保存
+        bookDetailsCache.set(asin, data);
       } catch (err) {
         setError('書籍情報の取得に失敗しました');
         console.error(err);
@@ -175,7 +194,7 @@ export default function BookDetailPage() {
             </div>
           </div>
           <button
-            onClick={() => router.push('/')}
+            onClick={() => router.back()}
             className="mt-4 text-qiita-green dark:text-dark-green hover-text-green inline-flex items-center gap-1"
           >
             <i className="ri-arrow-left-line"></i>
@@ -204,7 +223,7 @@ export default function BookDetailPage() {
           <main className="container mx-auto px-3 md:px-4 pt-6 pb-4 md:py-8">
             {/* 戻るボタン */}
             <button
-              onClick={() => router.push('/')}
+              onClick={() => router.back()}
               className="flex items-center gap-2 text-qiita-text dark:text-dark-text hover-text-green mb-4 md:mb-8 text-sm md:text-base font-medium py-2 px-3 md:px-0 md:py-0"
             >
               <i className="ri-arrow-left-line text-base md:text-lg"></i>
