@@ -192,6 +192,7 @@ function BookCard({ rank, book, stats, topArticles, onNavigate }: BookCardProps)
                 <Link
                   href={`/books/${book.isbn}#qiita-articles`}
                   prefetch={true}
+                  scroll={false}
                   className="flex items-center gap-1.5 text-qiita-green dark:text-dark-green"
                   onClick={onNavigate}
                 >
@@ -203,6 +204,7 @@ function BookCard({ rank, book, stats, topArticles, onNavigate }: BookCardProps)
                   <Link
                     href={`/books/${book.isbn}#qiita-articles`}
                     prefetch={true}
+                    scroll={false}
                     className="flex items-center gap-1.5 text-pink-600 dark:text-pink-400"
                     onClick={onNavigate}
                   >
@@ -254,6 +256,7 @@ function BookCard({ rank, book, stats, topArticles, onNavigate }: BookCardProps)
               <Link
                 href={`/books/${book.isbn}#qiita-articles`}
                 prefetch={true}
+                scroll={false}
                 className="inline-flex items-center gap-1.5 md:gap-1.5 text-base md:text-base text-qiita-green dark:text-dark-green font-medium py-2 px-3 md:py-0 md:px-0"
                 onClick={() => {
                   onNavigate?.();

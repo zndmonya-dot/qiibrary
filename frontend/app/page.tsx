@@ -139,21 +139,29 @@ export default function Home() {
 
     // sessionStorageからスクロール位置を復元
     const savedScrollPosition = sessionStorage.getItem('homepage_scroll');
-    if (savedScrollPosition) {
-      // DOMが完全にレンダリングされてから復元
-      requestAnimationFrame(() => {
-        requestAnimationFrame(() => {
-          window.scrollTo({
-            top: parseInt(savedScrollPosition, 10),
-            left: 0,
-            behavior: 'auto'
-          });
-          // 復元後に削除
-          sessionStorage.removeItem('homepage_scroll');
-        });
+    if (savedScrollPosition && rankings) {
+      // ランキングデータが読み込まれた後に復元
+      const position = parseInt(savedScrollPosition, 10);
+      
+      // 即座に復元
+      window.scrollTo({
+        top: position,
+        left: 0,
+        behavior: 'auto'
       });
+      
+      // 念のため、少し待ってから再度復元（DOMレンダリングが遅れた場合の保険）
+      setTimeout(() => {
+        window.scrollTo({
+          top: position,
+          left: 0,
+          behavior: 'auto'
+        });
+        // 復元後に削除
+        sessionStorage.removeItem('homepage_scroll');
+      }, 50);
     }
-  }, []);
+  }, [rankings]);
 
   // スクロール位置の復元と保存（タブ切り替え用）
   useEffect(() => {

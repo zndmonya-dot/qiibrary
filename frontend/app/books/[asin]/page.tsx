@@ -92,21 +92,29 @@ export default function BookDetailPage() {
 
     // sessionStorageからスクロール位置を復元
     const savedScrollPosition = sessionStorage.getItem(`book_scroll_${asin}`);
-    if (savedScrollPosition) {
-      // DOMが完全にレンダリングされてから復元
-      requestAnimationFrame(() => {
-        requestAnimationFrame(() => {
-          window.scrollTo({
-            top: parseInt(savedScrollPosition, 10),
-            left: 0,
-            behavior: 'auto'
-          });
-          // 復元後に削除
-          sessionStorage.removeItem(`book_scroll_${asin}`);
-        });
+    if (savedScrollPosition && book) {
+      // 書籍データが読み込まれた後に復元
+      const position = parseInt(savedScrollPosition, 10);
+      
+      // 即座に復元
+      window.scrollTo({
+        top: position,
+        left: 0,
+        behavior: 'auto'
       });
+      
+      // 念のため、少し待ってから再度復元（DOMレンダリングが遅れた場合の保険）
+      setTimeout(() => {
+        window.scrollTo({
+          top: position,
+          left: 0,
+          behavior: 'auto'
+        });
+        // 復元後に削除
+        sessionStorage.removeItem(`book_scroll_${asin}`);
+      }, 50);
     }
-  }, [asin]);
+  }, [asin, book]);
 
   // スクロール位置の復元と保存（キャッシュから復元時用）
   useEffect(() => {
