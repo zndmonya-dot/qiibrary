@@ -135,6 +135,12 @@ export default function Home() {
     };
     
     fetchRankings();
+    
+    // クリーンアップ：ページから離れる時にスクロール位置を保存
+    return () => {
+      const cacheKey = period === 'year' ? `${period}-${selectedYear}` : period;
+      scrollPositionCache.set(cacheKey, window.scrollY);
+    };
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [period, selectedYear]);
 

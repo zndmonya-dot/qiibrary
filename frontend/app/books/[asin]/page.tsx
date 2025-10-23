@@ -90,6 +90,11 @@ export default function BookDetailPage() {
     };
 
     fetchBook();
+    
+    // クリーンアップ：ページから離れる時にスクロール位置を保存
+    return () => {
+      scrollPositionCache.set(asin, window.scrollY);
+    };
   }, [asin]);
 
   const handleShowMore = useCallback((increment: number) => {
@@ -206,10 +211,7 @@ export default function BookDetailPage() {
             </div>
           </div>
           <button
-            onClick={() => {
-              scrollPositionCache.set(asin, window.scrollY);
-              window.history.back();
-            }}
+            onClick={() => window.history.back()}
             className="mt-4 text-qiita-green dark:text-dark-green hover-text-green inline-flex items-center gap-1"
           >
             <i className="ri-arrow-left-line"></i>
@@ -238,10 +240,7 @@ export default function BookDetailPage() {
           <main className="container mx-auto px-3 md:px-4 pt-6 pb-4 md:py-8">
             {/* 戻るボタン */}
             <button
-              onClick={() => {
-                scrollPositionCache.set(asin, window.scrollY);
-                window.history.back();
-              }}
+              onClick={() => window.history.back()}
               className="flex items-center gap-2 text-qiita-text dark:text-dark-text hover-text-green mb-4 md:mb-8 text-sm md:text-base font-medium py-2 px-3 md:px-0 md:py-0"
             >
               <i className="ri-arrow-left-line text-base md:text-lg"></i>
