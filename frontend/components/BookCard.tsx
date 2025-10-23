@@ -227,7 +227,7 @@ function BookCard({ rank, book, stats, topArticles }: BookCardProps) {
                   href={article.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="block p-3 md:p-3 rounded-lg bg-qiita-surface/30 dark:bg-dark-surface-light/30 border border-qiita-border/30 dark:border-dark-border/30"
+                  className="block p-3 md:p-3 rounded-lg bg-qiita-surface/30 dark:bg-dark-surface-light/30 border border-qiita-border/30 dark:border-dark-border/30 md:hover:bg-qiita-green/10 dark:md:hover:bg-qiita-green/20 md:hover:border-qiita-green/50 dark:md:hover:border-qiita-green/60 transition-all duration-200"
                 >
                   <div className="flex items-start gap-3 md:gap-2.5">
                     <span className="flex-shrink-0 w-7 h-7 md:w-6 md:h-6 flex items-center justify-center rounded-full bg-qiita-green/20 dark:bg-qiita-green/30 text-qiita-green dark:text-dark-green text-sm md:text-xs font-bold">
