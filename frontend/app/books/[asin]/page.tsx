@@ -29,6 +29,7 @@ export default function BookDetailPage() {
   const [book, setBook] = useState<BookDetail | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [isFromCache, setIsFromCache] = useState(false);
   const [displayedArticlesCount, setDisplayedArticlesCount] = useState(INITIAL_ARTICLES_COUNT);
   const previousCountRef = useRef(INITIAL_ARTICLES_COUNT);
   const [newlyAddedStart, setNewlyAddedStart] = useState<number | null>(null);
@@ -43,6 +44,7 @@ export default function BookDetailPage() {
       if (cachedData) {
         setBook(cachedData);
         setLoading(false);
+        setIsFromCache(true);
         setDisplayedArticlesCount(INITIAL_ARTICLES_COUNT);
         previousCountRef.current = INITIAL_ARTICLES_COUNT;
         setNewlyAddedStart(null);
@@ -56,6 +58,7 @@ export default function BookDetailPage() {
       
       setLoading(true);
       setError(null);
+      setIsFromCache(false);
       setDisplayedArticlesCount(INITIAL_ARTICLES_COUNT);
       previousCountRef.current = INITIAL_ARTICLES_COUNT;
       setNewlyAddedStart(null);
@@ -297,13 +300,35 @@ export default function BookDetailPage() {
                 </div>
                 
                 <div className="space-y-1.5 md:space-y-2">
-                  {book.qiita_articles.slice(0, displayedArticlesCount).map((article, index) => (
+                  {book.qiita_articles.slice(0, displayedArticlesCount).map((article, index) => {
+                    let style: React.CSSProperties = {};
+                    
+                    // キャッシュから復元時はアニメーションをスキップ
+                    if (!isFromCache) {
+                      if (newlyAddedStart !== null && index >= newlyAddedStart) {
+                        const relativeIndex = index - newlyAddedStart;
+                        const delayMs = Math.min(relativeIndex, 9) * 100;
+                        style = {
+                          animation: `fadeInUp 0.5s ease-out ${delayMs}ms forwards`,
+                          opacity: 0
+                        };
+                      } else if (index < INITIAL_ARTICLES_COUNT && displayedArticlesCount === INITIAL_ARTICLES_COUNT) {
+                        const delayMs = index * 100;
+                        style = {
+                          animation: `fadeInUp 0.5s ease-out ${delayMs}ms forwards`,
+                          opacity: 0
+                        };
+                      }
+                    }
+                    
+                    return (
                     <a
                       key={article.id}
                       href={article.url}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="group block p-2 md:p-3 rounded-lg bg-qiita-surface dark:bg-[#2f3232] hover-card"
+                      style={style}
                     >
                       <div className="flex gap-2 md:gap-3">
                         <div className="flex-shrink-0 pt-0.5 md:pt-1">
@@ -369,7 +394,8 @@ export default function BookDetailPage() {
                         </div>
                       </div>
                     </a>
-                  ))}
+                    );
+                  })}
                 </div>
                 
                 {/* もっと見る / すべて表示ボタン */}
@@ -411,11 +437,33 @@ export default function BookDetailPage() {
                 </div>
                 
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-3">
-                  {book.youtube_videos.slice(0, displayedVideosCount).map((video, index) => (
+                  {book.youtube_videos.slice(0, displayedVideosCount).map((video, index) => {
+                    let style: React.CSSProperties = {};
+                    
+                    // キャッシュから復元時はアニメーションをスキップ
+                    if (!isFromCache) {
+                      if (newlyAddedVideosStart !== null && index >= newlyAddedVideosStart) {
+                        const relativeIndex = index - newlyAddedVideosStart;
+                        const delayMs = Math.min(relativeIndex, 8) * 100;
+                        style = {
+                          animation: `fadeInUp 0.5s ease-out ${delayMs}ms forwards`,
+                          opacity: 0
+                        };
+                      } else if (index < 8 && displayedVideosCount === 8) {
+                        const delayMs = index * 100;
+                        style = {
+                          animation: `fadeInUp 0.5s ease-out ${delayMs}ms forwards`,
+                          opacity: 0
+                        };
+                      }
+                    }
+
+                    return (
                       <button
                         key={video.video_id}
                         onClick={() => setSelectedVideoId(video.video_id)}
                         className="block rounded-lg bg-qiita-surface dark:bg-[#2f3232] overflow-hidden w-full text-left border border-qiita-border dark:border-dark-border hover-card"
+                        style={style}
                       >
                         {/* サムネイル */}
                         <div className="relative aspect-video bg-gray-200 dark:bg-gray-800 overflow-hidden">
@@ -465,7 +513,8 @@ export default function BookDetailPage() {
                           )}
                         </div>
                       </button>
-                  ))}
+                    );
+                  })}
                 </div>
                 
                 {/* もっと見る / すべて表示ボタン */}
