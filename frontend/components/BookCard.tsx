@@ -12,9 +12,10 @@ interface BookCardProps {
   book: Book;
   stats: BookStats;
   topArticles?: TopArticle[];
+  onNavigate?: () => void;
 }
 
-function BookCard({ rank, book, stats, topArticles }: BookCardProps) {
+function BookCard({ rank, book, stats, topArticles, onNavigate }: BookCardProps) {
   // ランクに応じた色を決定
   const getRankStyle = () => {
     if (rank === 1) return 'text-yellow-500 drop-shadow-[0_0_8px_rgba(234,179,8,0.5)]'; // 金
@@ -192,6 +193,7 @@ function BookCard({ rank, book, stats, topArticles }: BookCardProps) {
                   href={`/books/${book.isbn}#qiita-articles`}
                   prefetch={true}
                   className="flex items-center gap-1.5 text-qiita-green dark:text-dark-green"
+                  onClick={onNavigate}
                 >
                   <i className="ri-article-line text-xl md:text-lg"></i>
                   <span className="font-bold text-lg md:text-base">{formatNumber(stats.mention_count)}</span>
@@ -202,6 +204,7 @@ function BookCard({ rank, book, stats, topArticles }: BookCardProps) {
                     href={`/books/${book.isbn}#qiita-articles`}
                     prefetch={true}
                     className="flex items-center gap-1.5 text-pink-600 dark:text-pink-400"
+                    onClick={onNavigate}
                   >
                     <i className="ri-heart-fill text-xl md:text-lg"></i>
                     <span className="font-bold text-lg md:text-base">{formatNumber(stats.total_likes)}</span>
@@ -253,6 +256,7 @@ function BookCard({ rank, book, stats, topArticles }: BookCardProps) {
                 prefetch={true}
                 className="inline-flex items-center gap-1.5 md:gap-1.5 text-base md:text-base text-qiita-green dark:text-dark-green font-medium py-2 px-3 md:py-0 md:px-0"
                 onClick={() => {
+                  onNavigate?.();
                   analytics.clickBook(book.isbn || '', book.title, rank);
                 }}
               >

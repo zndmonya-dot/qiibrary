@@ -15,6 +15,8 @@ type PeriodType = 'daily' | 'monthly' | 'yearly' | 'all' | 'year';
 
 // グローバルキャッシュ（コンポーネント外で管理）
 const rankingsCache = new Map<string, RankingResponse>();
+// スクロール位置キャッシュ
+const scrollPositionCache = new Map<string, number>();
 
 const getPeriodLabel = (period: PeriodType, selectedYear: number | null): string => {
   if (period === 'daily') return '24時間';
@@ -48,6 +50,12 @@ export default function Home() {
   );
   const [searchQuery, setSearchQuery] = useState(searchParams.get('search') || '');
   const [showAllYears, setShowAllYears] = useState(false);
+  
+  // スクロール位置を保存するヘルパー関数
+  const saveScrollPosition = useCallback(() => {
+    const cacheKey = period === 'year' ? `${period}-${selectedYear}` : period;
+    scrollPositionCache.set(cacheKey, window.scrollY);
+  }, [period, selectedYear]);
   
   // URLを更新するヘルパー関数
   const updateURL = useCallback((params: Record<string, string | number | null>) => {
@@ -91,6 +99,13 @@ export default function Home() {
       if (cachedData) {
         setRankings(cachedData);
         setLoading(false);
+        
+        // スクロール位置を復元（次のフレームで実行）
+        requestAnimationFrame(() => {
+          const savedScrollPosition = scrollPositionCache.get(cacheKey) || 0;
+          window.scrollTo(0, savedScrollPosition);
+        });
+        
         return;
       }
       
@@ -287,6 +302,7 @@ export default function Home() {
           <div className="flex flex-nowrap md:flex-wrap gap-1.5 md:gap-2 min-w-max md:min-w-0">
             <button
               onClick={() => {
+                saveScrollPosition();
                 setPeriod('daily');
                 setSelectedYear(null);
                 updateURL({ period: 'daily', year: null, page: 1 });
@@ -304,6 +320,7 @@ export default function Home() {
             </button>
             <button
               onClick={() => {
+                saveScrollPosition();
                 setPeriod('monthly');
                 setSelectedYear(null);
                 updateURL({ period: 'monthly', year: null, page: 1 });
@@ -320,6 +337,7 @@ export default function Home() {
             </button>
             <button
               onClick={() => {
+                saveScrollPosition();
                 setPeriod('yearly');
                 setSelectedYear(null);
                 updateURL({ period: 'yearly', year: null, page: 1 });
@@ -336,6 +354,7 @@ export default function Home() {
             </button>
             <button
               onClick={() => {
+                saveScrollPosition();
                 setPeriod('all');
                 setSelectedYear(null);
                 updateURL({ period: 'all', year: null, page: 1 });
@@ -359,6 +378,7 @@ export default function Home() {
               <button
                 key={year}
                 onClick={() => {
+                  saveScrollPosition();
                   setSelectedYear(year);
                   setPeriod('year');
                   updateURL({ period: 'year', year: year, page: 1 });
@@ -402,6 +422,7 @@ export default function Home() {
                 <button
                   key={year}
                   onClick={() => {
+                    saveScrollPosition();
                     setSelectedYear(year);
                     setPeriod('year');
                     updateURL({ period: 'year', year: year, page: 1 });
@@ -464,6 +485,7 @@ export default function Home() {
                         book={item.book}
                         stats={item.stats}
                         topArticles={item.top_articles}
+                        onNavigate={saveScrollPosition}
                       />
                     </div>
                   );
