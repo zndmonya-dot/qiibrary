@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Script from 'next/script';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
@@ -27,15 +28,39 @@ const getAnimationStyle = (index: number): React.CSSProperties => ({
 });
 
 export default function Home() {
-  const [period, setPeriod] = useState<PeriodType>('yearly');
-  const [selectedYear, setSelectedYear] = useState<number | null>(null);
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  
+  // URLパラメータから初期状態を復元
+  const [period, setPeriod] = useState<PeriodType>((searchParams.get('period') as PeriodType) || 'yearly');
+  const [selectedYear, setSelectedYear] = useState<number | null>(
+    searchParams.get('year') ? parseInt(searchParams.get('year')!) : null
+  );
   const [availableYears, setAvailableYears] = useState<number[]>([]);
   const [rankings, setRankings] = useState<RankingResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [searchQuery, setSearchQuery] = useState('');
+  const [currentPage, setCurrentPage] = useState(
+    searchParams.get('page') ? parseInt(searchParams.get('page')!) : 1
+  );
+  const [searchQuery, setSearchQuery] = useState(searchParams.get('search') || '');
   const [showAllYears, setShowAllYears] = useState(false);
+  
+  // URLを更新するヘルパー関数
+  const updateURL = useCallback((params: Record<string, string | number | null>) => {
+    const newParams = new URLSearchParams(searchParams.toString());
+    
+    Object.entries(params).forEach(([key, value]) => {
+      if (value === null || value === '' || value === 1 || (key === 'period' && value === 'yearly')) {
+        newParams.delete(key);
+      } else {
+        newParams.set(key, String(value));
+      }
+    });
+    
+    const queryString = newParams.toString();
+    router.replace(queryString ? `/?${queryString}` : '/', { scroll: false });
+  }, [searchParams, router]);
 
   useEffect(() => {
     const fetchYears = async () => {
@@ -105,17 +130,21 @@ export default function Home() {
   
   const handleNextPage = useCallback(() => {
     if (currentPage < totalPages) {
-      setCurrentPage(currentPage + 1);
+      const newPage = currentPage + 1;
+      setCurrentPage(newPage);
+      updateURL({ page: newPage });
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
-  }, [currentPage, totalPages]);
-  
+  }, [currentPage, totalPages, updateURL]);
+
   const handlePrevPage = useCallback(() => {
     if (currentPage > 1) {
-      setCurrentPage(currentPage - 1);
+      const newPage = currentPage - 1;
+      setCurrentPage(newPage);
+      updateURL({ page: newPage });
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
-  }, [currentPage]);
+  }, [currentPage, updateURL]);
 
   // 構造化データ（JSON-LD）
   const structuredData = {
@@ -177,10 +206,12 @@ export default function Home() {
               placeholder="書籍名、著者、出版社、ISBNで検索..."
               value={searchQuery}
               onChange={(e) => {
-                setSearchQuery(e.target.value);
-                setCurrentPage(1); // 検索時はページをリセット
-                if (e.target.value) {
-                  analytics.search(e.target.value, filteredRankings.length);
+                const query = e.target.value;
+                setSearchQuery(query);
+                setCurrentPage(1);
+                updateURL({ search: query, page: 1 });
+                if (query) {
+                  analytics.search(query, filteredRankings.length);
                 }
               }}
               onKeyDown={(e) => {
@@ -197,6 +228,7 @@ export default function Home() {
                 onClick={() => {
                   setSearchQuery('');
                   setCurrentPage(1);
+                  updateURL({ search: '', page: 1 });
                 }}
                 className="absolute right-12 md:right-4 top-1/2 -translate-y-1/2 text-qiita-text dark:text-dark-text p-1 md:p-0"
                 aria-label="検索をクリア"
@@ -240,6 +272,7 @@ export default function Home() {
               onClick={() => {
                 setPeriod('daily');
                 setSelectedYear(null);
+                updateURL({ period: 'daily', year: null, page: 1 });
                 analytics.changeRankingPeriod('daily');
               }}
               className={`px-2.5 md:px-4 py-1 md:py-2 text-xs md:text-base rounded-lg font-semibold whitespace-nowrap transition-all duration-150 ${
@@ -256,6 +289,7 @@ export default function Home() {
               onClick={() => {
                 setPeriod('monthly');
                 setSelectedYear(null);
+                updateURL({ period: 'monthly', year: null, page: 1 });
                 analytics.changeRankingPeriod('monthly');
               }}
               className={`px-2.5 md:px-4 py-1 md:py-2 text-xs md:text-base rounded-lg font-semibold transition-all duration-150 ${
@@ -271,6 +305,7 @@ export default function Home() {
               onClick={() => {
                 setPeriod('yearly');
                 setSelectedYear(null);
+                updateURL({ period: 'yearly', year: null, page: 1 });
                 analytics.changeRankingPeriod('yearly');
               }}
               className={`px-2.5 md:px-4 py-1 md:py-2 text-xs md:text-base rounded-lg font-semibold transition-all duration-150 ${
@@ -286,6 +321,7 @@ export default function Home() {
               onClick={() => {
                 setPeriod('all');
                 setSelectedYear(null);
+                updateURL({ period: 'all', year: null, page: 1 });
                 analytics.changeRankingPeriod('all');
               }}
               className={`px-2.5 md:px-4 py-1 md:py-2 text-xs md:text-base rounded-lg font-semibold transition-all duration-150 ${
@@ -308,6 +344,7 @@ export default function Home() {
                 onClick={() => {
                   setSelectedYear(year);
                   setPeriod('year');
+                  updateURL({ period: 'year', year: year, page: 1 });
                   analytics.changeRankingPeriod(`year-${year}`);
                 }}
                 className={`px-2.5 md:px-4 py-1 md:py-2 text-xs md:text-base rounded-lg font-semibold transition-all duration-150 ${
@@ -350,6 +387,7 @@ export default function Home() {
                   onClick={() => {
                     setSelectedYear(year);
                     setPeriod('year');
+                    updateURL({ period: 'year', year: year, page: 1 });
                     analytics.changeRankingPeriod(`year-${year}`);
                   }}
                   className={`px-2.5 md:px-4 py-1 md:py-2 text-xs md:text-base rounded-lg font-semibold transition-all duration-150 ${
