@@ -11,22 +11,22 @@ export default function Header() {
   const pathname = usePathname();
 
   useEffect(() => {
-    // DOMから現在のテーマを取得
-    setThemeState(getCurrentTheme());
-    
+    // DOMから現在のテーマ設定を取得
+    const current = getCurrentTheme();
+    setThemeState(current);
+  }, []);
+
+  useEffect(() => {
     // Autoモードの場合、システム設定の変更を監視
-    const currentTheme = getCurrentTheme();
-    if (currentTheme === 'auto') {
+    if (theme === 'auto') {
       const unwatch = watchSystemTheme(() => {
-        // システム設定が変更されたら、Autoモードの場合は再適用
-        if (getCurrentTheme() === 'auto') {
-          applyTheme('auto');
-        }
+        // システム設定が変更されたら再適用
+        applyTheme('auto');
       });
       
       return unwatch;
     }
-  }, []);
+  }, [theme]);
 
   const handleThemeChange = (newTheme: Theme) => {
     applyTheme(newTheme);

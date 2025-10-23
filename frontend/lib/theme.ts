@@ -65,18 +65,27 @@ export function applyTheme(theme: Theme): void {
 }
 
 /**
- * 現在のテーマを取得（ローカルストレージ → DOM の順）
+ * 現在のテーマ設定を取得（auto含む）
  */
 export function getCurrentTheme(): Theme {
   if (typeof window === 'undefined') return DEFAULT_THEME;
   
-  // まずローカルストレージから取得
+  // ローカルストレージから取得（auto, light, dark）
   const stored = getStoredTheme();
-  if (stored) return stored;
+  return stored || DEFAULT_THEME;
+}
+
+/**
+ * 実効的なテーマを取得（autoの場合はシステム設定を返す）
+ */
+export function getEffectiveTheme(): 'light' | 'dark' {
+  if (typeof window === 'undefined') return 'dark';
   
-  // なければDOMから取得
-  const isDark = document.documentElement.classList.contains('dark');
-  return isDark ? 'dark' : 'light';
+  const theme = getCurrentTheme();
+  if (theme === 'auto') {
+    return getSystemTheme();
+  }
+  return theme;
 }
 
 /**
