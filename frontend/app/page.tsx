@@ -169,7 +169,9 @@ export default function Home() {
         {/* 検索バー */}
         <div className="mb-4 md:mb-6 bg-qiita-card dark:bg-dark-surface rounded-lg border border-qiita-border dark:border-dark-border p-3 md:p-4 animate-fade-in-up">
           <div className="relative">
-            <i className="ri-search-line absolute left-3 md:left-4 top-1/2 -translate-y-1/2 text-qiita-text dark:text-dark-text text-lg md:text-xl"></i>
+            {/* デスクトップ: 左側の虫眼鏡アイコン */}
+            <i className="ri-search-line absolute left-3 md:left-4 top-1/2 -translate-y-1/2 text-qiita-text dark:text-dark-text text-lg md:text-xl hidden md:block"></i>
+            
             <input
               type="text"
               placeholder="書籍名、著者、出版社、ISBNで検索..."
@@ -181,20 +183,41 @@ export default function Home() {
                   analytics.search(e.target.value, filteredRankings.length);
                 }
               }}
-              className="w-full pl-10 md:pl-12 pr-10 md:pr-12 py-2.5 md:py-3 text-[16px] bg-qiita-surface dark:bg-[#494b4b] text-qiita-text-dark dark:text-white rounded-lg border border-qiita-border dark:border-dark-border focus:outline-none focus:ring-2 focus:ring-qiita-green/50 dark:focus:ring-dark-green/50 font-medium"
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  e.currentTarget.blur(); // キーボードを閉じる
+                }
+              }}
+              className="w-full pl-3 md:pl-12 pr-12 md:pr-12 py-2.5 md:py-3 text-[16px] bg-qiita-surface dark:bg-[#494b4b] text-qiita-text-dark dark:text-white rounded-lg border border-qiita-border dark:border-dark-border focus:outline-none focus:ring-2 focus:ring-qiita-green/50 dark:focus:ring-dark-green/50 font-medium"
             />
+            
+            {/* クリアボタン（検索文字がある時のみ） */}
             {searchQuery && (
               <button
                 onClick={() => {
                   setSearchQuery('');
                   setCurrentPage(1);
                 }}
-                className="absolute right-3 md:right-4 top-1/2 -translate-y-1/2 text-qiita-text dark:text-dark-text p-1"
+                className="absolute right-12 md:right-4 top-1/2 -translate-y-1/2 text-qiita-text dark:text-dark-text p-1 md:p-0"
                 aria-label="検索をクリア"
               >
-                <i className="ri-close-circle-line text-xl md:text-2xl"></i>
+                <i className="ri-close-circle-line text-xl"></i>
               </button>
             )}
+            
+            {/* スマホ: 右側の検索ボタン */}
+            <button
+              onClick={() => {
+                // キーボードを閉じる
+                if (document.activeElement instanceof HTMLElement) {
+                  document.activeElement.blur();
+                }
+              }}
+              className="md:hidden absolute right-3 top-1/2 -translate-y-1/2 text-qiita-green dark:text-dark-green p-1 hover:opacity-70 transition-opacity"
+              aria-label="検索"
+            >
+              <i className="ri-search-line text-2xl"></i>
+            </button>
           </div>
           {searchQuery && filteredRankings.length > 0 && (
             <div className="mt-3 text-sm md:text-base text-qiita-text dark:text-dark-text font-medium">
