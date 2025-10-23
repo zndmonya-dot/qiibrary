@@ -101,13 +101,6 @@ export default function Home() {
         setRankings(cachedData);
         setLoading(false);
         setIsFromCache(true); // キャッシュから復元したことを記録
-        
-        // スクロール位置を復元（少し遅延させて確実に復元）
-        setTimeout(() => {
-          const savedScrollPosition = scrollPositionCache.get(cacheKey) || 0;
-          window.scrollTo(0, savedScrollPosition);
-        }, 0);
-        
         return;
       }
       
@@ -135,14 +128,29 @@ export default function Home() {
     };
     
     fetchRankings();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [period, selectedYear]);
+
+  // スクロール位置の復元と保存
+  useEffect(() => {
+    const cacheKey = period === 'year' ? `${period}-${selectedYear}` : period;
+    
+    // キャッシュから復元した場合のみスクロール位置を復元
+    if (isFromCache && rankings) {
+      const savedScrollPosition = scrollPositionCache.get(cacheKey) || 0;
+      // DOMが完全にレンダリングされた後に復元
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          window.scrollTo(0, savedScrollPosition);
+        });
+      });
+    }
     
     // クリーンアップ：ページから離れる時にスクロール位置を保存
     return () => {
-      const cacheKey = period === 'year' ? `${period}-${selectedYear}` : period;
       scrollPositionCache.set(cacheKey, window.scrollY);
     };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [period, selectedYear]);
+  }, [period, selectedYear, isFromCache, rankings]);
 
   const filteredRankings = useMemo(() => {
     if (!rankings) return [];

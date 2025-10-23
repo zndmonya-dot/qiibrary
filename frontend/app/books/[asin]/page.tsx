@@ -51,13 +51,6 @@ export default function BookDetailPage() {
         setNewlyAddedStart(null);
         setDisplayedVideosCount(8);
         setNewlyAddedVideosStart(null);
-        
-        // スクロール位置を復元（少し遅延させて確実に復元）
-        setTimeout(() => {
-          const savedScrollPosition = scrollPositionCache.get(asin) || 0;
-          window.scrollTo(0, savedScrollPosition);
-        }, 0);
-        
         return;
       }
       
@@ -90,12 +83,26 @@ export default function BookDetailPage() {
     };
 
     fetchBook();
+  }, [asin]);
+
+  // スクロール位置の復元と保存
+  useEffect(() => {
+    // キャッシュから復元した場合のみスクロール位置を復元
+    if (isFromCache && book) {
+      const savedScrollPosition = scrollPositionCache.get(asin) || 0;
+      // DOMが完全にレンダリングされた後に復元
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          window.scrollTo(0, savedScrollPosition);
+        });
+      });
+    }
     
     // クリーンアップ：ページから離れる時にスクロール位置を保存
     return () => {
       scrollPositionCache.set(asin, window.scrollY);
     };
-  }, [asin]);
+  }, [asin, isFromCache, book]);
 
   const handleShowMore = useCallback((increment: number) => {
     const currentCount = displayedArticlesCount;
@@ -211,7 +218,7 @@ export default function BookDetailPage() {
             </div>
           </div>
           <button
-            onClick={() => window.history.back()}
+            onClick={() => router.back()}
             className="mt-4 text-qiita-green dark:text-dark-green hover-text-green inline-flex items-center gap-1"
           >
             <i className="ri-arrow-left-line"></i>
@@ -240,7 +247,7 @@ export default function BookDetailPage() {
           <main className="container mx-auto px-3 md:px-4 pt-6 pb-4 md:py-8">
             {/* 戻るボタン */}
             <button
-              onClick={() => window.history.back()}
+              onClick={() => router.back()}
               className="flex items-center gap-2 text-qiita-text dark:text-dark-text hover-text-green mb-4 md:mb-8 text-sm md:text-base font-medium py-2 px-3 md:px-0 md:py-0"
             >
               <i className="ri-arrow-left-line text-base md:text-lg"></i>
