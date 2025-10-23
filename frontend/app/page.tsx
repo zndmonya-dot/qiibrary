@@ -40,6 +40,8 @@ export default function Home() {
   const [rankings, setRankings] = useState<RankingResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  // データキャッシュ（期間/年ごとにキャッシュ）
+  const [rankingsCache, setRankingsCache] = useState<Map<string, RankingResponse>>(new Map());
   const [currentPage, setCurrentPage] = useState(
     searchParams.get('page') ? parseInt(searchParams.get('page')!) : 1
   );
@@ -80,9 +82,19 @@ export default function Home() {
 
   useEffect(() => {
     const fetchRankings = async () => {
+      // キャッシュキーを生成
+      const cacheKey = period === 'year' ? `${period}-${selectedYear}` : period;
+      
+      // キャッシュにデータがあればそれを使用
+      const cachedData = rankingsCache.get(cacheKey);
+      if (cachedData) {
+        setRankings(cachedData);
+        setLoading(false);
+        return;
+      }
+      
       setLoading(true);
       setError(null);
-      setCurrentPage(1);
       
       try {
         const data = period === 'daily' ? await getRankings.daily()
@@ -92,6 +104,9 @@ export default function Home() {
           : await getRankings.all();
         
         setRankings(data);
+        
+        // データをキャッシュに保存
+        setRankingsCache(prev => new Map(prev).set(cacheKey, data));
       } catch (err) {
         setError('ランキングの取得に失敗しました');
         console.error(err);
@@ -101,6 +116,7 @@ export default function Home() {
     };
     
     fetchRankings();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [period, selectedYear]);
 
   const filteredRankings = useMemo(() => {
