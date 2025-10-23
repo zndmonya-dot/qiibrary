@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import './globals.css'
 import PageTransition from '@/components/PageTransition'
+import ZundamonMascot from '@/components/ZundamonMascot'
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://qiibrary.com'),
@@ -96,6 +97,7 @@ export default function RootLayout({
         <PageTransition>
           {children}
         </PageTransition>
+        <ZundamonMascot />
       </body>
     </html>
   )
