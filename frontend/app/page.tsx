@@ -45,6 +45,7 @@ export default function Home() {
   const [rankings, setRankings] = useState<RankingResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [isFromCache, setIsFromCache] = useState(false);
   const [currentPage, setCurrentPage] = useState(
     searchParams.get('page') ? parseInt(searchParams.get('page')!) : 1
   );
@@ -99,6 +100,7 @@ export default function Home() {
       if (cachedData) {
         setRankings(cachedData);
         setLoading(false);
+        setIsFromCache(true); // キャッシュから復元したことを記録
         
         // スクロール位置を復元（次のフレームで実行）
         requestAnimationFrame(() => {
@@ -111,6 +113,7 @@ export default function Home() {
       
       setLoading(true);
       setError(null);
+      setIsFromCache(false); // 新規取得
       
       try {
         const data = period === 'daily' ? await getRankings.daily()
@@ -476,7 +479,8 @@ export default function Home() {
             <div className="space-y-2 md:space-y-4 mb-4 md:mb-8">
               {paginatedRankings.length > 0 ? (
                 paginatedRankings.map((item, index) => {
-                  const style = getAnimationStyle(index);
+                  // キャッシュから復元時はアニメーションをスキップ
+                  const style = isFromCache ? {} : getAnimationStyle(index);
                   
                   return (
                     <div key={item.book.id} style={style}>
