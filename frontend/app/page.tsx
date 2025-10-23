@@ -131,37 +131,32 @@ export default function Home() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [period, selectedYear]);
 
-  // ブラウザのネイティブなスクロール復元を有効化 + sessionStorageから復元
+  // 戻る・進むの検出とスクロール位置の即座復元
   useEffect(() => {
     if ('scrollRestoration' in window.history) {
-      window.history.scrollRestoration = 'manual'; // 手動で制御
+      window.history.scrollRestoration = 'manual';
     }
 
-    // sessionStorageからスクロール位置を復元
-    const savedScrollPosition = sessionStorage.getItem('homepage_scroll');
-    if (savedScrollPosition && rankings) {
-      // ランキングデータが読み込まれた後に復元
-      const position = parseInt(savedScrollPosition, 10);
-      
-      // 即座に復元
-      window.scrollTo({
-        top: position,
-        left: 0,
-        behavior: 'auto'
-      });
-      
-      // 念のため、少し待ってから再度復元（DOMレンダリングが遅れた場合の保険）
-      setTimeout(() => {
-        window.scrollTo({
-          top: position,
-          left: 0,
-          behavior: 'auto'
+    const handlePopState = () => {
+      // 戻る・進むが発生した瞬間、描画直前に復元
+      const savedScrollPosition = sessionStorage.getItem('homepage_scroll');
+      if (savedScrollPosition) {
+        const position = parseInt(savedScrollPosition, 10);
+        
+        // 次のフレームで即座に復元（描画直前）
+        requestAnimationFrame(() => {
+          window.scrollTo({ top: position, behavior: 'auto' });
+          sessionStorage.removeItem('homepage_scroll');
         });
-        // 復元後に削除
-        sessionStorage.removeItem('homepage_scroll');
-      }, 50);
-    }
-  }, [rankings]);
+      }
+    };
+
+    window.addEventListener('popstate', handlePopState);
+
+    return () => {
+      window.removeEventListener('popstate', handlePopState);
+    };
+  }, []);
 
   // スクロール位置の復元と保存（タブ切り替え用）
   useEffect(() => {
