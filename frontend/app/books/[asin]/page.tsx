@@ -29,7 +29,7 @@ export default function BookDetailPage() {
   const previousCountRef = useRef(INITIAL_ARTICLES_COUNT);
   const [newlyAddedStart, setNewlyAddedStart] = useState<number | null>(null);
   const [selectedVideoId, setSelectedVideoId] = useState<string | null>(null);
-  const [displayedVideosCount, setDisplayedVideosCount] = useState(9);
+  const [displayedVideosCount, setDisplayedVideosCount] = useState(8);
   const [newlyAddedVideosStart, setNewlyAddedVideosStart] = useState<number | null>(null);
 
   useEffect(() => {
@@ -42,7 +42,7 @@ export default function BookDetailPage() {
       setDisplayedArticlesCount(INITIAL_ARTICLES_COUNT);
       previousCountRef.current = INITIAL_ARTICLES_COUNT;
       setNewlyAddedStart(null);
-      setDisplayedVideosCount(9);
+      setDisplayedVideosCount(8);
       setNewlyAddedVideosStart(null);
       
       try {
@@ -378,13 +378,13 @@ export default function BookDetailPage() {
                     
                     if (newlyAddedVideosStart !== null && index >= newlyAddedVideosStart) {
                       const relativeIndex = index - newlyAddedVideosStart;
-                      const delayMs = Math.min(relativeIndex, 9) * 100;
+                      const delayMs = Math.min(relativeIndex, 8) * 100;
                       style = {
                         animation: `fadeInUp 0.5s ease-out ${delayMs}ms forwards`,
                         opacity: 0,
                         transform: 'translateY(20px)'
                       };
-                    } else if (index < 9 && displayedVideosCount === 9) {
+                    } else if (index < 8 && displayedVideosCount === 8) {
                       const delayMs = index * 100;
                       style = {
                         animation: `fadeInUp 0.5s ease-out ${delayMs}ms forwards`,
