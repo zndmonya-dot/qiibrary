@@ -53,12 +53,18 @@ async def get_book_detail(
             .all()
         )
         
-        # 関連するYouTube動画リンクを取得
+        # 関連するYouTube動画リンクを取得（人気度スコア順）
         youtube_links = (
             db.query(BookYouTubeLink)
             .filter(BookYouTubeLink.book_id == book.id)
-            .order_by(BookYouTubeLink.display_order)
             .all()
+        )
+        
+        # スコア計算してソート
+        youtube_links = sorted(
+            youtube_links,
+            key=lambda link: link.calculate_popularity_score(),
+            reverse=True
         )
         
         # 動的にAmazonアフィリエイトURLを生成
@@ -82,7 +88,9 @@ async def get_book_detail(
                     "thumbnail_url": link.thumbnail_url,
                     "view_count": getattr(link, 'view_count', 0) or 0,
                     "like_count": getattr(link, 'like_count', 0) or 0,
+                    "subscriber_count": getattr(link, 'subscriber_count', 0) or 0,
                     "display_order": link.display_order,
+                    "popularity_score": link.calculate_popularity_score(),
                 }
                 for link in youtube_links
             ]

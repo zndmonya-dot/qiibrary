@@ -97,6 +97,8 @@ export interface YouTubeVideo {
   video_url: string;
   view_count: number;
   like_count: number;
+  subscriber_count: number;
+  popularity_score: number;
   published_at: string;
 }
 
@@ -225,12 +227,14 @@ export const getBookDetail = async (asin: string): Promise<BookDetail> => {
     return {
       video_id: videoId,
       title: link.title || '動画タイトル',
-      channel_name: 'YouTube',
+      channel_name: link.channel_name || 'YouTube',
       thumbnail_url: link.thumbnail_url || getYouTubeThumbnailUrl(videoId),
       video_url: link.youtube_url || getYouTubeVideoUrl(videoId),
-      view_count: 0,
-      like_count: 0,
-      published_at: new Date().toISOString(),
+      view_count: link.view_count || 0,
+      like_count: link.like_count || 0,
+      subscriber_count: link.subscriber_count || 0,
+      popularity_score: link.popularity_score || 0,
+      published_at: link.published_at || new Date().toISOString(),
     };
   });
   
