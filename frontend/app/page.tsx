@@ -102,11 +102,11 @@ export default function Home() {
         setLoading(false);
         setIsFromCache(true); // キャッシュから復元したことを記録
         
-        // スクロール位置を復元（次のフレームで実行）
-        requestAnimationFrame(() => {
+        // スクロール位置を復元（少し遅延させて確実に復元）
+        setTimeout(() => {
           const savedScrollPosition = scrollPositionCache.get(cacheKey) || 0;
           window.scrollTo(0, savedScrollPosition);
-        });
+        }, 0);
         
         return;
       }

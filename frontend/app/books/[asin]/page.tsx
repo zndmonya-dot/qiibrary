@@ -52,11 +52,11 @@ export default function BookDetailPage() {
         setDisplayedVideosCount(8);
         setNewlyAddedVideosStart(null);
         
-        // スクロール位置を復元（次のフレームで実行）
-        requestAnimationFrame(() => {
+        // スクロール位置を復元（少し遅延させて確実に復元）
+        setTimeout(() => {
           const savedScrollPosition = scrollPositionCache.get(asin) || 0;
           window.scrollTo(0, savedScrollPosition);
-        });
+        }, 0);
         
         return;
       }
@@ -208,7 +208,7 @@ export default function BookDetailPage() {
           <button
             onClick={() => {
               scrollPositionCache.set(asin, window.scrollY);
-              router.back();
+              window.history.back();
             }}
             className="mt-4 text-qiita-green dark:text-dark-green hover-text-green inline-flex items-center gap-1"
           >
@@ -240,7 +240,7 @@ export default function BookDetailPage() {
             <button
               onClick={() => {
                 scrollPositionCache.set(asin, window.scrollY);
-                router.back();
+                window.history.back();
               }}
               className="flex items-center gap-2 text-qiita-text dark:text-dark-text hover-text-green mb-4 md:mb-8 text-sm md:text-base font-medium py-2 px-3 md:px-0 md:py-0"
             >
