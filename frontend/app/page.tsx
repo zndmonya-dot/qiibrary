@@ -141,64 +141,38 @@ export default function Home() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [period, selectedYear]);
 
-  // 戻る・進むの検出とスクロール位置の即座復元
+  // スクロール復元の制御
   useEffect(() => {
     if ('scrollRestoration' in window.history) {
       window.history.scrollRestoration = 'manual';
     }
-
-    const handlePopState = () => {
-      // 戻る・進むが発生した瞬間、スクロール位置を復元
-      const savedScrollPosition = sessionStorage.getItem('homepage_scroll');
-      if (savedScrollPosition) {
-        const position = parseInt(savedScrollPosition, 10);
-        
-        // 複数のタイミングで復元を試みる（確実性を高める）
-        // 1. 即座に復元
-        window.scrollTo({ top: position, behavior: 'auto' });
-        
-        // 2. 次のフレームで復元
-        requestAnimationFrame(() => {
-          window.scrollTo({ top: position, behavior: 'auto' });
-        });
-        
-        // 3. さらに次のフレームで復元（念のため）
-        requestAnimationFrame(() => {
-          requestAnimationFrame(() => {
-            window.scrollTo({ top: position, behavior: 'auto' });
-            sessionStorage.removeItem('homepage_scroll');
-          });
-        });
-      }
-    };
-
-    window.addEventListener('popstate', handlePopState);
-
-    return () => {
-      window.removeEventListener('popstate', handlePopState);
-    };
   }, []);
 
-  // スクロール位置の復元と保存（タブ切り替え用）
+  // ランキングデータ表示後にスクロール位置を復元
   useEffect(() => {
+    if (!rankings || !isFromCache) return;
+    
     const cacheKey = period === 'year' ? `${period}-${selectedYear}` : period;
     
-    // キャッシュから復元した場合のみスクロール位置を復元
-    if (isFromCache && rankings) {
-      const savedScrollPosition = scrollPositionCache.get(cacheKey) || 0;
-      
-      // DOMが完全にレンダリングされた後に復元（より確実に）
-      const scrollTimeout = setTimeout(() => {
-        window.scrollTo({
-          top: savedScrollPosition,
-          left: 0,
-          behavior: 'auto' // 即座にスクロール
-        });
+    // 優先順位: sessionStorage（戻る・進む） > メモリキャッシュ（タブ切り替え）
+    const sessionPosition = sessionStorage.getItem('homepage_scroll');
+    const cachePosition = scrollPositionCache.get(cacheKey);
+    
+    const position = sessionPosition 
+      ? parseInt(sessionPosition, 10) 
+      : (cachePosition || 0);
+    
+    if (position > 0) {
+      // DOMレンダリング完了後に復元
+      setTimeout(() => {
+        window.scrollTo({ top: position, behavior: 'auto' });
+        // sessionStorageから削除（1回のみ使用）
+        if (sessionPosition) {
+          sessionStorage.removeItem('homepage_scroll');
+        }
       }, 0);
-      
-      return () => clearTimeout(scrollTimeout);
     }
-  }, [period, selectedYear, isFromCache, rankings]);
+  }, [period, selectedYear, rankings, isFromCache]);
   
   // ページから離れる時にスクロール位置を保存
   useEffect(() => {

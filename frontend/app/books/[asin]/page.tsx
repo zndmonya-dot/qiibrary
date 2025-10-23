@@ -84,62 +84,36 @@ export default function BookDetailPage() {
     fetchBook();
   }, [asin]);
 
-  // 戻る・進むの検出とスクロール位置の即座復元
+  // スクロール復元の制御
   useEffect(() => {
     if ('scrollRestoration' in window.history) {
       window.history.scrollRestoration = 'manual';
     }
+  }, []);
 
-    const handlePopState = () => {
-      // 戻る・進むが発生した瞬間、スクロール位置を復元
-      const savedScrollPosition = sessionStorage.getItem(`book_scroll_${asin}`);
-      if (savedScrollPosition) {
-        const position = parseInt(savedScrollPosition, 10);
-        
-        // 複数のタイミングで復元を試みる（確実性を高める）
-        // 1. 即座に復元
-        window.scrollTo({ top: position, behavior: 'auto' });
-        
-        // 2. 次のフレームで復元
-        requestAnimationFrame(() => {
-          window.scrollTo({ top: position, behavior: 'auto' });
-        });
-        
-        // 3. さらに次のフレームで復元（念のため）
-        requestAnimationFrame(() => {
-          requestAnimationFrame(() => {
-            window.scrollTo({ top: position, behavior: 'auto' });
-            sessionStorage.removeItem(`book_scroll_${asin}`);
-          });
-        });
-      }
-    };
-
-    window.addEventListener('popstate', handlePopState);
-
-    return () => {
-      window.removeEventListener('popstate', handlePopState);
-    };
-  }, [asin]);
-
-  // スクロール位置の復元と保存（キャッシュから復元時用）
+  // 書籍データ表示後にスクロール位置を復元
   useEffect(() => {
-    // キャッシュから復元した場合のみスクロール位置を復元
-    if (isFromCache && book) {
-      const savedScrollPosition = scrollPositionCache.get(asin) || 0;
-      
-      // DOMが完全にレンダリングされた後に復元（より確実に）
-      const scrollTimeout = setTimeout(() => {
-        window.scrollTo({
-          top: savedScrollPosition,
-          left: 0,
-          behavior: 'auto' // 即座にスクロール
-        });
+    if (!book || !isFromCache) return;
+    
+    // 優先順位: sessionStorage（戻る・進む） > メモリキャッシュ（直接戻る）
+    const sessionPosition = sessionStorage.getItem(`book_scroll_${asin}`);
+    const cachePosition = scrollPositionCache.get(asin);
+    
+    const position = sessionPosition 
+      ? parseInt(sessionPosition, 10) 
+      : (cachePosition || 0);
+    
+    if (position > 0) {
+      // DOMレンダリング完了後に復元
+      setTimeout(() => {
+        window.scrollTo({ top: position, behavior: 'auto' });
+        // sessionStorageから削除（1回のみ使用）
+        if (sessionPosition) {
+          sessionStorage.removeItem(`book_scroll_${asin}`);
+        }
       }, 0);
-      
-      return () => clearTimeout(scrollTimeout);
     }
-  }, [asin, isFromCache, book]);
+  }, [asin, book, isFromCache]);
   
   // ページから離れる時にスクロール位置を保存
   useEffect(() => {
