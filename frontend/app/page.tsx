@@ -138,19 +138,33 @@ export default function Home() {
     // キャッシュから復元した場合のみスクロール位置を復元
     if (isFromCache && rankings) {
       const savedScrollPosition = scrollPositionCache.get(cacheKey) || 0;
-      // DOMが完全にレンダリングされた後に復元
-      requestAnimationFrame(() => {
-        requestAnimationFrame(() => {
-          window.scrollTo(0, savedScrollPosition);
+      
+      // ブラウザのデフォルトのスクロール復元を無効化
+      if ('scrollRestoration' in window.history) {
+        window.history.scrollRestoration = 'manual';
+      }
+      
+      // DOMが完全にレンダリングされた後に復元（より確実に）
+      const scrollTimeout = setTimeout(() => {
+        window.scrollTo({
+          top: savedScrollPosition,
+          left: 0,
+          behavior: 'auto' // 即座にスクロール
         });
-      });
+      }, 0);
+      
+      return () => clearTimeout(scrollTimeout);
     }
+  }, [period, selectedYear, isFromCache, rankings]);
+  
+  // ページから離れる時にスクロール位置を保存
+  useEffect(() => {
+    const cacheKey = period === 'year' ? `${period}-${selectedYear}` : period;
     
-    // クリーンアップ：ページから離れる時にスクロール位置を保存
     return () => {
       scrollPositionCache.set(cacheKey, window.scrollY);
     };
-  }, [period, selectedYear, isFromCache, rankings]);
+  }, [period, selectedYear]);
 
   const filteredRankings = useMemo(() => {
     if (!rankings) return [];

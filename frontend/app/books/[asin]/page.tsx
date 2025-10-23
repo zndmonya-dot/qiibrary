@@ -90,19 +90,31 @@ export default function BookDetailPage() {
     // キャッシュから復元した場合のみスクロール位置を復元
     if (isFromCache && book) {
       const savedScrollPosition = scrollPositionCache.get(asin) || 0;
-      // DOMが完全にレンダリングされた後に復元
-      requestAnimationFrame(() => {
-        requestAnimationFrame(() => {
-          window.scrollTo(0, savedScrollPosition);
+      
+      // ブラウザのデフォルトのスクロール復元を無効化
+      if ('scrollRestoration' in window.history) {
+        window.history.scrollRestoration = 'manual';
+      }
+      
+      // DOMが完全にレンダリングされた後に復元（より確実に）
+      const scrollTimeout = setTimeout(() => {
+        window.scrollTo({
+          top: savedScrollPosition,
+          left: 0,
+          behavior: 'auto' // 即座にスクロール
         });
-      });
+      }, 0);
+      
+      return () => clearTimeout(scrollTimeout);
     }
-    
-    // クリーンアップ：ページから離れる時にスクロール位置を保存
+  }, [asin, isFromCache, book]);
+  
+  // ページから離れる時にスクロール位置を保存
+  useEffect(() => {
     return () => {
       scrollPositionCache.set(asin, window.scrollY);
     };
-  }, [asin, isFromCache, book]);
+  }, [asin]);
 
   const handleShowMore = useCallback((increment: number) => {
     const currentCount = displayedArticlesCount;
