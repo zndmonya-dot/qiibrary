@@ -637,7 +637,7 @@ export default function YouTubeAdminPage() {
                     }
                   }}
                   placeholder={`「${bookDetail.title}」で検索`}
-                  className="flex-1 px-4 py-2.5 text-sm rounded-lg border border-qiita-border dark:border-dark-border bg-qiita-surface dark:bg-dark-surface-light text-qiita-text-dark dark:text-white focus:outline-none focus:ring-2 focus:ring-qiita-green/50 dark:focus:ring-dark-green/50"
+                  className="flex-1 px-4 py-2.5 text-[16px] rounded-lg border border-qiita-border dark:border-dark-border bg-qiita-surface dark:bg-dark-surface-light text-qiita-text-dark dark:text-white focus:outline-none focus:ring-2 focus:ring-qiita-green/50 dark:focus:ring-dark-green/50"
                   autoFocus
                 />
                 <button

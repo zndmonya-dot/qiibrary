@@ -181,7 +181,7 @@ export default function Home() {
                   analytics.search(e.target.value, filteredRankings.length);
                 }
               }}
-              className="w-full pl-10 md:pl-12 pr-10 md:pr-12 py-2.5 md:py-3 text-base bg-qiita-surface dark:bg-[#494b4b] text-qiita-text-dark dark:text-white rounded-lg border border-qiita-border dark:border-dark-border focus:outline-none focus:ring-2 focus:ring-qiita-green/50 dark:focus:ring-dark-green/50 font-medium"
+              className="w-full pl-10 md:pl-12 pr-10 md:pr-12 py-2.5 md:py-3 text-[16px] bg-qiita-surface dark:bg-[#494b4b] text-qiita-text-dark dark:text-white rounded-lg border border-qiita-border dark:border-dark-border focus:outline-none focus:ring-2 focus:ring-qiita-green/50 dark:focus:ring-dark-green/50 font-medium"
             />
             {searchQuery && (
               <button
