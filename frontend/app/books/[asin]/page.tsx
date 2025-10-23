@@ -29,6 +29,8 @@ export default function BookDetailPage() {
   const previousCountRef = useRef(INITIAL_ARTICLES_COUNT);
   const [newlyAddedStart, setNewlyAddedStart] = useState<number | null>(null);
   const [selectedVideoId, setSelectedVideoId] = useState<string | null>(null);
+  const [displayedVideosCount, setDisplayedVideosCount] = useState(9);
+  const [newlyAddedVideosStart, setNewlyAddedVideosStart] = useState<number | null>(null);
 
   useEffect(() => {
     // ページトップにスクロール
@@ -40,6 +42,8 @@ export default function BookDetailPage() {
       setDisplayedArticlesCount(INITIAL_ARTICLES_COUNT);
       previousCountRef.current = INITIAL_ARTICLES_COUNT;
       setNewlyAddedStart(null);
+      setDisplayedVideosCount(9);
+      setNewlyAddedVideosStart(null);
       
       try {
         const data = await getBookDetail(asin);
@@ -80,6 +84,28 @@ export default function BookDetailPage() {
     
     setTimeout(() => setNewlyAddedStart(null), ANIMATION_TIMEOUT_ALL);
   }, [displayedArticlesCount, book?.qiita_articles]);
+
+  const handleShowMoreVideos = useCallback((increment: number) => {
+    const currentCount = displayedVideosCount;
+    const newCount = Math.min(currentCount + increment, book?.youtube_videos?.length || currentCount);
+    
+    setNewlyAddedVideosStart(currentCount);
+    setDisplayedVideosCount(newCount);
+    
+    setTimeout(() => setNewlyAddedVideosStart(null), ANIMATION_TIMEOUT_MORE);
+  }, [displayedVideosCount, book?.youtube_videos?.length]);
+
+  const handleShowAllVideos = useCallback(() => {
+    if (!book?.youtube_videos) return;
+    
+    const currentCount = displayedVideosCount;
+    const totalCount = book.youtube_videos.length;
+    
+    setNewlyAddedVideosStart(currentCount);
+    setDisplayedVideosCount(totalCount);
+    
+    setTimeout(() => setNewlyAddedVideosStart(null), ANIMATION_TIMEOUT_ALL);
+  }, [displayedVideosCount, book?.youtube_videos]);
 
   // 構造化データ（JSON-LD）を生成
   const generateStructuredData = () => {
@@ -346,20 +372,32 @@ export default function BookDetailPage() {
                   </p>
                 </div>
                 
-                <div className="grid md:grid-cols-2 gap-3 md:gap-4">
-                  {book.youtube_videos.map((video, index) => {
-                    const delayMs = index * 100;
-                    const style: React.CSSProperties = {
-                      animation: `fadeInUp 0.5s ease-out ${delayMs}ms forwards`,
-                      opacity: 0,
-                      transform: 'translateY(20px)'
-                    };
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-3">
+                  {book.youtube_videos.slice(0, displayedVideosCount).map((video, index) => {
+                    let style: React.CSSProperties = {};
+                    
+                    if (newlyAddedVideosStart !== null && index >= newlyAddedVideosStart) {
+                      const relativeIndex = index - newlyAddedVideosStart;
+                      const delayMs = Math.min(relativeIndex, 9) * 100;
+                      style = {
+                        animation: `fadeInUp 0.5s ease-out ${delayMs}ms forwards`,
+                        opacity: 0,
+                        transform: 'translateY(20px)'
+                      };
+                    } else if (index < 9 && displayedVideosCount === 9) {
+                      const delayMs = index * 100;
+                      style = {
+                        animation: `fadeInUp 0.5s ease-out ${delayMs}ms forwards`,
+                        opacity: 0,
+                        transform: 'translateY(20px)'
+                      };
+                    }
 
                     return (
                       <button
                         key={video.video_id}
                         onClick={() => setSelectedVideoId(video.video_id)}
-                        className="block rounded-lg bg-qiita-surface dark:bg-[#2f3232] overflow-hidden w-full text-left border border-qiita-border dark:border-dark-border"
+                        className="block rounded-lg bg-qiita-surface dark:bg-[#2f3232] overflow-hidden w-full text-left border border-qiita-border dark:border-dark-border hover-card"
                         style={style}
                       >
                         {/* サムネイル */}
@@ -372,36 +410,36 @@ export default function BookDetailPage() {
                             />
                           )}
                           <div className="absolute inset-0 flex items-center justify-center">
-                            <div className="w-12 h-12 md:w-16 md:h-16 bg-red-600 rounded-full flex items-center justify-center shadow-lg">
-                              <i className="ri-play-fill text-white text-2xl md:text-3xl ml-1"></i>
+                            <div className="w-10 h-10 md:w-12 md:h-12 bg-red-600 rounded-full flex items-center justify-center shadow-lg">
+                              <i className="ri-play-fill text-white text-lg md:text-2xl ml-0.5"></i>
                             </div>
                           </div>
                         </div>
                         
                         {/* 動画情報 */}
-                        <div className="p-3 md:p-4">
-                          <h3 className="text-sm md:text-base font-bold text-qiita-text-dark dark:text-white mb-2 line-clamp-2 leading-relaxed">
+                        <div className="p-2 md:p-3">
+                          <h3 className="text-xs md:text-sm font-bold text-qiita-text-dark dark:text-white mb-1.5 md:mb-2 line-clamp-2 leading-relaxed">
                             {video.title}
                           </h3>
                           
-                          <div className="flex items-center gap-3 text-xs text-qiita-text dark:text-dark-text mb-2">
-                            <div className="flex items-center gap-1">
-                              <i className="ri-youtube-line text-red-500"></i>
+                          <div className="flex items-center gap-1.5 text-[10px] md:text-xs text-qiita-text dark:text-dark-text mb-1 md:mb-1.5">
+                            <div className="flex items-center gap-0.5 md:gap-1 truncate">
+                              <i className="ri-youtube-line text-red-500 flex-shrink-0"></i>
                               <span className="truncate">{video.channel_name}</span>
                             </div>
                           </div>
                           
                           {/* 再生回数・いいね数 */}
                           {(video.view_count > 0 || video.like_count > 0) && (
-                            <div className="flex items-center gap-3 text-xs text-qiita-text dark:text-dark-text">
+                            <div className="flex items-center gap-2 text-[10px] md:text-xs text-qiita-text dark:text-dark-text">
                               {video.view_count > 0 && (
-                                <div className="flex items-center gap-1">
+                                <div className="flex items-center gap-0.5 md:gap-1">
                                   <i className="ri-play-circle-line"></i>
                                   <span>{video.view_count.toLocaleString()}回</span>
                                 </div>
                               )}
                               {video.like_count > 0 && (
-                                <div className="flex items-center gap-1">
+                                <div className="flex items-center gap-0.5 md:gap-1">
                                   <i className="ri-thumb-up-line"></i>
                                   <span>{video.like_count.toLocaleString()}</span>
                                 </div>
@@ -413,6 +451,24 @@ export default function BookDetailPage() {
                     );
                   })}
                 </div>
+                
+                {/* もっと見る / すべて表示ボタン */}
+                {book.youtube_videos.length > displayedVideosCount && (
+                  <div className="mt-4 md:mt-6 flex gap-3 justify-center flex-wrap">
+                    <button
+                      onClick={() => handleShowMoreVideos(12)}
+                      className="px-4 md:px-5 py-2.5 md:py-3 text-sm md:text-base bg-red-500 dark:bg-red-600 text-white rounded-lg hover-opacity-90 font-semibold"
+                    >
+                      もっと見る（+12件）
+                    </button>
+                    <button
+                      onClick={handleShowAllVideos}
+                      className="px-4 md:px-5 py-2.5 md:py-3 text-sm md:text-base bg-qiita-surface dark:bg-dark-surface-light text-qiita-text-dark dark:text-white rounded-lg hover-primary font-semibold"
+                    >
+                      すべて表示（全{book.youtube_videos.length}件）
+                    </button>
+                  </div>
+                )}
               </div>
             )}
 
