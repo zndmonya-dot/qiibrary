@@ -131,14 +131,31 @@ export default function Home() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [period, selectedYear]);
 
-  // ブラウザのネイティブなスクロール復元を有効化
+  // ブラウザのネイティブなスクロール復元を有効化 + sessionStorageから復元
   useEffect(() => {
     if ('scrollRestoration' in window.history) {
-      window.history.scrollRestoration = 'auto';
+      window.history.scrollRestoration = 'manual'; // 手動で制御
+    }
+
+    // sessionStorageからスクロール位置を復元
+    const savedScrollPosition = sessionStorage.getItem('homepage_scroll');
+    if (savedScrollPosition) {
+      // DOMが完全にレンダリングされてから復元
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          window.scrollTo({
+            top: parseInt(savedScrollPosition, 10),
+            left: 0,
+            behavior: 'auto'
+          });
+          // 復元後に削除
+          sessionStorage.removeItem('homepage_scroll');
+        });
+      });
     }
   }, []);
 
-  // スクロール位置の復元と保存
+  // スクロール位置の復元と保存（タブ切り替え用）
   useEffect(() => {
     const cacheKey = period === 'year' ? `${period}-${selectedYear}` : period;
     
@@ -163,7 +180,19 @@ export default function Home() {
   useEffect(() => {
     const cacheKey = period === 'year' ? `${period}-${selectedYear}` : period;
     
+    const handleBeforeUnload = () => {
+      // sessionStorageに保存（ブラウザの戻る・進む用）
+      sessionStorage.setItem('homepage_scroll', window.scrollY.toString());
+      // メモリキャッシュにも保存（タブ切り替え用）
+      scrollPositionCache.set(cacheKey, window.scrollY);
+    };
+
+    // pagehideイベントで保存（より確実）
+    window.addEventListener('pagehide', handleBeforeUnload);
+    
     return () => {
+      window.removeEventListener('pagehide', handleBeforeUnload);
+      // コンポーネントのアンマウント時にも保存
       scrollPositionCache.set(cacheKey, window.scrollY);
     };
   }, [period, selectedYear]);

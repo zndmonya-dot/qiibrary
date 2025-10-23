@@ -85,14 +85,31 @@ export default function BookDetailPage() {
     fetchBook();
   }, [asin]);
 
-  // ブラウザのネイティブなスクロール復元を有効化
+  // ブラウザのネイティブなスクロール復元を有効化 + sessionStorageから復元
   useEffect(() => {
     if ('scrollRestoration' in window.history) {
-      window.history.scrollRestoration = 'auto';
+      window.history.scrollRestoration = 'manual'; // 手動で制御
     }
-  }, []);
 
-  // スクロール位置の復元と保存
+    // sessionStorageからスクロール位置を復元
+    const savedScrollPosition = sessionStorage.getItem(`book_scroll_${asin}`);
+    if (savedScrollPosition) {
+      // DOMが完全にレンダリングされてから復元
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          window.scrollTo({
+            top: parseInt(savedScrollPosition, 10),
+            left: 0,
+            behavior: 'auto'
+          });
+          // 復元後に削除
+          sessionStorage.removeItem(`book_scroll_${asin}`);
+        });
+      });
+    }
+  }, [asin]);
+
+  // スクロール位置の復元と保存（キャッシュから復元時用）
   useEffect(() => {
     // キャッシュから復元した場合のみスクロール位置を復元
     if (isFromCache && book) {
@@ -113,7 +130,19 @@ export default function BookDetailPage() {
   
   // ページから離れる時にスクロール位置を保存
   useEffect(() => {
+    const handleBeforeUnload = () => {
+      // sessionStorageに保存（ブラウザの戻る・進む用）
+      sessionStorage.setItem(`book_scroll_${asin}`, window.scrollY.toString());
+      // メモリキャッシュにも保存
+      scrollPositionCache.set(asin, window.scrollY);
+    };
+
+    // pagehideイベントで保存（より確実）
+    window.addEventListener('pagehide', handleBeforeUnload);
+    
     return () => {
+      window.removeEventListener('pagehide', handleBeforeUnload);
+      // コンポーネントのアンマウント時にも保存
       scrollPositionCache.set(asin, window.scrollY);
     };
   }, [asin]);
