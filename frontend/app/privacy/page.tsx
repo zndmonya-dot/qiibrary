@@ -9,7 +9,7 @@ export default function PrivacyPage() {
       <Header />
       
       <main className="container mx-auto px-4 py-8 max-w-4xl">
-        <div className="bg-qiita-card dark:bg-dark-surface rounded-lg p-6 md:p-8 border border-qiita-border dark:border-dark-border shadow-lg">
+        <div className="bg-qiita-card dark:bg-dark-surface rounded-lg p-6 md:p-8 border border-qiita-border dark:border-dark-border shadow-lg animate-fade-in">
           {/* ヘッダー */}
           <div className="mb-8 pb-6 border-b border-qiita-border dark:border-dark-border">
             <h1 className="text-2xl md:text-3xl font-bold mb-3 flex items-center gap-2 md:gap-3 text-qiita-text-dark dark:text-white">
