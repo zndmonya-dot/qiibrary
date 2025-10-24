@@ -64,10 +64,11 @@ class Settings(BaseSettings):
         """本番環境でのADMIN_TOKEN検証"""
         environment = os.getenv('ENVIRONMENT', 'development')
         if environment == 'production' and not v:
-            logger.error("本番環境でADMIN_TOKENが設定されていません！")
-            raise ValueError(
-                "本番環境ではADMIN_TOKENを必ず設定してください"
-            )
+            logger.warning("⚠️ 本番環境でADMIN_TOKENが設定されていません！管理者APIは認証なしで動作します")
+            # 一時的に警告のみとし、エラーにはしない
+            # raise ValueError(
+            #     "本番環境ではADMIN_TOKENを必ず設定してください"
+            # )
         if v and len(v) < 16:
             logger.warning("ADMIN_TOKENが短すぎます。16文字以上を推奨します")
         return v

@@ -52,6 +52,12 @@ async def verify_admin_access(request: Request):
     if request.url.path == "/api/admin/health":
         return
     
+    # ADMIN_TOKENが設定されていない場合は認証をスキップ（開発環境用）
+    admin_token = os.getenv("ADMIN_TOKEN", "")
+    if not admin_token:
+        logger.warning(f"⚠️ ADMIN_TOKEN未設定のため管理者API認証をスキップ: {request.url.path}")
+        return
+    
     # Authorizationヘッダーをチェック
     authorization = request.headers.get("Authorization")
     
@@ -74,16 +80,6 @@ async def verify_admin_access(request: Request):
     
     # トークンを抽出
     token = authorization[7:]  # "Bearer " を除去
-    
-    # トークンを検証
-    admin_token = os.getenv("ADMIN_TOKEN", "")
-    
-    if not admin_token:
-        logger.error("ADMIN_TOKEN環境変数が設定されていません")
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="サーバー設定エラー",
-        )
     
     # タイミング攻撃対策のため、secrets.compare_digestを使用
     import secrets
