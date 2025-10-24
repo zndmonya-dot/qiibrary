@@ -14,27 +14,37 @@ export async function GET() {
     { url: `${SITE_URL}/privacy`, lastmod: new Date().toISOString(), changefreq: 'yearly', priority: 0.3 },
   ]
 
-  // 書籍一覧を取得
+  // 書籍一覧を取得（ランキングAPIから取得）
   let bookPages: any[] = []
   
   try {
-    const response = await fetch(`${API_URL}/api/books/?limit=10000`, {
+    const response = await fetch(`${API_URL}/api/rankings/?limit=1000&offset=0`, {
       next: { revalidate: 3600 } // 1時間キャッシュ
     })
     
     if (response.ok) {
       const data = await response.json()
-      const books = data.books || []
+      const rankings = data.rankings || []
       
-      bookPages = books.map((book: any) => {
-        const asin = book.isbn ? book.isbn.replace(/-/g, '') : ''
-        return {
-          url: `${SITE_URL}/books/${asin}`,
-          lastmod: book.updated_at ? new Date(book.updated_at).toISOString() : new Date().toISOString(),
-          changefreq: 'weekly',
-          priority: 0.7,
-        }
-      })
+      // 言及数の多い順にソート（既にソート済みだが念のため）
+      bookPages = rankings
+        .filter((item: any) => item.book && item.book.isbn)
+        .map((item: any, index: number) => {
+          const book = item.book
+          const asin = book.isbn.replace(/-/g, '')
+          
+          // ランキング上位ほど優先度を高く設定
+          let priority = 0.7
+          if (index < 10) priority = 0.9      // トップ10
+          else if (index < 50) priority = 0.8  // トップ50
+          
+          return {
+            url: `${SITE_URL}/books/${asin}`,
+            lastmod: book.updated_at ? new Date(book.updated_at).toISOString() : new Date().toISOString(),
+            changefreq: 'weekly',
+            priority,
+          }
+        })
     }
   } catch (error) {
     console.error('Failed to fetch books for sitemap:', error)

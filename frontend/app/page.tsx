@@ -10,6 +10,7 @@ import LoadingSpinner from '@/components/LoadingSpinner';
 import { getRankings, getAvailableYears, RankingResponse } from '@/lib/api';
 import { analytics, trackPageView } from '@/lib/analytics';
 import { ITEMS_PER_PAGE } from '@/lib/constants';
+import { generateWebSiteStructuredData, generateRankingStructuredData } from '@/lib/seo';
 
 type PeriodType = 'daily' | 'monthly' | 'yearly' | 'all' | 'year';
 
@@ -698,6 +699,29 @@ export default function Home() {
           </div>
         )}
       </main>
+      
+      {/* 構造化データ（JSON-LD） */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(generateWebSiteStructuredData()),
+        }}
+      />
+      {rankings && rankings.rankings && rankings.rankings.length > 0 && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(
+              generateRankingStructuredData(
+                rankings.rankings.slice(0, 10).map((item, index) => ({
+                  book: item.book,
+                  rank: (currentPage - 1) * ITEMS_PER_PAGE + index + 1,
+                }))
+              )
+            ),
+          }}
+        />
+      )}
       
       <Footer />
     </div>

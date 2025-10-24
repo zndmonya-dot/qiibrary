@@ -5,6 +5,7 @@ from .scheduler import start_scheduler, stop_scheduler
 from .middleware.rate_limit import RateLimitMiddleware
 from .middleware.security import SecurityHeadersMiddleware
 from .middleware.admin_auth import verify_admin_access
+from .monitoring.sentry import init_sentry
 import os
 import logging
 
@@ -14,6 +15,9 @@ logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
 )
 logger = logging.getLogger(__name__)
+
+# Sentry初期化（エラー監視）
+init_sentry()
 
 app = FastAPI(
     title="Qiibrary API",

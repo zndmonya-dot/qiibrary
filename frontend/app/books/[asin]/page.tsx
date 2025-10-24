@@ -10,6 +10,7 @@ import Footer from '@/components/Footer';
 import LoadingSpinner from '@/components/LoadingSpinner';
 import { getBookDetail, BookDetail } from '@/lib/api';
 import { formatNumber, formatPublicationDate } from '@/lib/utils';
+import { generateBookStructuredData, generateBreadcrumbStructuredData } from '@/lib/seo';
 
 // グローバルキャッシュ（コンポーネント外で管理）
 const bookDetailsCache = new Map<string, BookDetail>();
@@ -583,6 +584,29 @@ export default function BookDetailPage() {
               </div>
             )}
       </main>
+      
+      {/* 構造化データ（JSON-LD） */}
+      {book && (
+        <>
+          <script
+            type="application/ld+json"
+            dangerouslySetInnerHTML={{
+              __html: JSON.stringify(generateBookStructuredData(book)),
+            }}
+          />
+          <script
+            type="application/ld+json"
+            dangerouslySetInnerHTML={{
+              __html: JSON.stringify(
+                generateBreadcrumbStructuredData([
+                  { name: 'ホーム', url: '/' },
+                  { name: book.book.title || '書籍詳細', url: `/books/${asin}` },
+                ])
+              ),
+            }}
+          />
+        </>
+      )}
       
       <Footer />
     </div>
