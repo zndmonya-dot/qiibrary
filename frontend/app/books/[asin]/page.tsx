@@ -33,6 +33,55 @@ export default function BookDetailPage() {
   const [displayedVideosCount, setDisplayedVideosCount] = useState<number>(BOOK_DETAIL.INITIAL_VIDEOS_COUNT);
   const [newlyAddedVideosStart, setNewlyAddedVideosStart] = useState<number | null>(null);
 
+  // SEO: 動的メタデータ更新
+  useEffect(() => {
+    if (!book) return;
+    
+    const articleCount = book.qiita_articles?.length || 0;
+    const totalLikes = book.qiita_articles?.reduce((sum, article) => sum + (article.likes_count || 0), 0) || 0;
+    
+    // タイトル更新
+    document.title = `${book.title} 評判・レビュー【Qiita ${articleCount}記事で紹介】 | Qiibrary`;
+    
+    // メタディスクリプション更新
+    const description = `「${book.title}」はQiitaで${articleCount}記事、${formatNumber(totalLikes)}いいねを獲得。実際に使ったエンジニアのレビューと評判をまとめました。${book.author ? `著者: ${book.author}` : ''}`;
+    
+    let metaDescription = document.querySelector('meta[name="description"]');
+    if (!metaDescription) {
+      metaDescription = document.createElement('meta');
+      metaDescription.setAttribute('name', 'description');
+      document.head.appendChild(metaDescription);
+    }
+    metaDescription.setAttribute('content', description);
+    
+    // OGP更新
+    let ogTitle = document.querySelector('meta[property="og:title"]');
+    if (!ogTitle) {
+      ogTitle = document.createElement('meta');
+      ogTitle.setAttribute('property', 'og:title');
+      document.head.appendChild(ogTitle);
+    }
+    ogTitle.setAttribute('content', `${book.title} - Qiitaで話題の技術書`);
+    
+    let ogDescription = document.querySelector('meta[property="og:description"]');
+    if (!ogDescription) {
+      ogDescription = document.createElement('meta');
+      ogDescription.setAttribute('property', 'og:description');
+      document.head.appendChild(ogDescription);
+    }
+    ogDescription.setAttribute('content', `${articleCount}記事で紹介された人気の技術書`);
+    
+    if (book.thumbnail_url) {
+      let ogImage = document.querySelector('meta[property="og:image"]');
+      if (!ogImage) {
+        ogImage = document.createElement('meta');
+        ogImage.setAttribute('property', 'og:image');
+        document.head.appendChild(ogImage);
+      }
+      ogImage.setAttribute('content', book.thumbnail_url);
+    }
+  }, [book]);
+
   useEffect(() => {
     const fetchBook = async () => {
       // キャッシュにデータがあればそれを使用
