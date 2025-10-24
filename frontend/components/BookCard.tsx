@@ -1,11 +1,13 @@
 'use client';
 
 import { memo } from 'react';
-import Image from 'next/image';
 import Link from 'next/link';
 import { Book, BookStats, TopArticle } from '@/lib/api';
 import { formatNumber, formatPublicationDate } from '@/lib/utils';
 import { analytics } from '@/lib/analytics';
+import BookImage from './BookImage';
+import { getRankStyle, getRankIcon } from '@/lib/rank-styles';
+import { BREAKPOINTS } from '@/lib/constants';
 
 interface BookCardProps {
   rank: number;
@@ -16,18 +18,8 @@ interface BookCardProps {
 }
 
 function BookCard({ rank, book, stats, topArticles, onNavigate }: BookCardProps) {
-  // ランクに応じた色を決定
-  const getRankStyle = () => {
-    if (rank === 1) return 'text-yellow-500 drop-shadow-[0_0_8px_rgba(234,179,8,0.5)]'; // 金
-    if (rank === 2) return 'text-gray-400 drop-shadow-[0_0_8px_rgba(156,163,175,0.5)]'; // 銀
-    if (rank === 3) return 'text-orange-500 drop-shadow-[0_0_8px_rgba(251,146,60,0.5)]'; // 銅
-    return 'text-qiita-green';
-  };
-
-  const getRankIcon = () => {
-    if (rank <= 3) return 'ri-medal-line';
-    return null;
-  };
+  const rankStyle = getRankStyle(rank);
+  const rankIcon = getRankIcon(rank);
 
   return (
     <div className="card-primary flex flex-col items-center md:flex-row md:items-center gap-4 md:gap-6 border border-qiita-border relative overflow-hidden">
@@ -49,10 +41,10 @@ function BookCard({ rank, book, stats, topArticles, onNavigate }: BookCardProps)
       <div className="flex-shrink-0 w-full md:w-14 flex items-center justify-center">
         <div className="flex flex-col items-center">
           {/* メダルアイコン：デスクトップのみ表示 */}
-          {getRankIcon() && (
-            <i className={`hidden md:inline ${getRankIcon()} text-2xl ${getRankStyle()}`}></i>
+          {rankIcon && (
+            <i className={`hidden md:inline ${rankIcon} text-2xl ${rankStyle}`}></i>
           )}
-          <span className={`text-4xl md:text-3xl font-bold ${getRankStyle()}`}>
+          <span className={`text-4xl md:text-3xl font-bold ${rankStyle}`}>
             {rank}
           </span>
         </div>
@@ -69,66 +61,30 @@ function BookCard({ rank, book, stats, topArticles, onNavigate }: BookCardProps)
             onClick={(e) => {
               analytics.clickAmazonLink(book.isbn || '', book.title);
               // スマホではアフィリエイトリンクを保持するため、同じタブで開く
-              if (window.innerWidth < 768) {
+              if (window.innerWidth < BREAKPOINTS.MOBILE) {
                 e.preventDefault();
                 window.location.href = book.amazon_affiliate_url || '';
               }
             }}
           >
-            {book.thumbnail_url ? (
-              <div className="relative w-[120px] h-[180px] md:w-[160px] md:h-[240px]">
-                <Image
-                  src={book.thumbnail_url}
-                  alt={book.title}
-                  width={160}
-                  height={240}
-                  className="rounded shadow-lg w-full h-full object-cover"
-                  loading={rank > 10 ? "lazy" : "eager"}
-                  priority={rank <= 5}
-                  onError={(e) => {
-                    const target = e.target as HTMLImageElement;
-                    target.style.display = 'none';
-                    if (target.parentElement) {
-                      target.parentElement.innerHTML = '<div class="w-[120px] h-[180px] md:w-[160px] md:h-[240px] bg-qiita-surface dark:bg-dark-surface-light rounded shadow-sm flex flex-col items-center justify-center gap-3 border border-qiita-border dark:border-dark-border"><i class="ri-image-2-line text-4xl md:text-6xl text-qiita-text-light dark:text-dark-text-light"></i><span class="text-xs text-qiita-text dark:text-dark-text font-medium px-2 text-center">画像読込失敗</span></div>';
-                    }
-                  }}
-                />
-              </div>
-            ) : (
-              <div className="w-[120px] h-[180px] md:w-[160px] md:h-[240px] bg-qiita-surface dark:bg-dark-surface-light rounded shadow-sm flex flex-col items-center justify-center gap-3 border border-qiita-border dark:border-dark-border">
-                <i className="ri-book-2-line text-5xl md:text-6xl text-qiita-text-light dark:text-dark-text-light"></i>
-                <span className="text-xs text-qiita-text dark:text-dark-text font-medium px-2 text-center">画像なし</span>
-              </div>
-            )}
+            <BookImage
+              src={book.thumbnail_url}
+              alt={book.title}
+              width={160}
+              height={240}
+              rank={rank}
+              className="w-[120px] h-[180px] md:w-[160px] md:h-[240px]"
+            />
           </a>
         ) : (
-          <>
-            {book.thumbnail_url ? (
-              <div className="relative w-[120px] h-[180px] md:w-[160px] md:h-[240px]">
-                <Image
-                  src={book.thumbnail_url}
-                  alt={book.title}
-                  width={160}
-                  height={240}
-                  className="rounded shadow-lg w-full h-full object-cover"
-                  loading={rank > 10 ? "lazy" : "eager"}
-                  priority={rank <= 5}
-                  onError={(e) => {
-                    const target = e.target as HTMLImageElement;
-                    target.style.display = 'none';
-                    if (target.parentElement) {
-                      target.parentElement.innerHTML = '<div class="w-[120px] h-[180px] md:w-[160px] md:h-[240px] bg-qiita-surface dark:bg-dark-surface-light rounded shadow-sm flex flex-col items-center justify-center gap-3 border border-qiita-border dark:border-dark-border"><i class="ri-image-2-line text-4xl md:text-6xl text-qiita-text-light dark:text-dark-text-light"></i><span class="text-xs text-qiita-text dark:text-dark-text font-medium px-2 text-center">画像読込失敗</span></div>';
-                    }
-                  }}
-                />
-              </div>
-            ) : (
-              <div className="w-[120px] h-[180px] md:w-[160px] md:h-[240px] bg-qiita-surface dark:bg-dark-surface-light rounded shadow-sm flex flex-col items-center justify-center gap-3 border border-qiita-border dark:border-dark-border">
-                <i className="ri-book-2-line text-5xl md:text-6xl text-qiita-text-light dark:text-dark-text-light"></i>
-                <span className="text-xs text-qiita-text dark:text-dark-text font-medium px-2 text-center">画像なし</span>
-              </div>
-            )}
-          </>
+          <BookImage
+            src={book.thumbnail_url}
+            alt={book.title}
+            width={160}
+            height={240}
+            rank={rank}
+            className="w-[120px] h-[180px] md:w-[160px] md:h-[240px]"
+          />
         )}
       </div>
       
@@ -146,7 +102,7 @@ function BookCard({ rank, book, stats, topArticles, onNavigate }: BookCardProps)
                 onClick={(e) => {
                   analytics.clickAmazonLink(book.isbn || '', book.title);
                   // スマホではアフィリエイトリンクを保持するため、同じタブで開く
-                  if (window.innerWidth < 768) {
+                  if (window.innerWidth < BREAKPOINTS.MOBILE) {
                     e.preventDefault();
                     window.location.href = book.amazon_affiliate_url || '';
                   }

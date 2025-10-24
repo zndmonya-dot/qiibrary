@@ -9,10 +9,10 @@ import BookCard from '@/components/BookCard';
 import LoadingSpinner from '@/components/LoadingSpinner';
 import { getRankings, getAvailableYears, RankingResponse } from '@/lib/api';
 import { analytics, trackPageView } from '@/lib/analytics';
-import { ITEMS_PER_PAGE } from '@/lib/constants';
+import { ITEMS_PER_PAGE, ANIMATION, SEARCH } from '@/lib/constants';
 import { generateWebSiteStructuredData, generateRankingStructuredData } from '@/lib/seo';
-
-type PeriodType = 'daily' | 'monthly' | 'yearly' | 'all' | 'year';
+import { getErrorMessage, logError } from '@/lib/error-handler';
+import { PeriodType } from '@/types/common';
 
 // スクロール位置キャッシュ（これは残す）
 const scrollPositionCache = new Map<string, number>();
@@ -29,7 +29,7 @@ const getPeriodLabel = (period: PeriodType, selectedYear: number | null): string
 };
 
 const getAnimationStyle = (index: number): React.CSSProperties => ({
-  animation: `fadeInUp 0.4s ease-out ${0.2 + index * 0.05}s forwards`,
+  animation: `fadeInUp ${ANIMATION.DURATION}s ease-out ${ANIMATION.FADE_IN_DELAY + index * ANIMATION.FADE_IN_INCREMENT}s forwards`,
   opacity: 0
 });
 
@@ -115,29 +115,17 @@ export default function Home() {
         setRankings(data);
         setError(null);  // エラーをクリア
       } catch (err: any) {
-        console.error('ランキング取得エラー:', err);
-        
-        // エラーメッセージを詳細化
-        if (err.response?.status === 429) {
-          setError('アクセスが集中しています。しばらく待ってから再試行してください。');
-        } else if (err.response?.status === 500) {
-          setError('サーバーエラーが発生しました。しばらく待ってから再試行してください。');
-        } else if (err.code === 'ECONNABORTED' || err.message?.includes('timeout')) {
-          setError('接続がタイムアウトしました。ネットワーク接続を確認してください。');
-        } else if (!navigator.onLine) {
-          setError('インターネット接続がありません。接続を確認してください。');
-        } else {
-          setError('ランキングの取得に失敗しました。ページを再読み込みしてください。');
-        }
+        logError(err, 'ランキング取得');
+        setError(getErrorMessage(err));
       } finally {
         setLoading(false);
       }
     };
     
-    // デバウンス：検索時は0.5秒待つ
+    // デバウンス：検索時は設定された時間待つ
     const timeoutId = setTimeout(() => {
       fetchRankings();
-    }, searchQuery ? 500 : 0);
+    }, searchQuery ? SEARCH.DEBOUNCE_DELAY : 0);
     
     return () => clearTimeout(timeoutId);
   // eslint-disable-next-line react-hooks/exhaustive-deps

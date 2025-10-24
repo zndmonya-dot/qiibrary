@@ -11,17 +11,12 @@ import LoadingSpinner from '@/components/LoadingSpinner';
 import { getBookDetail, BookDetail } from '@/lib/api';
 import { formatNumber, formatPublicationDate } from '@/lib/utils';
 import { generateBookStructuredData, generateBreadcrumbStructuredData } from '@/lib/seo';
+import { BOOK_DETAIL } from '@/lib/constants';
 
 // グローバルキャッシュ（コンポーネント外で管理）
 const bookDetailsCache = new Map<string, BookDetail>();
 // スクロール位置キャッシュ
 const scrollPositionCache = new Map<string, number>();
-
-const INITIAL_ARTICLES_COUNT = 20;
-const SHOW_MORE_INCREMENT = 20;
-const ANIMATION_TIMEOUT_MORE = 1200;
-const ANIMATION_TIMEOUT_ALL = 2000;
-const MIN_LOADING_DELAY = 300;
 
 export default function BookDetailPage() {
   const params = useParams();
@@ -31,11 +26,11 @@ export default function BookDetailPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isFromCache, setIsFromCache] = useState(false);
-  const [displayedArticlesCount, setDisplayedArticlesCount] = useState(INITIAL_ARTICLES_COUNT);
-  const previousCountRef = useRef(INITIAL_ARTICLES_COUNT);
+  const [displayedArticlesCount, setDisplayedArticlesCount] = useState<number>(BOOK_DETAIL.INITIAL_ARTICLES_COUNT);
+  const previousCountRef = useRef<number>(BOOK_DETAIL.INITIAL_ARTICLES_COUNT);
   const [newlyAddedStart, setNewlyAddedStart] = useState<number | null>(null);
   const [selectedVideoId, setSelectedVideoId] = useState<string | null>(null);
-  const [displayedVideosCount, setDisplayedVideosCount] = useState(8);
+  const [displayedVideosCount, setDisplayedVideosCount] = useState<number>(BOOK_DETAIL.INITIAL_VIDEOS_COUNT);
   const [newlyAddedVideosStart, setNewlyAddedVideosStart] = useState<number | null>(null);
 
   useEffect(() => {
@@ -46,10 +41,10 @@ export default function BookDetailPage() {
         setBook(cachedData);
         setLoading(false);
         setIsFromCache(true);
-        setDisplayedArticlesCount(INITIAL_ARTICLES_COUNT);
-        previousCountRef.current = INITIAL_ARTICLES_COUNT;
+        setDisplayedArticlesCount(BOOK_DETAIL.INITIAL_ARTICLES_COUNT);
+        previousCountRef.current = BOOK_DETAIL.INITIAL_ARTICLES_COUNT;
         setNewlyAddedStart(null);
-        setDisplayedVideosCount(8);
+        setDisplayedVideosCount(BOOK_DETAIL.INITIAL_VIDEOS_COUNT);
         setNewlyAddedVideosStart(null);
         return;
       }
@@ -60,15 +55,15 @@ export default function BookDetailPage() {
       setLoading(true);
       setError(null);
       setIsFromCache(false);
-      setDisplayedArticlesCount(INITIAL_ARTICLES_COUNT);
-      previousCountRef.current = INITIAL_ARTICLES_COUNT;
+      setDisplayedArticlesCount(BOOK_DETAIL.INITIAL_ARTICLES_COUNT);
+      previousCountRef.current = BOOK_DETAIL.INITIAL_ARTICLES_COUNT;
       setNewlyAddedStart(null);
-      setDisplayedVideosCount(8);
+      setDisplayedVideosCount(BOOK_DETAIL.INITIAL_VIDEOS_COUNT);
       setNewlyAddedVideosStart(null);
       
       try {
         const data = await getBookDetail(asin);
-        const minDelay = new Promise(resolve => setTimeout(resolve, MIN_LOADING_DELAY));
+        const minDelay = new Promise(resolve => setTimeout(resolve, BOOK_DETAIL.MIN_LOADING_DELAY));
         await Promise.all([data, minDelay]);
         setBook(data);
         
@@ -125,7 +120,7 @@ export default function BookDetailPage() {
     setDisplayedArticlesCount(newCount);
     previousCountRef.current = newCount;
     
-    setTimeout(() => setNewlyAddedStart(null), ANIMATION_TIMEOUT_MORE);
+    setTimeout(() => setNewlyAddedStart(null), BOOK_DETAIL.ANIMATION_TIMEOUT_MORE);
   }, [displayedArticlesCount, book?.qiita_articles?.length]);
 
   const handleShowAll = useCallback(() => {
@@ -138,7 +133,7 @@ export default function BookDetailPage() {
     setDisplayedArticlesCount(totalCount);
     previousCountRef.current = totalCount;
     
-    setTimeout(() => setNewlyAddedStart(null), ANIMATION_TIMEOUT_ALL);
+    setTimeout(() => setNewlyAddedStart(null), BOOK_DETAIL.ANIMATION_TIMEOUT_ALL);
   }, [displayedArticlesCount, book?.qiita_articles]);
 
   const handleShowMoreVideos = useCallback((increment: number) => {
@@ -148,7 +143,7 @@ export default function BookDetailPage() {
     setNewlyAddedVideosStart(currentCount);
     setDisplayedVideosCount(newCount);
     
-    setTimeout(() => setNewlyAddedVideosStart(null), ANIMATION_TIMEOUT_MORE);
+    setTimeout(() => setNewlyAddedVideosStart(null), BOOK_DETAIL.ANIMATION_TIMEOUT_MORE);
   }, [displayedVideosCount, book?.youtube_videos?.length]);
 
   const handleShowAllVideos = useCallback(() => {
@@ -160,7 +155,7 @@ export default function BookDetailPage() {
     setNewlyAddedVideosStart(currentCount);
     setDisplayedVideosCount(totalCount);
     
-    setTimeout(() => setNewlyAddedVideosStart(null), ANIMATION_TIMEOUT_ALL);
+    setTimeout(() => setNewlyAddedVideosStart(null), BOOK_DETAIL.ANIMATION_TIMEOUT_ALL);
   }, [displayedVideosCount, book?.youtube_videos]);
 
   // 構造化データ（JSON-LD）を生成
@@ -313,7 +308,7 @@ export default function BookDetailPage() {
                           animation: `fadeInUp 0.5s ease-out ${delayMs}ms forwards`,
                           opacity: 0
                         };
-                      } else if (index < INITIAL_ARTICLES_COUNT && displayedArticlesCount === INITIAL_ARTICLES_COUNT) {
+                      } else if (index < BOOK_DETAIL.INITIAL_ARTICLES_COUNT && displayedArticlesCount === BOOK_DETAIL.INITIAL_ARTICLES_COUNT) {
                         const delayMs = index * 100;
                         style = {
                           animation: `fadeInUp 0.5s ease-out ${delayMs}ms forwards`,
@@ -403,10 +398,10 @@ export default function BookDetailPage() {
                 {book.qiita_articles.length > displayedArticlesCount && (
                   <div className="mt-4 md:mt-6 flex gap-3 justify-center flex-wrap">
                     <button
-                      onClick={() => handleShowMore(SHOW_MORE_INCREMENT)}
+                      onClick={() => handleShowMore(BOOK_DETAIL.SHOW_MORE_INCREMENT)}
                       className="px-4 md:px-5 py-2.5 md:py-3 text-sm md:text-base bg-qiita-green dark:bg-dark-green text-white rounded-lg hover-opacity-90 font-semibold"
                     >
-                      もっと見る（+{SHOW_MORE_INCREMENT}件）
+                      もっと見る（+{BOOK_DETAIL.SHOW_MORE_INCREMENT}件）
                     </button>
                     <button
                       onClick={handleShowAll}
