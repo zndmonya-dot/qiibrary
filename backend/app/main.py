@@ -1,8 +1,10 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from .api import rankings, books, admin, data_update, daily_tweet, youtube
 from .scheduler import start_scheduler, stop_scheduler
 from .middleware.rate_limit import RateLimitMiddleware
+from .middleware.security import SecurityHeadersMiddleware
+from .middleware.admin_auth import verify_admin_access
 import os
 import logging
 
@@ -71,6 +73,18 @@ app.add_middleware(
 
 # レート制限ミドルウェア（ボット攻撃対策）
 app.add_middleware(RateLimitMiddleware)
+
+# セキュリティヘッダーミドルウェア
+app.add_middleware(SecurityHeadersMiddleware)
+
+# 管理者API認証ミドルウェア
+@app.middleware("http")
+async def admin_auth_middleware(request: Request, call_next):
+    """管理者APIへのアクセスを認証でチェック"""
+    if request.url.path.startswith("/api/admin"):
+        await verify_admin_access(request)
+    response = await call_next(request)
+    return response
 
 # ルーター登録
 app.include_router(rankings.router, prefix="/api/rankings", tags=["rankings"])
