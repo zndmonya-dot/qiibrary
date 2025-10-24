@@ -98,10 +98,10 @@ export default function Home() {
       setError(null);
       
       try {
-        // サーバーサイドページネーション用のオプション
+        // 真のサーバーサイドページネーション
         const options = {
-          limit: 100,  // 1回で100件取得（サーバー側でキャッシュ）
-          offset: 0,   // 常に最初から取得（クライアント側でページング）
+          limit: ITEMS_PER_PAGE,  // 1ページあたりの件数（25件）
+          offset: (currentPage - 1) * ITEMS_PER_PAGE,  // ページに応じたオフセット
           search: searchQuery || undefined,  // サーバーサイド検索
         };
         
@@ -127,7 +127,7 @@ export default function Home() {
     
     return () => clearTimeout(timeoutId);
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [period, selectedYear, searchQuery]);
+  }, [period, selectedYear, searchQuery, currentPage]);
 
   // スクロール位置の保存と復元（ちらつき防止版）
   useEffect(() => {
@@ -164,29 +164,24 @@ export default function Home() {
     }
   }, [period, selectedYear, rankings]);
 
-  // サーバーサイド検索なので、フィルタリング不要
-  const filteredRankings = useMemo(() => {
+  // サーバーサイドページネーションなので、取得したデータをそのまま表示
+  const paginatedRankings = useMemo(() => {
     if (!rankings) return [];
     return rankings.rankings;
   }, [rankings]);
 
-  const paginatedRankings = useMemo(() => {
-    return filteredRankings.slice(
-      (currentPage - 1) * ITEMS_PER_PAGE,
-      currentPage * ITEMS_PER_PAGE
-    );
-  }, [filteredRankings, currentPage]);
-
+  // 総ページ数をサーバーから取得した総件数で計算
   const totalPages = useMemo(() => {
-    return Math.ceil(filteredRankings.length / ITEMS_PER_PAGE);
-  }, [filteredRankings.length]);
+    if (!rankings || !rankings.total) return 0;
+    return Math.ceil(rankings.total / ITEMS_PER_PAGE);
+  }, [rankings]);
   
   const handleNextPage = useCallback(() => {
     if (currentPage < totalPages) {
       const newPage = currentPage + 1;
       setCurrentPage(newPage);
       updateURL({ page: newPage });
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      window.scrollTo({ top: 0, behavior: 'instant' }); // サーバーから取得するので即座にスクロール
     }
   }, [currentPage, totalPages, updateURL]);
 
@@ -195,7 +190,7 @@ export default function Home() {
       const newPage = currentPage - 1;
       setCurrentPage(newPage);
       updateURL({ page: newPage });
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      window.scrollTo({ top: 0, behavior: 'instant' }); // サーバーから取得するので即座にスクロール
     }
   }, [currentPage, updateURL]);
 
@@ -264,7 +259,7 @@ export default function Home() {
                 setCurrentPage(1);
                 updateURL({ search: query, page: 1 });
                 if (query) {
-                  analytics.search(query, filteredRankings.length);
+                  analytics.search(query, rankings?.total || 0);
                 }
               }}
               onKeyDown={(e) => {
@@ -331,6 +326,7 @@ export default function Home() {
               onClick={() => {
                 setPeriod('daily');
                 setSelectedYear(null);
+                setCurrentPage(1);
                 updateURL({ period: 'daily', year: null, page: 1 });
                 analytics.changeRankingPeriod('daily');
               }}
@@ -348,6 +344,7 @@ export default function Home() {
               onClick={() => {
                 setPeriod('monthly');
                 setSelectedYear(null);
+                setCurrentPage(1);
                 updateURL({ period: 'monthly', year: null, page: 1 });
                 analytics.changeRankingPeriod('monthly');
               }}
@@ -364,6 +361,7 @@ export default function Home() {
               onClick={() => {
                 setPeriod('yearly');
                 setSelectedYear(null);
+                setCurrentPage(1);
                 updateURL({ period: 'yearly', year: null, page: 1 });
                 analytics.changeRankingPeriod('yearly');
               }}
@@ -380,6 +378,7 @@ export default function Home() {
               onClick={() => {
                 setPeriod('all');
                 setSelectedYear(null);
+                setCurrentPage(1);
                 updateURL({ period: 'all', year: null, page: 1 });
                 analytics.changeRankingPeriod('all');
               }}
@@ -403,6 +402,7 @@ export default function Home() {
                 onClick={() => {
                   setSelectedYear(year);
                   setPeriod('year');
+                  setCurrentPage(1);
                   updateURL({ period: 'year', year: year, page: 1 });
                   analytics.changeRankingPeriod(`year-${year}`);
                 }}
@@ -446,6 +446,7 @@ export default function Home() {
                   onClick={() => {
                     setSelectedYear(year);
                     setPeriod('year');
+                    setCurrentPage(1);
                     updateURL({ period: 'year', year: year, page: 1 });
                     analytics.changeRankingPeriod(`year-${year}`);
                   }}
@@ -490,7 +491,7 @@ export default function Home() {
                 </h2>
               </div>
               <div className="text-[10px] md:text-sm text-qiita-text dark:text-dark-text">
-                {(currentPage - 1) * ITEMS_PER_PAGE + 1} - {Math.min(currentPage * ITEMS_PER_PAGE, filteredRankings.length)} / {rankings?.total || filteredRankings.length}件
+                {(currentPage - 1) * ITEMS_PER_PAGE + 1} - {Math.min(currentPage * ITEMS_PER_PAGE, rankings?.total || 0)} / {rankings?.total || 0}件
               </div>
             </div>
             
@@ -525,7 +526,8 @@ export default function Home() {
                     <button
                       onClick={() => {
                         setCurrentPage(1);
-                        window.scrollTo({ top: 0, behavior: 'smooth' });
+                        updateURL({ page: 1 });
+                        window.scrollTo({ top: 0, behavior: 'instant' });
                       }}
                       disabled={currentPage === 1}
                       className={`flex items-center justify-center w-10 h-10 md:w-11 md:h-11 rounded-lg font-medium transition-all duration-150 ${
@@ -595,7 +597,8 @@ export default function Home() {
                             key={index}
                             onClick={() => {
                               setCurrentPage(page);
-                              window.scrollTo({ top: 0, behavior: 'smooth' });
+                              updateURL({ page });
+                              window.scrollTo({ top: 0, behavior: 'instant' });
                             }}
                             className={`flex items-center justify-center w-10 h-10 md:w-11 md:h-11 rounded-lg font-semibold text-sm md:text-base transition-all duration-150 ${
                               currentPage === page
@@ -629,7 +632,8 @@ export default function Home() {
                     <button
                       onClick={() => {
                         setCurrentPage(totalPages);
-                        window.scrollTo({ top: 0, behavior: 'smooth' });
+                        updateURL({ page: totalPages });
+                        window.scrollTo({ top: 0, behavior: 'instant' });
                       }}
                       disabled={currentPage === totalPages}
                       className={`flex items-center justify-center w-10 h-10 md:w-11 md:h-11 rounded-lg font-medium transition-all duration-150 ${
@@ -654,7 +658,8 @@ export default function Home() {
                         const page = parseInt(e.target.value);
                         if (page >= 1 && page <= totalPages) {
                           setCurrentPage(page);
-                          window.scrollTo({ top: 0, behavior: 'smooth' });
+                          updateURL({ page });
+                          window.scrollTo({ top: 0, behavior: 'instant' });
                         }
                       }}
                       className="w-16 md:w-20 px-2 md:px-3 py-1.5 md:py-2 text-sm md:text-base bg-qiita-surface dark:bg-dark-surface-light border border-qiita-border dark:border-dark-border rounded-lg text-center text-qiita-text-dark dark:text-white font-medium focus:outline-none focus:ring-2 focus:ring-qiita-green dark:focus:ring-dark-green"
