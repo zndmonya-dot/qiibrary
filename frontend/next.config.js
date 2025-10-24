@@ -44,7 +44,7 @@ const nextConfig = {
   // 実験的な最適化機能
   experimental: {
     optimizePackageImports: ['remixicon'], // アイコンパッケージの最適化
-    optimizeCss: true, // CSS最適化を有効化
+    // optimizeCss: true, // Vercelでcritters依存の問題があるため無効化
   },
   // 圧縮設定
   compress: true,
