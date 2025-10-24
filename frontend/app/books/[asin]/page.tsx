@@ -256,22 +256,24 @@ export default function BookDetailPage() {
           
           <Header />
           
-          <main className="container mx-auto px-3 md:px-4 pt-6 pb-4 md:py-8">
+          <main className="container mx-auto px-3 md:px-4 pt-6 pb-4 md:py-8 animate-fade-in">
             {/* 戻るボタン */}
-            <a
-              href="/"
-              className="flex items-center gap-2 text-qiita-text dark:text-dark-text hover-text-green mb-4 md:mb-8 text-sm md:text-base font-medium py-2 px-3 md:px-0 md:py-0 cursor-pointer"
-              onClick={(e) => {
-                e.preventDefault();
-                window.history.back();
-              }}
-            >
-              <i className="ri-arrow-left-line text-base md:text-lg"></i>
-              <span>ランキングに戻る</span>
-            </a>
+            <div className="animate-slide-down" style={{ animationDelay: '0ms' }}>
+              <a
+                href="/"
+                className="inline-flex items-center gap-2 text-qiita-text dark:text-dark-text hover-text-green mb-4 md:mb-8 text-sm md:text-base font-medium py-2 px-3 rounded-lg transition-all duration-200 hover:bg-qiita-surface dark:hover:bg-dark-surface-light hover:pl-2 cursor-pointer"
+                onClick={(e) => {
+                  e.preventDefault();
+                  window.history.back();
+                }}
+              >
+                <i className="ri-arrow-left-line text-base md:text-lg transition-transform duration-200 group-hover:-translate-x-1"></i>
+                <span>ランキングに戻る</span>
+              </a>
+            </div>
             
             {/* タイトル */}
-            <div className="mb-4 md:mb-8">
+            <div className="mb-4 md:mb-8 animate-slide-up" style={{ animationDelay: '100ms' }}>
               <h1 className="text-xl md:text-3xl font-bold text-qiita-text-dark dark:text-white leading-tight">
                 {book.title}
               </h1>
@@ -279,7 +281,7 @@ export default function BookDetailPage() {
             
             {/* Qiita記事セクション */}
             {book.qiita_articles && book.qiita_articles.length > 0 && (
-              <div id="qiita-articles" className="mb-12 scroll-mt-24">
+              <div id="qiita-articles" className="mb-12 scroll-mt-24 animate-slide-up" style={{ animationDelay: '200ms' }}>
                 {/* セクションヘッダー */}
                 <div className="mb-4 md:mb-6">
                   <div className="flex items-center gap-2 md:gap-3 mb-1.5 md:mb-2">
@@ -416,7 +418,7 @@ export default function BookDetailPage() {
 
             {/* YouTube動画セクション */}
             {book.youtube_videos && book.youtube_videos.length > 0 && (
-              <div id="youtube-videos" className="mb-12 scroll-mt-24">
+              <div id="youtube-videos" className="mb-12 scroll-mt-24 animate-slide-up" style={{ animationDelay: '300ms' }}>
                 {/* セクションヘッダー */}
                 <div className="mb-4 md:mb-6">
                   <div className="flex items-center gap-2 md:gap-3 mb-1.5 md:mb-2">
