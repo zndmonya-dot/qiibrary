@@ -679,6 +679,7 @@ export default function Home() {
                         }
                       }}
                       className="w-16 md:w-20 px-2 md:px-3 py-1.5 md:py-2 text-sm md:text-base bg-qiita-surface dark:bg-dark-surface-light border border-qiita-border dark:border-dark-border rounded-lg text-center text-qiita-text-dark dark:text-white font-medium focus:outline-none focus:ring-2 focus:ring-qiita-green dark:focus:ring-dark-green"
+                      aria-label="ページ番号"
                     />
                     <span className="text-xs md:text-sm text-qiita-text dark:text-dark-text">/ {totalPages}</span>
                   </div>
