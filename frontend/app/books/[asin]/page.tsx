@@ -600,7 +600,7 @@ export default function BookDetailPage() {
               __html: JSON.stringify(
                 generateBreadcrumbStructuredData([
                   { name: 'ホーム', url: '/' },
-                  { name: book.book.title || '書籍詳細', url: `/books/${asin}` },
+                  { name: book.title || '書籍詳細', url: `/books/${asin}` },
                 ])
               ),
             }}

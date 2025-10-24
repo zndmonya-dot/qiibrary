@@ -10,46 +10,54 @@ import { Book, BookDetail } from './api';
  * https://schema.org/Book
  */
 export function generateBookStructuredData(bookDetail: BookDetail) {
-  const { book, stats, top_articles } = bookDetail;
+  // BookDetail型から統計情報を計算
+  const qiitaArticles = bookDetail.qiita_articles || [];
+  const totalLikes = qiitaArticles.reduce((sum: number, article: any) => sum + (article.likes_count || 0), 0);
+  const mentionCount = qiitaArticles.length;
   
   // 集約評価の計算（Qiita記事のいいね数とメンション数から）
-  const aggregateRating = stats.total_likes > 0 ? {
+  const aggregateRating = totalLikes > 0 ? {
     '@type': 'AggregateRating',
-    'ratingValue': Math.min(5, Math.max(1, Math.log10(stats.total_likes + 1) * 1.5 + 3)).toFixed(1),
-    'reviewCount': stats.mention_count,
+    'ratingValue': Math.min(5, Math.max(1, Math.log10(totalLikes + 1) * 1.5 + 3)).toFixed(1),
+    'reviewCount': mentionCount,
     'bestRating': '5',
     'worstRating': '1',
   } : undefined;
 
+  // トップ記事を取得（いいね数順、上位3件）
+  const topArticles = [...qiitaArticles]
+    .sort((a: any, b: any) => (b.likes_count || 0) - (a.likes_count || 0))
+    .slice(0, 3);
+
   const structuredData = {
     '@context': 'https://schema.org',
     '@type': 'Book',
-    'name': book.title,
-    'author': book.author ? {
+    'name': bookDetail.title,
+    'author': bookDetail.author ? {
       '@type': 'Person',
-      'name': book.author,
+      'name': bookDetail.author,
     } : undefined,
-    'publisher': book.publisher ? {
+    'publisher': bookDetail.publisher ? {
       '@type': 'Organization',
-      'name': book.publisher,
+      'name': bookDetail.publisher,
     } : undefined,
-    'isbn': book.isbn,
-    'image': book.thumbnail_url,
-    'url': `https://qiibrary.com/books/${book.isbn}`,
-    'description': book.description || `${book.title}についてQiitaで言及された技術書。${stats.mention_count}件の記事で紹介されています。`,
-    'datePublished': book.publication_date,
+    'isbn': bookDetail.isbn,
+    'image': bookDetail.thumbnail_url,
+    'url': `https://qiibrary.com/books/${bookDetail.isbn}`,
+    'description': bookDetail.description || `${bookDetail.title}についてQiitaで言及された技術書。${mentionCount}件の記事で紹介されています。`,
+    'datePublished': bookDetail.publication_date,
     'inLanguage': 'ja',
     'aggregateRating': aggregateRating,
-    'offers': book.amazon_affiliate_url ? {
+    'offers': bookDetail.amazon_affiliate_url ? {
       '@type': 'Offer',
-      'url': book.amazon_affiliate_url,
+      'url': bookDetail.amazon_affiliate_url,
       'availability': 'https://schema.org/InStock',
       'seller': {
         '@type': 'Organization',
         'name': 'Amazon.co.jp',
       },
     } : undefined,
-    'review': top_articles?.slice(0, 3).map(article => ({
+    'review': topArticles.map((article: any) => ({
       '@type': 'Review',
       'author': {
         '@type': 'Person',
