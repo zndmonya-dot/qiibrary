@@ -28,10 +28,14 @@ const getPeriodLabel = (period: PeriodType, selectedYear: number | null): string
   return '365日間';
 };
 
-const getAnimationStyle = (index: number): React.CSSProperties => ({
-  animation: `fadeInUp ${ANIMATION.DURATION}s ease-out ${ANIMATION.FADE_IN_DELAY + index * ANIMATION.FADE_IN_INCREMENT}s forwards`,
-  opacity: 0
-});
+const getAnimationStyle = (index: number): React.CSSProperties => {
+  // 最初の10件のみ順次アニメーション、以降は10件目と同じタイミング
+  const effectiveIndex = Math.min(index, 9);
+  return {
+    animation: `fadeInUp ${ANIMATION.DURATION}s ease-out ${ANIMATION.FADE_IN_DELAY + effectiveIndex * ANIMATION.FADE_IN_INCREMENT}s forwards`,
+    opacity: 0
+  };
+};
 
 
 export default function Home() {
@@ -528,7 +532,7 @@ export default function Home() {
                 paginatedRankings.map((item, index) => {
                   const style = getAnimationStyle(index);
                   return (
-                    <div key={item.book.id} style={style}>
+                    <div key={`${currentPage}-${item.book.id}`} style={style}>
                       <BookCard
                         rank={item.rank}
                         book={item.book}
