@@ -270,6 +270,7 @@ export default function Home() {
                 }
               }}
               className="w-full pl-3 md:pl-12 pr-12 md:pr-12 py-2.5 md:py-3 text-[16px] bg-qiita-surface dark:bg-[#494b4b] text-qiita-text-dark dark:text-white rounded-lg border border-qiita-border dark:border-dark-border focus:outline-none focus:ring-2 focus:ring-qiita-green/50 dark:focus:ring-dark-green/50 font-medium"
+              aria-label="書籍を検索"
             />
             
             {/* クリアボタン（検索文字がある時のみ） */}
