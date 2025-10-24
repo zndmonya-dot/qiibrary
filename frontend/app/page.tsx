@@ -13,9 +13,7 @@ import { ITEMS_PER_PAGE } from '@/lib/constants';
 
 type PeriodType = 'daily' | 'monthly' | 'yearly' | 'all' | 'year';
 
-// グローバルキャッシュ（コンポーネント外で管理）
-const rankingsCache = new Map<string, RankingResponse>();
-// スクロール位置キャッシュ
+// スクロール位置キャッシュ（これは残す）
 const scrollPositionCache = new Map<string, number>();
 // 利用可能な年のキャッシュ
 let availableYearsCache: number[] | null = null;
@@ -48,7 +46,6 @@ export default function Home() {
   const [rankings, setRankings] = useState<RankingResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [isFromCache, setIsFromCache] = useState(false);
   const [currentPage, setCurrentPage] = useState(
     searchParams.get('page') ? parseInt(searchParams.get('page')!) : 1
   );
@@ -97,33 +94,24 @@ export default function Home() {
 
   useEffect(() => {
     const fetchRankings = async () => {
-      // キャッシュキーを生成
-      const cacheKey = period === 'year' ? `${period}-${selectedYear}` : period;
-      
-      // キャッシュにデータがあればそれを使用
-      const cachedData = rankingsCache.get(cacheKey);
-      if (cachedData) {
-        setRankings(cachedData);
-        setLoading(false);
-        setIsFromCache(true);
-        return;
-      }
-      
       setLoading(true);
       setError(null);
-      setIsFromCache(false);
       
       try {
-        const data = period === 'daily' ? await getRankings.daily()
-          : period === 'monthly' ? await getRankings.monthly()
-          : period === 'yearly' ? await getRankings.yearly()
-          : period === 'year' && selectedYear ? await getRankings.byYear(selectedYear)
-          : await getRankings.all();
+        // サーバーサイドページネーション用のオプション
+        const options = {
+          limit: 100,  // 1回で100件取得（サーバー側でキャッシュ）
+          offset: 0,   // 常に最初から取得（クライアント側でページング）
+          search: searchQuery || undefined,  // サーバーサイド検索
+        };
+        
+        const data = period === 'daily' ? await getRankings.daily(options)
+          : period === 'monthly' ? await getRankings.monthly(options)
+          : period === 'yearly' ? await getRankings.yearly(options)
+          : period === 'year' && selectedYear ? await getRankings.byYear(selectedYear, options)
+          : await getRankings.all(options);
         
         setRankings(data);
-        
-        // データをグローバルキャッシュに保存
-        rankingsCache.set(cacheKey, data);
       } catch (err) {
         setError('ランキングの取得に失敗しました');
         console.error(err);
@@ -132,9 +120,14 @@ export default function Home() {
       }
     };
     
-    fetchRankings();
+    // デバウンス：検索時は0.5秒待つ
+    const timeoutId = setTimeout(() => {
+      fetchRankings();
+    }, searchQuery ? 500 : 0);
+    
+    return () => clearTimeout(timeoutId);
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [period, selectedYear]);
+  }, [period, selectedYear, searchQuery]);
 
   // スクロール位置の保存と復元（ちらつき防止版）
   useEffect(() => {
@@ -171,19 +164,11 @@ export default function Home() {
     }
   }, [period, selectedYear, rankings]);
 
+  // サーバーサイド検索なので、フィルタリング不要
   const filteredRankings = useMemo(() => {
     if (!rankings) return [];
-    return rankings.rankings.filter(item => {
-      if (!searchQuery) return true;
-      const query = searchQuery.toLowerCase();
-      return (
-        item.book.title?.toLowerCase().includes(query) ||
-        item.book.author?.toLowerCase().includes(query) ||
-        item.book.publisher?.toLowerCase().includes(query) ||
-        item.book.isbn?.toLowerCase().includes(query)
-      );
-    });
-  }, [rankings, searchQuery]);
+    return rankings.rankings;
+  }, [rankings]);
 
   const paginatedRankings = useMemo(() => {
     return filteredRankings.slice(
@@ -249,7 +234,7 @@ export default function Home() {
       
       <main className="container mx-auto px-3 md:px-4 py-3 md:py-8 min-h-[calc(100vh-120px)]">
         {/* ヘッダー */}
-        <div className={`mb-3 md:mb-8 bg-qiita-card dark:bg-dark-surface rounded-xl p-3 md:p-8 border-l-4 border-qiita-green dark:border-dark-green shadow-sm ${!isFromCache ? 'animate-fade-in-up' : ''}`}>
+        <div className="mb-3 md:mb-8 bg-qiita-card dark:bg-dark-surface rounded-xl p-3 md:p-8 border-l-4 border-qiita-green dark:border-dark-green shadow-sm animate-fade-in-up">
           <div className="flex items-start justify-between">
             <div className="w-full text-left">
               <h2 className="text-lg md:text-3xl font-bold mb-1.5 md:mb-3 flex items-center justify-start gap-2 md:gap-3 text-qiita-text-dark dark:text-white">
@@ -264,7 +249,7 @@ export default function Home() {
         </div>
         
         {/* 検索バー */}
-        <div className={`mb-4 md:mb-6 bg-qiita-card dark:bg-dark-surface rounded-lg border border-qiita-border dark:border-dark-border p-3 md:p-4 ${!isFromCache ? 'animate-fade-in-up' : ''}`}>
+        <div className="mb-4 md:mb-6 bg-qiita-card dark:bg-dark-surface rounded-lg border border-qiita-border dark:border-dark-border p-3 md:p-4 animate-fade-in-up">
           <div className="relative">
             {/* デスクトップ: 左側の虫眼鏡アイコン */}
             <i className="ri-search-line absolute left-3 md:left-4 top-1/2 -translate-y-1/2 text-qiita-text dark:text-dark-text text-lg md:text-xl hidden md:block"></i>
@@ -319,22 +304,28 @@ export default function Home() {
               <i className="ri-search-line text-2xl"></i>
             </button>
           </div>
-          {searchQuery && filteredRankings.length > 0 && (
+          {searchQuery && rankings && rankings.total > 0 && !loading && (
             <div className="mt-3 text-sm md:text-base text-qiita-text dark:text-dark-text font-medium">
               <i className="ri-information-line text-qiita-green dark:text-dark-green mr-1"></i>
-              {filteredRankings.length}件の書籍が見つかりました
+              {rankings.total}件の書籍が見つかりました
             </div>
           )}
-          {searchQuery && filteredRankings.length === 0 && !loading && (
+          {searchQuery && rankings && rankings.total === 0 && !loading && (
             <div className="mt-3 text-sm md:text-base text-red-600 dark:text-red-400 font-medium animate-fade-in-up">
               <i className="ri-error-warning-line mr-1"></i>
               該当する書籍が見つかりませんでした
             </div>
           )}
+          {loading && searchQuery && (
+            <div className="mt-3 text-sm md:text-base text-qiita-text dark:text-dark-text font-medium">
+              <i className="ri-loader-4-line animate-spin mr-1"></i>
+              検索中...
+            </div>
+          )}
         </div>
         
         {/* タブ */}
-        <div className={`relative mb-3 md:mb-6 bg-qiita-card dark:bg-dark-surface rounded-lg border border-qiita-border dark:border-dark-border p-2 md:p-4 overflow-x-auto ${!isFromCache ? 'animate-fade-in-up animate-delay-50' : ''}`}>
+        <div className="relative mb-3 md:mb-6 bg-qiita-card dark:bg-dark-surface rounded-lg border border-qiita-border dark:border-dark-border p-2 md:p-4 overflow-x-auto animate-fade-in-up animate-delay-50">
           <div className="flex flex-nowrap md:flex-wrap gap-1.5 md:gap-2 min-w-max md:min-w-0">
             <button
               onClick={() => {
@@ -491,7 +482,7 @@ export default function Home() {
 
         {!error && rankings && !loading && (
           <div>
-            <div className={`mb-3 md:mb-6 flex items-center justify-between bg-qiita-card dark:bg-dark-surface p-2.5 md:p-4 rounded-lg shadow-sm border border-qiita-border dark:border-dark-border ${!isFromCache ? 'animate-fade-in-up animate-delay-100' : ''}`}>
+            <div className="mb-3 md:mb-6 flex items-center justify-between bg-qiita-card dark:bg-dark-surface p-2.5 md:p-4 rounded-lg shadow-sm border border-qiita-border dark:border-dark-border animate-fade-in-up animate-delay-100">
               <div className="flex items-center gap-1.5 md:gap-2">
                 <i className="ri-trophy-line text-qiita-green dark:text-dark-green text-lg md:text-2xl"></i>
                 <h2 className="text-sm md:text-lg font-semibold text-qiita-text-dark dark:text-white">
@@ -499,14 +490,14 @@ export default function Home() {
                 </h2>
               </div>
               <div className="text-[10px] md:text-sm text-qiita-text dark:text-dark-text">
-                {(currentPage - 1) * ITEMS_PER_PAGE + 1} - {Math.min(currentPage * ITEMS_PER_PAGE, filteredRankings.length)} / {filteredRankings.length}件
+                {(currentPage - 1) * ITEMS_PER_PAGE + 1} - {Math.min(currentPage * ITEMS_PER_PAGE, filteredRankings.length)} / {rankings?.total || filteredRankings.length}件
               </div>
             </div>
             
             <div className="space-y-2 md:space-y-4 mb-4 md:mb-8">
               {paginatedRankings.length > 0 ? (
                 paginatedRankings.map((item, index) => {
-                  const style = isFromCache ? {} : getAnimationStyle(index);
+                  const style = getAnimationStyle(index);
                   return (
                     <div key={item.book.id} style={style}>
                       <BookCard
