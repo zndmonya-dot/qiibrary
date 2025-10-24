@@ -57,29 +57,28 @@ class RankingService:
         - 検索あり: キャッシュしない（リアルタイム検索）
         - ページネーションあり: 5分間キャッシュ
         """
-        # 検索時はキャッシュをスキップ（リアルタイム性重視）
-        use_cache = not search
+        # 検索結果も短時間キャッシュ（同じ検索の重複を防ぐ）
+        use_cache = True  # 常にキャッシュを使用
         
-        cache_key = ""
-        if use_cache:
-            # キャッシュキーを生成
-            cache_key_params = {
-                "tags": tuple(sorted(tags)) if tags else None,
-                "days": days,
-                "year": year,
-                "month": month,
-                "limit": limit,
-                "offset": offset,
-            }
-            cache_key = self.cache._generate_key("ranking_fast", **cache_key_params)
+        # キャッシュキーを生成（検索キーワードも含める）
+        cache_key_params = {
+            "tags": tuple(sorted(tags)) if tags else None,
+            "days": days,
+            "year": year,
+            "month": month,
+            "limit": limit,
+            "offset": offset,
+            "search": search,  # 検索キーワードもキャッシュキーに含める
+        }
+        cache_key = self.cache._generate_key("ranking_fast", **cache_key_params)
             
-            # キャッシュから取得を試みる
-            cached_result = self.cache.get(cache_key)
-            if cached_result is not None:
-                logger.info(f"✅ ランキングキャッシュヒット: {cache_key}")
-                return cached_result
-            
-            logger.info(f"🔍 ランキングキャッシュミス、DBクエリ実行: {cache_key}")
+        # キャッシュから取得を試みる
+        cached_result = self.cache.get(cache_key)
+        if cached_result is not None:
+            logger.info(f"✅ ランキングキャッシュヒット: {cache_key[:50]}...")
+            return cached_result
+        
+        logger.info(f"🔍 ランキングキャッシュミス、DBクエリ実行: {cache_key[:50]}...")
         # 期間条件を構築
         date_condition = ""
         if days is not None:
@@ -98,16 +97,22 @@ class RankingService:
             tag_checks = " OR ".join([f"qa.tags ? '{tag}'" for tag in tags])
             tag_condition = f"AND ({tag_checks})"
         
-        # 検索条件を構築
+        # 検索条件を構築（SQLインジェクション対策強化）
         search_condition = ""
+        search_params = {}
         if search:
-            search_term = search.replace("'", "''")  # SQLインジェクション対策
-            search_condition = f"""AND (
-                LOWER(b.title) LIKE LOWER('%{search_term}%') OR
-                LOWER(b.author) LIKE LOWER('%{search_term}%') OR
-                LOWER(b.publisher) LIKE LOWER('%{search_term}%') OR
-                LOWER(b.isbn) LIKE LOWER('%{search_term}%')
-            )"""
+            # 危険な文字を除去
+            search_term = search.replace("'", "").replace(";", "").replace("--", "").replace("/*", "").replace("*/", "")
+            # 長さ制限（100文字まで）
+            search_term = search_term[:100] if len(search_term) > 100 else search_term
+            
+            if search_term:  # 空文字列でない場合のみ
+                search_condition = f"""AND (
+                    LOWER(b.title) LIKE LOWER('%{search_term}%') OR
+                    LOWER(b.author) LIKE LOWER('%{search_term}%') OR
+                    LOWER(b.publisher) LIKE LOWER('%{search_term}%') OR
+                    LOWER(b.isbn) LIKE LOWER('%{search_term}%')
+                )"""
         
         # ページネーション句
         pagination_clause = ""
@@ -277,29 +282,29 @@ class RankingService:
             "offset": offset or 0,
         }
         
-        # キャッシュに保存（検索時以外）
-        if use_cache:
-            # TTL決定
-            if days is None and year is None:
-                # 全期間ランキング: 10分間キャッシュ
-                ttl = 600
-            elif days and days >= 30:
-                # 30日以上: 5分間キャッシュ
-                ttl = 300
-            elif days and days <= 7:
-                # 7日以内: 2分間キャッシュ
-                ttl = 120
-            elif tags:
-                # タグフィルタあり: 5分間キャッシュ
-                ttl = 300
-            else:
-                # その他: 3分間キャッシュ
-                ttl = 180
-            
-            self.cache.set(cache_key, result, ttl_seconds=ttl)
-            logger.info(f"高速ランキング取得完了: {len(rankings)}/{total_count}件、キャッシュ保存 (TTL: {ttl}s)")
+        # TTL決定（全て2-3倍に延長）
+        if search:
+            # 検索: 1分間キャッシュ（同じ検索の重複を防ぐ）
+            ttl = 60
+        elif days is None and year is None:
+            # 全期間ランキング: 30分間キャッシュ（10分→30分）
+            ttl = 1800
+        elif days and days >= 30:
+            # 30日以上: 15分間キャッシュ（5分→15分）
+            ttl = 900
+        elif days and days <= 7:
+            # 7日以内: 5分間キャッシュ（2分→5分）
+            ttl = 300
+        elif tags:
+            # タグフィルタあり: 15分間キャッシュ（5分→15分）
+            ttl = 900
         else:
-            logger.info(f"高速ランキング取得完了（検索）: {len(rankings)}/{total_count}件")
+            # その他: 10分間キャッシュ（3分→10分）
+            ttl = 600
+        
+        self.cache.set(cache_key, result, ttl_seconds=ttl)
+        cache_type = "検索" if search else "通常"
+        logger.info(f"ランキング取得完了（{cache_type}）: {len(rankings)}/{total_count}件、キャッシュ保存 (TTL: {ttl}s)")
         
         return result
     

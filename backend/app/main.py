@@ -2,6 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from .api import rankings, books, admin, data_update, daily_tweet, youtube
 from .scheduler import start_scheduler, stop_scheduler
+from .middleware.rate_limit import RateLimitMiddleware
 import os
 import logging
 
@@ -67,6 +68,9 @@ app.add_middleware(
     expose_headers=["*"],
     max_age=3600,
 )
+
+# レート制限ミドルウェア（ボット攻撃対策）
+app.add_middleware(RateLimitMiddleware)
 
 # ルーター登録
 app.include_router(rankings.router, prefix="/api/rankings", tags=["rankings"])

@@ -112,9 +112,22 @@ export default function Home() {
           : await getRankings.all(options);
         
         setRankings(data);
-      } catch (err) {
-        setError('ランキングの取得に失敗しました');
-        console.error(err);
+        setError(null);  // エラーをクリア
+      } catch (err: any) {
+        console.error('ランキング取得エラー:', err);
+        
+        // エラーメッセージを詳細化
+        if (err.response?.status === 429) {
+          setError('アクセスが集中しています。しばらく待ってから再試行してください。');
+        } else if (err.response?.status === 500) {
+          setError('サーバーエラーが発生しました。しばらく待ってから再試行してください。');
+        } else if (err.code === 'ECONNABORTED' || err.message?.includes('timeout')) {
+          setError('接続がタイムアウトしました。ネットワーク接続を確認してください。');
+        } else if (!navigator.onLine) {
+          setError('インターネット接続がありません。接続を確認してください。');
+        } else {
+          setError('ランキングの取得に失敗しました。ページを再読み込みしてください。');
+        }
       } finally {
         setLoading(false);
       }
@@ -470,9 +483,22 @@ export default function Home() {
         
         {error && (
           <div className="bg-red-50 dark:bg-red-900/20 border border-red-300 dark:border-red-800 text-red-700 dark:text-red-300 px-4 py-3 rounded animate-slide-down">
-            <div className="flex items-center gap-2">
-              <i className="ri-error-warning-line text-xl"></i>
-              <span>{error}</span>
+            <div className="flex items-center justify-between gap-2">
+              <div className="flex items-center gap-2">
+                <i className="ri-error-warning-line text-xl"></i>
+                <span>{error}</span>
+              </div>
+              <button
+                onClick={() => {
+                  setError(null);
+                  // リトライ
+                  window.location.reload();
+                }}
+                className="px-3 py-1 bg-red-600 hover:bg-red-700 text-white rounded text-sm font-medium transition-colors"
+              >
+                <i className="ri-refresh-line mr-1"></i>
+                再試行
+              </button>
             </div>
           </div>
         )}
