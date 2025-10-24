@@ -44,9 +44,16 @@ const nextConfig = {
   // 実験的な最適化機能
   experimental: {
     optimizePackageImports: ['remixicon'], // アイコンパッケージの最適化
+    optimizeCss: true, // CSS最適化を有効化
   },
   // 圧縮設定
   compress: true,
+  // CSS最適化
+  productionBrowserSourceMaps: false, // ソースマップを無効化してサイズ削減
+  // モダンブラウザターゲット
+  typescript: {
+    ignoreBuildErrors: false,
+  },
 }
 
 module.exports = nextConfig
