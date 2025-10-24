@@ -14,6 +14,7 @@ from ..database import SessionLocal
 from ..models.book import Book, BookYouTubeLink
 from ..config.settings import settings
 from ..services.youtube_service import get_video_details
+from ..services.cache_service import get_cache_service
 
 router = APIRouter()
 logger = logging.getLogger(__name__)
@@ -329,5 +330,68 @@ async def add_youtube_links_batch(
         "failed": len(failed_urls),
         "added_links": added_links,
         "failed_urls": failed_urls,
+    }
+
+
+# ============================================================
+# キャッシュ管理エンドポイント
+# ============================================================
+
+@router.get("/cache/stats")
+async def get_cache_stats(
+    _: bool = Depends(verify_admin_token)
+):
+    """
+    キャッシュの統計情報を取得
+    
+    Returns:
+        キャッシュヒット率などの統計情報
+    """
+    cache = get_cache_service()
+    stats = cache.get_stats()
+    
+    return {
+        "status": "success",
+        "stats": stats,
+    }
+
+
+@router.post("/cache/clear")
+async def clear_cache(
+    _: bool = Depends(verify_admin_token)
+):
+    """
+    すべてのキャッシュをクリア
+    
+    Note:
+        次回アクセス時に自動的にDBから再取得されます
+    """
+    cache = get_cache_service()
+    cache.clear()
+    logger.info("管理者がキャッシュをクリアしました")
+    
+    return {
+        "status": "success",
+        "message": "All cache cleared successfully",
+    }
+
+
+@router.post("/cache/cleanup")
+async def cleanup_expired_cache(
+    _: bool = Depends(verify_admin_token)
+):
+    """
+    期限切れのキャッシュをクリーンアップ
+    
+    Note:
+        通常は自動的に期限切れになるため、手動実行は不要です
+    """
+    cache = get_cache_service()
+    cache.cleanup_expired()
+    logger.info("管理者が期限切れキャッシュをクリーンアップしました")
+    
+    return {
+        "status": "success",
+        "message": "Expired cache cleaned up successfully",
     }
 

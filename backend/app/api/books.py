@@ -10,6 +10,7 @@ from ..database import SessionLocal
 from ..models.book import Book, BookQiitaMention, BookYouTubeLink
 from ..models.qiita_article import QiitaArticle
 from ..services.openbd_service import get_openbd_service
+from ..services.cache_service import get_cache_service
 
 router = APIRouter()
 
@@ -29,7 +30,7 @@ async def get_book_detail(
     db: Session = Depends(get_db)
 ):
     """
-    書籍詳細情報取得
+    書籍詳細情報取得（キャッシュ5分）
     
     Args:
         isbn: ISBN-10 or ISBN-13
@@ -38,6 +39,13 @@ async def get_book_detail(
         書籍詳細（Qiita記事・YouTube動画リスト含む）
     """
     try:
+        # キャッシュから取得を試みる
+        cache = get_cache_service()
+        cache_key = cache._generate_key("book_detail", isbn=isbn)
+        cached_result = cache.get(cache_key)
+        if cached_result is not None:
+            return cached_result
+        
         # 書籍情報を取得
         book = db.query(Book).filter(Book.isbn == isbn).first()
         
@@ -75,7 +83,7 @@ async def get_book_detail(
         book_dict = book.to_dict()
         book_dict["amazon_affiliate_url"] = amazon_affiliate_url  # アフィリエイトURLを上書き
         
-        return {
+        result = {
             "book": book_dict,
             "qiita_articles": [article.to_dict() for article in qiita_articles],
             "youtube_links": [
@@ -95,6 +103,11 @@ async def get_book_detail(
                 for link in youtube_links
             ]
         }
+        
+        # キャッシュに保存（5分間）
+        cache.set(cache_key, result, ttl_seconds=300)
+        
+        return result
     
     except HTTPException:
         raise

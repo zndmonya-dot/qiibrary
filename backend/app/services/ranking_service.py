@@ -12,6 +12,7 @@ from sqlalchemy import func, text
 from ..models.book import Book, BookQiitaMention
 from ..models.qiita_article import QiitaArticle
 from ..services.openbd_service import get_openbd_service
+from ..services.cache_service import get_cache_service
 
 logger = logging.getLogger(__name__)
 
@@ -22,6 +23,7 @@ class RankingService:
     def __init__(self, db: Session):
         self.db = db
         self.openbd_service = get_openbd_service()
+        self.cache = get_cache_service()
     
     def get_ranking_fast(
         self,
@@ -35,7 +37,30 @@ class RankingService:
         高速ランキング取得（直接SQL使用、top_articlesも2クエリで効率取得）
         
         NEONなどネットワークレイテンシーが高い環境でも高速動作
+        
+        キャッシング戦略:
+        - 全期間ランキング: 10分間キャッシュ（更新頻度低い）
+        - 過去30日以上: 5分間キャッシュ
+        - 過去7日以内: 2分間キャッシュ（リアルタイム性重視）
+        - タグフィルタあり: 5分間キャッシュ
         """
+        # キャッシュキーを生成
+        cache_key_params = {
+            "tags": tuple(sorted(tags)) if tags else None,
+            "days": days,
+            "year": year,
+            "month": month,
+            "limit": limit,
+        }
+        cache_key = self.cache._generate_key("ranking_fast", **cache_key_params)
+        
+        # キャッシュから取得を試みる
+        cached_result = self.cache.get(cache_key)
+        if cached_result is not None:
+            logger.info(f"✅ ランキングキャッシュヒット: {cache_key}")
+            return cached_result
+        
+        logger.info(f"🔍 ランキングキャッシュミス、DBクエリ実行: {cache_key}")
         # 期間条件を構築
         date_condition = ""
         if days is not None:
@@ -95,7 +120,7 @@ class RankingService:
         book_ids = [row.id for row in results]
         
         # トップ記事を一括取得（2回目のクエリ）
-        top_articles_map = {}
+        top_articles_map: dict[int, list[dict]] = {}
         if book_ids:
             # WINDOW関数でトップ3記事を一括取得
             articles_sql = text(f"""
@@ -192,7 +217,26 @@ class RankingService:
                 "top_articles": top_articles,
             })
         
-        logger.info(f"高速ランキング取得完了: {len(rankings)}件、トップ記事も取得")
+        # キャッシュに保存（TTL決定）
+        if days is None and year is None:
+            # 全期間ランキング: 10分間キャッシュ
+            ttl = 600
+        elif days and days >= 30:
+            # 30日以上: 5分間キャッシュ
+            ttl = 300
+        elif days and days <= 7:
+            # 7日以内: 2分間キャッシュ
+            ttl = 120
+        elif tags:
+            # タグフィルタあり: 5分間キャッシュ
+            ttl = 300
+        else:
+            # その他: 3分間キャッシュ
+            ttl = 180
+        
+        self.cache.set(cache_key, rankings, ttl_seconds=ttl)
+        logger.info(f"高速ランキング取得完了: {len(rankings)}件、キャッシュ保存 (TTL: {ttl}s)")
+        
         return rankings
     
     def get_ranking(
@@ -404,11 +448,20 @@ class RankingService:
     
     def get_all_tags(self) -> List[Dict]:
         """
-        すべてのタグとその書籍数を取得
+        すべてのタグとその書籍数を取得（キャッシュ15分）
         
         Returns:
             タグのリスト（書籍数でソート）
         """
+        # キャッシュから取得
+        cache_key = "all_tags"
+        cached_result = self.cache.get(cache_key)
+        if cached_result is not None:
+            logger.info("✅ タグリストキャッシュヒット")
+            return cached_result
+        
+        logger.info("🔍 タグリストキャッシュミス、DBクエリ実行")
+        
         # すべての記事からタグを抽出
         articles = self.db.query(QiitaArticle.tags).all()
         
@@ -426,6 +479,10 @@ class RankingService:
             key=lambda x: x["book_count"],
             reverse=True
         )
+        
+        # 15分間キャッシュ（更新頻度低い）
+        self.cache.set(cache_key, sorted_tags, ttl_seconds=900)
+        logger.info(f"タグリスト取得完了: {len(sorted_tags)}件、キャッシュ保存 (TTL: 900s)")
         
         return sorted_tags
     
@@ -514,11 +571,20 @@ class RankingService:
     
     def get_available_years(self) -> List[int]:
         """
-        データが存在する年のリストを取得（高速版：直接SQL使用）
+        データが存在する年のリストを取得（高速版：直接SQL使用、キャッシュ15分）
         
         Returns:
             年のリスト（降順）
         """
+        # キャッシュから取得
+        cache_key = "available_years"
+        cached_result = self.cache.get(cache_key)
+        if cached_result is not None:
+            logger.info("✅ 年リストキャッシュヒット")
+            return cached_result
+        
+        logger.info("🔍 年リストキャッシュミス、DBクエリ実行")
+        
         # 直接SQLで高速化
         sql = text("""
             SELECT DISTINCT EXTRACT(YEAR FROM published_at)::int as year
@@ -528,7 +594,13 @@ class RankingService:
         """)
         
         results = self.db.execute(sql).fetchall()
-        return [int(row.year) for row in results if row.year]
+        years = [int(row.year) for row in results if row.year]
+        
+        # 15分間キャッシュ（更新頻度低い）
+        self.cache.set(cache_key, years, ttl_seconds=900)
+        logger.info(f"年リスト取得完了: {len(years)}件、キャッシュ保存 (TTL: 900s)")
+        
+        return years
 
 
 # ヘルパー関数
