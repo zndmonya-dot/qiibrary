@@ -31,36 +31,55 @@ class RankingService:
         days: Optional[int] = None,
         year: Optional[int] = None,
         month: Optional[int] = None,
-        limit: Optional[int] = 100
-    ) -> List[Dict]:
+        limit: Optional[int] = 100,
+        offset: Optional[int] = None,
+        search: Optional[str] = None
+    ) -> Dict:
         """
         高速ランキング取得（直接SQL使用、top_articlesも2クエリで効率取得）
         
         NEONなどネットワークレイテンシーが高い環境でも高速動作
         
+        Args:
+            tags: タグフィルタ
+            days: 過去N日間
+            year: 年フィルタ
+            month: 月フィルタ
+            limit: 取得件数（ページネーション用）
+            offset: オフセット（ページネーション用）
+            search: 検索キーワード（書籍名、著者、出版社）
+        
+        Returns:
+            ランキングデータと総件数
+        
         キャッシング戦略:
-        - 全期間ランキング: 10分間キャッシュ（更新頻度低い）
-        - 過去30日以上: 5分間キャッシュ
-        - 過去7日以内: 2分間キャッシュ（リアルタイム性重視）
-        - タグフィルタあり: 5分間キャッシュ
+        - 検索なし・全件: 10分間キャッシュ
+        - 検索あり: キャッシュしない（リアルタイム検索）
+        - ページネーションあり: 5分間キャッシュ
         """
-        # キャッシュキーを生成
-        cache_key_params = {
-            "tags": tuple(sorted(tags)) if tags else None,
-            "days": days,
-            "year": year,
-            "month": month,
-            "limit": limit,
-        }
-        cache_key = self.cache._generate_key("ranking_fast", **cache_key_params)
+        # 検索時はキャッシュをスキップ（リアルタイム性重視）
+        use_cache = not search
         
-        # キャッシュから取得を試みる
-        cached_result = self.cache.get(cache_key)
-        if cached_result is not None:
-            logger.info(f"✅ ランキングキャッシュヒット: {cache_key}")
-            return cached_result
-        
-        logger.info(f"🔍 ランキングキャッシュミス、DBクエリ実行: {cache_key}")
+        cache_key = ""
+        if use_cache:
+            # キャッシュキーを生成
+            cache_key_params = {
+                "tags": tuple(sorted(tags)) if tags else None,
+                "days": days,
+                "year": year,
+                "month": month,
+                "limit": limit,
+                "offset": offset,
+            }
+            cache_key = self.cache._generate_key("ranking_fast", **cache_key_params)
+            
+            # キャッシュから取得を試みる
+            cached_result = self.cache.get(cache_key)
+            if cached_result is not None:
+                logger.info(f"✅ ランキングキャッシュヒット: {cache_key}")
+                return cached_result
+            
+            logger.info(f"🔍 ランキングキャッシュミス、DBクエリ実行: {cache_key}")
         # 期間条件を構築
         date_condition = ""
         if days is not None:
@@ -79,8 +98,38 @@ class RankingService:
             tag_checks = " OR ".join([f"qa.tags ? '{tag}'" for tag in tags])
             tag_condition = f"AND ({tag_checks})"
         
-        # limit句
-        limit_clause = f"LIMIT {limit}" if limit else ""
+        # 検索条件を構築
+        search_condition = ""
+        if search:
+            search_term = search.replace("'", "''")  # SQLインジェクション対策
+            search_condition = f"""AND (
+                LOWER(b.title) LIKE LOWER('%{search_term}%') OR
+                LOWER(b.author) LIKE LOWER('%{search_term}%') OR
+                LOWER(b.publisher) LIKE LOWER('%{search_term}%') OR
+                LOWER(b.isbn) LIKE LOWER('%{search_term}%')
+            )"""
+        
+        # ページネーション句
+        pagination_clause = ""
+        if limit is not None:
+            pagination_clause = f"LIMIT {limit}"
+            if offset is not None:
+                pagination_clause += f" OFFSET {offset}"
+        
+        # 総件数取得用SQL（検索条件とフィルタを適用）
+        count_sql = text(f"""
+            SELECT COUNT(DISTINCT b.id) as total
+            FROM books b
+            JOIN book_qiita_mentions bqm ON b.id = bqm.book_id
+            JOIN qiita_articles qa ON bqm.article_id = qa.id
+            WHERE b.total_mentions > 0
+            {date_condition}
+            {tag_condition}
+            {search_condition}
+        """)
+        
+        count_result = self.db.execute(count_sql).fetchone()
+        total_count = int(count_result.total) if count_result else 0
         
         # 直接SQL（1回のクエリでランキングデータ取得）
         # スコアを計算してソート（元のget_ranking()と同じロジック）
@@ -101,6 +150,7 @@ class RankingService:
                 WHERE b.total_mentions > 0
                 {date_condition}
                 {tag_condition}
+                {search_condition}
                 GROUP BY b.id, b.isbn, b.title, b.author, b.publisher, b.publication_date,
                          b.description, b.thumbnail_url, b.amazon_url, b.amazon_affiliate_url,
                          b.total_mentions, b.first_mentioned_at
@@ -111,7 +161,7 @@ class RankingService:
                 unique_user_count * (1 + LN(CASE WHEN article_count > 0 THEN (total_likes::float / article_count) + 1 ELSE 1 END)) as calculated_score
             FROM book_stats
             ORDER BY calculated_score DESC
-            {limit_clause}
+            {pagination_clause}
         """)
         
         results = self.db.execute(sql).fetchall()
@@ -189,8 +239,11 @@ class RankingService:
             # トップ記事を取得
             top_articles = top_articles_map.get(row.id, [])
             
+            # offsetを考慮したランク計算
+            actual_rank = rank if offset is None else (offset + rank)
+            
             rankings.append({
-                "rank": rank,
+                "rank": actual_rank,
                 "book": {
                     "id": row.id,
                     "isbn": row.isbn,
@@ -217,27 +270,38 @@ class RankingService:
                 "top_articles": top_articles,
             })
         
-        # キャッシュに保存（TTL決定）
-        if days is None and year is None:
-            # 全期間ランキング: 10分間キャッシュ
-            ttl = 600
-        elif days and days >= 30:
-            # 30日以上: 5分間キャッシュ
-            ttl = 300
-        elif days and days <= 7:
-            # 7日以内: 2分間キャッシュ
-            ttl = 120
-        elif tags:
-            # タグフィルタあり: 5分間キャッシュ
-            ttl = 300
+        result = {
+            "rankings": rankings,
+            "total": total_count,
+            "limit": limit,
+            "offset": offset or 0,
+        }
+        
+        # キャッシュに保存（検索時以外）
+        if use_cache:
+            # TTL決定
+            if days is None and year is None:
+                # 全期間ランキング: 10分間キャッシュ
+                ttl = 600
+            elif days and days >= 30:
+                # 30日以上: 5分間キャッシュ
+                ttl = 300
+            elif days and days <= 7:
+                # 7日以内: 2分間キャッシュ
+                ttl = 120
+            elif tags:
+                # タグフィルタあり: 5分間キャッシュ
+                ttl = 300
+            else:
+                # その他: 3分間キャッシュ
+                ttl = 180
+            
+            self.cache.set(cache_key, result, ttl_seconds=ttl)
+            logger.info(f"高速ランキング取得完了: {len(rankings)}/{total_count}件、キャッシュ保存 (TTL: {ttl}s)")
         else:
-            # その他: 3分間キャッシュ
-            ttl = 180
+            logger.info(f"高速ランキング取得完了（検索）: {len(rankings)}/{total_count}件")
         
-        self.cache.set(cache_key, rankings, ttl_seconds=ttl)
-        logger.info(f"高速ランキング取得完了: {len(rankings)}件、キャッシュ保存 (TTL: {ttl}s)")
-        
-        return rankings
+        return result
     
     def get_ranking(
         self,
