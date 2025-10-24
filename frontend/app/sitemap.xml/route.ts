@@ -18,7 +18,7 @@ export async function GET() {
   let bookPages: any[] = []
   
   try {
-    const response = await fetch(`${API_URL}/api/rankings/?limit=1000&offset=0`, {
+    const response = await fetch(`${API_URL}/api/rankings/?limit=20000&offset=0`, {
       next: { revalidate: 3600 } // 1時間キャッシュ
     })
     
@@ -34,9 +34,10 @@ export async function GET() {
           const asin = book.isbn.replace(/-/g, '')
           
           // ランキング上位ほど優先度を高く設定
-          let priority = 0.7
-          if (index < 10) priority = 0.9      // トップ10
-          else if (index < 50) priority = 0.8  // トップ50
+          let priority = 0.6  // デフォルト
+          if (index < 10) priority = 0.9       // トップ10
+          else if (index < 50) priority = 0.8   // トップ50
+          else if (index < 100) priority = 0.7  // トップ100
           
           return {
             url: `${SITE_URL}/books/${asin}`,
