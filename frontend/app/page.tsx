@@ -178,23 +178,35 @@ export default function Home() {
     return Math.ceil(rankings.total / ITEMS_PER_PAGE);
   }, [rankings]);
   
+  // ページ遷移時のスムーズなスクロール
+  const scrollToResults = useCallback(() => {
+    // 検索バー・フィルターエリアの高さを考慮してスクロール（約400px）
+    const headerHeight = 80; // ヘッダーの高さ
+    const filterHeight = 300; // フィルターエリアの概算
+    const scrollTarget = headerHeight + filterHeight;
+    window.scrollTo({ 
+      top: scrollTarget, 
+      behavior: 'smooth' 
+    });
+  }, []);
+
   const handleNextPage = useCallback(() => {
     if (currentPage < totalPages) {
       const newPage = currentPage + 1;
       setCurrentPage(newPage);
       updateURL({ page: newPage });
-      window.scrollTo({ top: 0, behavior: 'instant' }); // サーバーから取得するので即座にスクロール
+      scrollToResults(); // 結果エリアにスムーズにスクロール
     }
-  }, [currentPage, totalPages, updateURL]);
+  }, [currentPage, totalPages, updateURL, scrollToResults]);
 
   const handlePrevPage = useCallback(() => {
     if (currentPage > 1) {
       const newPage = currentPage - 1;
       setCurrentPage(newPage);
       updateURL({ page: newPage });
-      window.scrollTo({ top: 0, behavior: 'instant' }); // サーバーから取得するので即座にスクロール
+      scrollToResults(); // 結果エリアにスムーズにスクロール
     }
-  }, [currentPage, updateURL]);
+  }, [currentPage, updateURL, scrollToResults]);
 
   // 構造化データ（JSON-LD）
   const structuredData = {
@@ -543,7 +555,7 @@ export default function Home() {
                       onClick={() => {
                         setCurrentPage(1);
                         updateURL({ page: 1 });
-                        window.scrollTo({ top: 0, behavior: 'instant' });
+                        scrollToResults();
                       }}
                       disabled={currentPage === 1}
                       className={`flex items-center justify-center w-10 h-10 md:w-11 md:h-11 rounded-lg font-medium transition-all duration-150 ${
@@ -614,7 +626,7 @@ export default function Home() {
                             onClick={() => {
                               setCurrentPage(page);
                               updateURL({ page });
-                              window.scrollTo({ top: 0, behavior: 'instant' });
+                              scrollToResults();
                             }}
                             className={`flex items-center justify-center w-10 h-10 md:w-11 md:h-11 rounded-lg font-semibold text-sm md:text-base transition-all duration-150 ${
                               currentPage === page
@@ -649,7 +661,7 @@ export default function Home() {
                       onClick={() => {
                         setCurrentPage(totalPages);
                         updateURL({ page: totalPages });
-                        window.scrollTo({ top: 0, behavior: 'instant' });
+                        scrollToResults();
                       }}
                       disabled={currentPage === totalPages}
                       className={`flex items-center justify-center w-10 h-10 md:w-11 md:h-11 rounded-lg font-medium transition-all duration-150 ${
@@ -675,7 +687,7 @@ export default function Home() {
                         if (page >= 1 && page <= totalPages) {
                           setCurrentPage(page);
                           updateURL({ page });
-                          window.scrollTo({ top: 0, behavior: 'instant' });
+                          scrollToResults();
                         }
                       }}
                       className="w-16 md:w-20 px-2 md:px-3 py-1.5 md:py-2 text-sm md:text-base bg-qiita-surface dark:bg-dark-surface-light border border-qiita-border dark:border-dark-border rounded-lg text-center text-qiita-text-dark dark:text-white font-medium focus:outline-none focus:ring-2 focus:ring-qiita-green dark:focus:ring-dark-green"
