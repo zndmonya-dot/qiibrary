@@ -49,19 +49,43 @@ export default function DailyTweetPage() {
     setTweetInfo(null);
 
     try {
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}/api/admin/daily-tweet?pattern=${pattern}`
-      );
+      const headers: HeadersInit = {};
+      
+      // 管理者トークンを環境変数から取得（設定されている場合）
+      const adminToken = process.env.NEXT_PUBLIC_ADMIN_TOKEN;
+      if (adminToken) {
+        headers['Authorization'] = `Bearer ${adminToken}`;
+      }
+      
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'https://qiibrary.onrender.com';
+      const endpoint = `${apiUrl}/api/admin/daily-tweet?pattern=${pattern}`;
+      
+      const response = await fetch(endpoint, { headers });
       
       if (!response.ok) {
-        throw new Error('ツイート文の取得に失敗しました');
+        // エラーレスポンスの詳細を取得
+        let errorDetail = '';
+        try {
+          const errorData = await response.json();
+          errorDetail = errorData.detail || JSON.stringify(errorData);
+        } catch {
+          errorDetail = await response.text();
+        }
+        
+        if (response.status === 401) {
+          throw new Error(`認証に失敗しました (401): ${errorDetail}`);
+        }
+        throw new Error(`ツイート文の取得に失敗しました (${response.status}): ${errorDetail}`);
       }
 
       const data = await response.json();
       setTweet(data.tweet);
       setTweetInfo(data);
     } catch (err) {
-      setError(err instanceof Error ? err.message : '不明なエラーが発生しました');
+      const errorMessage = err instanceof Error ? err.message : '不明なエラーが発生しました';
+      console.error('ツイート生成エラー:', errorMessage);
+      console.error('API URL:', process.env.NEXT_PUBLIC_API_URL || 'https://qiibrary.onrender.com');
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }
