@@ -165,7 +165,7 @@ export default function YouTubeAdminPage() {
       const response = await axios.get(`${API_URL}/api/youtube/search`, {
         params: {
           q: searchQuery.trim(),
-          max_results: 50,
+          max_results: 20,
         },
       });
 
