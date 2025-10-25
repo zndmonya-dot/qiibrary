@@ -74,7 +74,10 @@ def daily_tweet_generation():
         
         # 24時間ランキングを取得
         ranking_service = RankingService(db)
-        rankings_data = ranking_service.get_ranking_fast(days=1, limit=1)
+        rankings_result = ranking_service.get_ranking_fast(days=1, limit=1)
+        
+        # 返り値は{"rankings": [...], "total": ...}形式
+        rankings_data = rankings_result.get('rankings', [])
         
         if not rankings_data or len(rankings_data) == 0:
             logger.warning("⚠️  24時間以内のランキングデータがありません")

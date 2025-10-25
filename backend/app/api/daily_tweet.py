@@ -126,12 +126,15 @@ async def get_daily_tweet(
         
         # ランキングを取得
         ranking_service = RankingService(db)
-        rankings_data = ranking_service.get_ranking_fast(
+        rankings_result = ranking_service.get_ranking_fast(
             days=pattern_config['days'],
             year=pattern_config['year'],
             month=pattern_config['month'],
             limit=1
         )
+        
+        # 返り値は{"rankings": [...], "total": ...}形式
+        rankings_data = rankings_result.get('rankings', [])
         
         if not rankings_data or len(rankings_data) == 0:
             raise HTTPException(
