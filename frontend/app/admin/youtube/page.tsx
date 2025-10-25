@@ -307,6 +307,32 @@ export default function YouTubeAdminPage() {
     }
   };
 
+  // 全ての動画を削除
+  const handleDeleteAllYouTube = async () => {
+    if (!bookDetail) return;
+    
+    const count = bookDetail.youtube_links.length;
+    if (count === 0) {
+      alert('削除する動画がありません');
+      return;
+    }
+    
+    if (!confirm(`全ての動画（${count}件）を削除しますか？\nこの操作は取り消せません。`)) return;
+
+    setLoading(true);
+    setError('');
+
+    try {
+      const response = await axios.delete(`${API_URL}/api/admin/books/${bookDetail.id}/youtube/all`);
+      alert(`✅ ${response.data.deleted_count}件の動画を削除しました`);
+      await reloadBook();
+    } catch (err: any) {
+      setError(err.response?.data?.detail || '一括削除に失敗しました');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   // 表示順序を更新
   const handleUpdateOrder = async (linkId: number, newOrder: number) => {
     setLoading(true);
@@ -543,15 +569,25 @@ export default function YouTubeAdminPage() {
 
                 {/* 動画リスト */}
                 <div className="bg-qiita-card dark:bg-dark-surface rounded-lg border border-qiita-border dark:border-dark-border p-3 md:p-6">
-                  <h3 className="text-base md:text-lg font-bold text-qiita-text-dark dark:text-white mb-3 md:mb-4 flex items-center justify-between">
-                    <span className="flex items-center gap-2">
+                  <div className="flex items-center justify-between mb-3 md:mb-4">
+                    <h3 className="text-base md:text-lg font-bold text-qiita-text-dark dark:text-white flex items-center gap-2">
                       <i className="ri-play-list-line"></i>
                       登録済み動画
-                    </span>
-                    <span className="text-xs md:text-sm font-normal bg-qiita-green/10 dark:bg-dark-green/20 text-qiita-green dark:text-dark-green px-2 md:px-3 py-1 rounded-full">
-                      {bookDetail.youtube_links.length}件
-                    </span>
-                  </h3>
+                      <span className="text-xs md:text-sm font-normal bg-qiita-green/10 dark:bg-dark-green/20 text-qiita-green dark:text-dark-green px-2 md:px-3 py-1 rounded-full">
+                        {bookDetail.youtube_links.length}件
+                      </span>
+                    </h3>
+                    {bookDetail.youtube_links.length > 0 && (
+                      <button
+                        onClick={handleDeleteAllYouTube}
+                        disabled={loading}
+                        className="px-3 py-1.5 bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 text-xs rounded hover:bg-red-100 dark:hover:bg-red-900/30 disabled:opacity-50 font-semibold transition-all flex items-center gap-1"
+                      >
+                        <i className="ri-delete-bin-line"></i>
+                        全削除
+                      </button>
+                    )}
+                  </div>
                   
                   {bookDetail.youtube_links.length === 0 ? (
                     <div className="text-center py-8 md:py-12">

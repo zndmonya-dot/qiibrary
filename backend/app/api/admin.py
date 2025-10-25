@@ -269,6 +269,43 @@ async def delete_youtube_link(
     return {"message": "YouTube link deleted successfully"}
 
 
+@router.delete("/books/{book_id}/youtube/all")
+async def delete_all_youtube_links(
+    book_id: int,
+    db: Session = Depends(get_db)
+):
+    """書籍に紐付いた全てのYouTube動画を削除"""
+    # 書籍の存在確認
+    book = db.query(Book).filter(Book.id == book_id).first()
+    if not book:
+        raise HTTPException(status_code=404, detail="Book not found")
+    
+    # 削除前に件数を取得
+    link_count = db.query(BookYouTubeLink).filter(
+        BookYouTubeLink.book_id == book_id
+    ).count()
+    
+    if link_count == 0:
+        return {
+            "message": "削除する動画がありません",
+            "deleted_count": 0
+        }
+    
+    # 全ての動画リンクを削除
+    db.query(BookYouTubeLink).filter(
+        BookYouTubeLink.book_id == book_id
+    ).delete()
+    
+    db.commit()
+    
+    logger.info(f"YouTube動画一括削除: book_id={book_id}, 削除件数={link_count}件")
+    
+    return {
+        "message": f"{link_count}件の動画を削除しました",
+        "deleted_count": link_count
+    }
+
+
 # 一括登録用のリクエストモデル
 class YouTubeLinkBatchCreate(BaseModel):
     youtube_urls: List[str]
