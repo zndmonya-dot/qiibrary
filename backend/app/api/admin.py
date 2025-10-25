@@ -159,6 +159,18 @@ async def add_youtube_link(
     if not video_id:
         raise HTTPException(status_code=400, detail="Invalid YouTube URL")
     
+    # 重複チェック：同じ書籍に同じ動画IDが既に登録されていないか確認
+    existing_link = db.query(BookYouTubeLink).filter(
+        BookYouTubeLink.book_id == book_id,
+        BookYouTubeLink.youtube_video_id == video_id
+    ).first()
+    
+    if existing_link:
+        raise HTTPException(
+            status_code=400, 
+            detail=f"この動画は既に登録されています（登録順: {existing_link.display_order}）"
+        )
+    
     # YouTube APIから詳細情報を取得
     video_details = get_video_details(video_id)
     
@@ -281,6 +293,7 @@ async def add_youtube_links_batch(
     
     added_links = []
     failed_urls = []
+    skipped_urls = []  # 重複でスキップされた動画
     
     for idx, youtube_url in enumerate(batch_data.youtube_urls):
         try:
@@ -288,6 +301,21 @@ async def add_youtube_links_batch(
             video_id = extract_youtube_video_id(youtube_url)
             if not video_id:
                 failed_urls.append({"url": youtube_url, "reason": "Invalid YouTube URL"})
+                continue
+            
+            # 重複チェック：同じ書籍に同じ動画IDが既に登録されていないか確認
+            existing_link = db.query(BookYouTubeLink).filter(
+                BookYouTubeLink.book_id == book_id,
+                BookYouTubeLink.youtube_video_id == video_id
+            ).first()
+            
+            if existing_link:
+                skipped_urls.append({
+                    "url": youtube_url,
+                    "reason": f"既に登録済み（順序: {existing_link.display_order}）",
+                    "title": existing_link.title
+                })
+                logger.info(f"重複のためスキップ: book_id={book_id}, video_id={video_id}")
                 continue
             
             # YouTube APIから詳細情報を取得
@@ -325,12 +353,14 @@ async def add_youtube_links_batch(
     
     db.commit()
     
-    logger.info(f"YouTube動画一括追加: book_id={book_id}, 成功={len(added_links)}件, 失敗={len(failed_urls)}件")
+    logger.info(f"YouTube動画一括追加: book_id={book_id}, 成功={len(added_links)}件, スキップ={len(skipped_urls)}件, 失敗={len(failed_urls)}件")
     
     return {
         "added": len(added_links),
+        "skipped": len(skipped_urls),
         "failed": len(failed_urls),
         "added_links": added_links,
+        "skipped_urls": skipped_urls,
         "failed_urls": failed_urls,
     }
 

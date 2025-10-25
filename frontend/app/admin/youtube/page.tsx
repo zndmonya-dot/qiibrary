@@ -229,7 +229,18 @@ export default function YouTubeAdminPage() {
         }
       );
       
-      alert(`✅ ${response.data.added}件の動画を登録しました！${response.data.failed > 0 ? `\n❌ ${response.data.failed}件の登録に失敗しました。` : ''}`);
+      // 結果メッセージを構築
+      let message = `✅ ${response.data.added}件の動画を登録しました！`;
+      
+      if (response.data.skipped > 0) {
+        message += `\n⏭️ ${response.data.skipped}件は既に登録済みのためスキップしました。`;
+      }
+      
+      if (response.data.failed > 0) {
+        message += `\n❌ ${response.data.failed}件の登録に失敗しました。`;
+      }
+      
+      alert(message);
       
       // 選択をクリア
       setSelectedVideos(new Set());
@@ -267,7 +278,13 @@ export default function YouTubeAdminPage() {
       setNewYouTubeUrl('');
       await reloadBook();
     } catch (err: any) {
-      setError(err.response?.data?.detail || '追加に失敗しました');
+      // 重複エラーの場合は特別なメッセージ
+      const errorDetail = err.response?.data?.detail || '追加に失敗しました';
+      if (errorDetail.includes('既に登録されています')) {
+        setError(`⚠️ ${errorDetail}`);
+      } else {
+        setError(errorDetail);
+      }
     } finally {
       setLoading(false);
     }
