@@ -32,8 +32,10 @@ def get_db():
 # 簡易認証
 def verify_admin_token(authorization: Optional[str] = Header(None)):
     """管理者トークンを検証"""
+    # ADMIN_TOKENが未設定の場合は認証をスキップ（開発環境用）
     if not settings.ADMIN_TOKEN:
-        raise HTTPException(status_code=500, detail="Admin token not configured")
+        logger.warning("⚠️ ADMIN_TOKEN未設定のため管理者API認証をスキップ")
+        return True
     
     if not authorization:
         raise HTTPException(status_code=401, detail="Authorization header required")
