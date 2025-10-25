@@ -409,7 +409,7 @@ export default function YouTubeAdminPage() {
                   データがありません
                 </p>
               ) : (
-                <div className="space-y-2 md:space-y-3">
+                <div className="space-y-2 md:space-y-3 max-h-[70vh] overflow-y-auto">
                   {rankings.map((item) => (
                     <button
                       key={item.book.id}
@@ -460,7 +460,7 @@ export default function YouTubeAdminPage() {
           </div>
 
           {/* 右側：YouTube管理 (2/5) */}
-          <div className="lg:col-span-2">
+          <div className="lg:col-span-2 lg:sticky lg:top-4 lg:self-start">
             {error && (
               <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-300 px-3 md:px-4 py-2 md:py-3 rounded-lg mb-3 md:mb-4 text-xs md:text-sm">
                 {error}
