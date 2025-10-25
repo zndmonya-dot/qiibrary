@@ -95,7 +95,7 @@ export default function YouTubeAdminPage() {
     setError('');
 
     try {
-      let url = `${API_URL}/api/rankings/?limit=10`;
+      let url = `${API_URL}/api/rankings/?limit=50`;
       
       if (mode === 'period') {
         const days = period === '24h' ? 1 : period === '30d' ? 30 : 365;
@@ -165,7 +165,7 @@ export default function YouTubeAdminPage() {
       const response = await axios.get(`${API_URL}/api/youtube/search`, {
         params: {
           q: searchQuery.trim(),
-          max_results: 10,
+          max_results: 50,
         },
       });
 
@@ -201,6 +201,17 @@ export default function YouTubeAdminPage() {
       newSelection.add(videoUrl);
     }
     setSelectedVideos(newSelection);
+  };
+  
+  // 全選択
+  const handleSelectAll = () => {
+    const allVideoUrls = searchResults.map(video => video.youtube_url);
+    setSelectedVideos(new Set(allVideoUrls));
+  };
+  
+  // 全解除
+  const handleDeselectAll = () => {
+    setSelectedVideos(new Set());
   };
   
   // 選択した動画を一括登録
@@ -386,7 +397,7 @@ export default function YouTubeAdminPage() {
               <div className="flex items-center justify-between mb-3 md:mb-4">
                 <h3 className="text-base md:text-xl font-bold text-qiita-text-dark dark:text-white flex items-center gap-2">
                   <i className="ri-trophy-line text-qiita-green dark:text-dark-green"></i>
-                  TOP 10
+                  TOP 50
                 </h3>
                 {loading && !bookDetail && (
                   <div className="animate-spin h-5 w-5 border-2 border-qiita-green dark:border-dark-green border-t-transparent rounded-full"></div>
@@ -673,20 +684,38 @@ export default function YouTubeAdminPage() {
                 <>
                   {/* 一括選択ヘッダー */}
                   {searchResults.length > 0 && (
-                    <div className="flex items-center justify-between mb-4 pb-3 border-b border-qiita-border dark:border-dark-border">
-                      <div className="text-sm text-qiita-text dark:text-dark-text">
-                        {selectedVideos.size > 0 ? (
-                          <span className="font-bold text-qiita-green dark:text-dark-green">
-                            {selectedVideos.size}件選択中
-                          </span>
-                        ) : (
-                          <span>動画をクリックして選択</span>
-                        )}
+                    <div className="mb-4 pb-3 border-b border-qiita-border dark:border-dark-border">
+                      <div className="flex items-center justify-between mb-3">
+                        <div className="text-sm text-qiita-text dark:text-dark-text">
+                          {selectedVideos.size > 0 ? (
+                            <span className="font-bold text-qiita-green dark:text-dark-green">
+                              {selectedVideos.size}件選択中 / 全{searchResults.length}件
+                            </span>
+                          ) : (
+                            <span>動画をクリックして選択</span>
+                          )}
+                        </div>
+                        <div className="flex gap-2">
+                          <button
+                            onClick={handleSelectAll}
+                            disabled={selectedVideos.size === searchResults.length}
+                            className="px-3 py-1.5 bg-qiita-surface dark:bg-dark-surface-light text-qiita-text-dark dark:text-white text-xs rounded border border-qiita-border dark:border-dark-border hover:bg-qiita-border dark:hover:bg-dark-border disabled:opacity-50 disabled:cursor-not-allowed font-semibold transition-all"
+                          >
+                            全選択
+                          </button>
+                          <button
+                            onClick={handleDeselectAll}
+                            disabled={selectedVideos.size === 0}
+                            className="px-3 py-1.5 bg-qiita-surface dark:bg-dark-surface-light text-qiita-text-dark dark:text-white text-xs rounded border border-qiita-border dark:border-dark-border hover:bg-qiita-border dark:hover:bg-dark-border disabled:opacity-50 disabled:cursor-not-allowed font-semibold transition-all"
+                          >
+                            全解除
+                          </button>
+                        </div>
                       </div>
                       <button
                         onClick={handleBatchRegister}
                         disabled={selectedVideos.size === 0 || batchRegistering}
-                        className="px-4 py-2 bg-qiita-green hover:bg-qiita-green-dark dark:bg-dark-green dark:hover:bg-dark-green-dark text-white text-sm rounded-lg disabled:opacity-50 disabled:cursor-not-allowed font-semibold transition-all flex items-center gap-2"
+                        className="w-full px-4 py-2.5 bg-qiita-green hover:bg-qiita-green-dark dark:bg-dark-green dark:hover:bg-dark-green-dark text-white text-sm rounded-lg disabled:opacity-50 disabled:cursor-not-allowed font-semibold transition-all flex items-center justify-center gap-2"
                       >
                         {batchRegistering ? (
                           <>
@@ -696,7 +725,7 @@ export default function YouTubeAdminPage() {
                         ) : (
                           <>
                             <i className="ri-check-double-line"></i>
-                            選択した動画を登録
+                            選択した{selectedVideos.size}件の動画を登録
                           </>
                         )}
                       </button>

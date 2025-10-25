@@ -16,14 +16,14 @@ YOUTUBE_SEARCH_URL = "https://www.googleapis.com/youtube/v3/search"
 @router.get("/search")
 async def search_youtube_videos(
     q: str = Query(..., description="検索キーワード"),
-    max_results: int = Query(10, ge=1, le=20, description="取得件数")
+    max_results: int = Query(10, ge=1, le=50, description="取得件数")
 ):
     """
     YouTube動画を検索
     
     Args:
         q: 検索キーワード（書籍タイトルなど）
-        max_results: 最大取得件数（1-20）
+        max_results: 最大取得件数（1-50）
     
     Returns:
         検索結果リスト
