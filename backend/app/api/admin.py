@@ -26,7 +26,10 @@ def get_db():
     try:
         yield db
     finally:
-        db.close()
+        try:
+            db.close()
+        except Exception as e:
+            logger.error(f"データベース接続クローズエラー: {e}")
 
 
 # 簡易認証
