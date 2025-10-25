@@ -200,6 +200,12 @@ async def add_youtube_link(
     db.commit()
     db.refresh(new_link)
     
+    # キャッシュをクリア
+    cache = get_cache_service()
+    cache_key = cache._generate_key("book_detail", isbn=book.isbn)
+    cache.delete(cache_key)
+    logger.info(f"キャッシュクリア: {book.isbn}")
+    
     logger.info(f"YouTube動画追加: book_id={book_id}, video_id={video_id}, title={new_link.title}")
     
     return {
@@ -244,6 +250,14 @@ async def update_youtube_link(
     db.commit()
     db.refresh(link)
     
+    # キャッシュをクリア
+    book = db.query(Book).filter(Book.id == link.book_id).first()
+    if book:
+        cache = get_cache_service()
+        cache_key = cache._generate_key("book_detail", isbn=book.isbn)
+        cache.delete(cache_key)
+        logger.info(f"キャッシュクリア: {book.isbn}")
+    
     logger.info(f"YouTube動画更新: link_id={link_id}")
     
     return {
@@ -267,8 +281,18 @@ async def delete_youtube_link(
     if not link:
         raise HTTPException(status_code=404, detail="YouTube link not found")
     
+    # キャッシュクリア用に書籍情報を取得
+    book = db.query(Book).filter(Book.id == link.book_id).first()
+    
     db.delete(link)
     db.commit()
+    
+    # キャッシュをクリア
+    if book:
+        cache = get_cache_service()
+        cache_key = cache._generate_key("book_detail", isbn=book.isbn)
+        cache.delete(cache_key)
+        logger.info(f"キャッシュクリア: {book.isbn}")
     
     logger.info(f"YouTube動画削除: link_id={link_id}")
     
@@ -304,6 +328,12 @@ async def delete_all_youtube_links(
     ).delete()
     
     db.commit()
+    
+    # キャッシュをクリア
+    cache = get_cache_service()
+    cache_key = cache._generate_key("book_detail", isbn=book.isbn)
+    cache.delete(cache_key)
+    logger.info(f"キャッシュクリア: {book.isbn}")
     
     logger.info(f"YouTube動画一括削除: book_id={book_id}, 削除件数={link_count}件")
     
@@ -409,6 +439,12 @@ async def add_youtube_links_batch(
     except Exception as e:
         logger.error(f"最終コミットエラー: {e}")
         db.rollback()
+    
+    # キャッシュをクリア
+    cache = get_cache_service()
+    cache_key = cache._generate_key("book_detail", isbn=book.isbn)
+    cache.delete(cache_key)
+    logger.info(f"キャッシュクリア: {book.isbn}")
     
     logger.info(f"YouTube動画一括追加: book_id={book_id}, 成功={len(added_links)}件, スキップ={len(skipped_urls)}件, 失敗={len(failed_urls)}件")
     
