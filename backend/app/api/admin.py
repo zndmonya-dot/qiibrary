@@ -380,18 +380,30 @@ async def add_youtube_links_batch(
             )
             
             db.add(new_link)
+            
+            # 5件ごとにコミット（大量INSERT時のRETURNING句エラーを回避）
+            if (idx + 1) % 5 == 0:
+                db.commit()
+            
             added_links.append({
-                "youtube_url": new_link.youtube_url,
-                "youtube_video_id": new_link.youtube_video_id,
-                "title": new_link.title,
-                "channel_name": new_link.channel_name,
+                "youtube_url": youtube_url,
+                "youtube_video_id": video_id,
+                "title": video_details.get("title") if video_details else None,
+                "channel_name": video_details.get("channel_name") if video_details else None,
             })
             
         except Exception as e:
             failed_urls.append({"url": youtube_url, "reason": str(e)})
             logger.error(f"Failed to add YouTube link: {youtube_url}, error: {e}")
+            # エラーが発生してもロールバックして続行
+            db.rollback()
     
-    db.commit()
+    # 最後に残りをコミット
+    try:
+        db.commit()
+    except Exception as e:
+        logger.error(f"最終コミットエラー: {e}")
+        db.rollback()
     
     logger.info(f"YouTube動画一括追加: book_id={book_id}, 成功={len(added_links)}件, スキップ={len(skipped_urls)}件, 失敗={len(failed_urls)}件")
     
