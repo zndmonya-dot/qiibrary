@@ -6,6 +6,15 @@ import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+const ADMIN_TOKEN = process.env.NEXT_PUBLIC_ADMIN_TOKEN;
+
+// axios用の認証ヘッダーを生成
+const getAuthHeaders = () => {
+  if (ADMIN_TOKEN) {
+    return { Authorization: `Bearer ${ADMIN_TOKEN}` };
+  }
+  return {};
+};
 
 interface Book {
   id: number;
@@ -167,6 +176,7 @@ export default function YouTubeAdminPage() {
           q: searchQuery.trim(),
           max_results: 20,
         },
+        headers: getAuthHeaders(),
       });
 
       setSearchResults(response.data.videos || []);
@@ -226,6 +236,9 @@ export default function YouTubeAdminPage() {
         `${API_URL}/api/admin/books/${bookDetail.id}/youtube/batch`,
         {
           youtube_urls: Array.from(selectedVideos),
+        },
+        {
+          headers: getAuthHeaders(),
         }
       );
       
@@ -272,6 +285,9 @@ export default function YouTubeAdminPage() {
         {
           youtube_url: newYouTubeUrl.trim(),
           display_order: nextOrder,
+        },
+        {
+          headers: getAuthHeaders(),
         }
       );
 
@@ -298,7 +314,9 @@ export default function YouTubeAdminPage() {
     setError('');
 
     try {
-      await axios.delete(`${API_URL}/api/admin/youtube/${linkId}`);
+      await axios.delete(`${API_URL}/api/admin/youtube/${linkId}`, {
+        headers: getAuthHeaders()
+      });
       await reloadBook();
     } catch (err: any) {
       setError(err.response?.data?.detail || '削除に失敗しました');
@@ -323,7 +341,9 @@ export default function YouTubeAdminPage() {
     setError('');
 
     try {
-      const response = await axios.delete(`${API_URL}/api/admin/books/${bookDetail.id}/youtube/all`);
+      const response = await axios.delete(`${API_URL}/api/admin/books/${bookDetail.id}/youtube/all`, {
+        headers: getAuthHeaders()
+      });
       alert(`✅ ${response.data.deleted_count}件の動画を削除しました`);
       await reloadBook();
     } catch (err: any) {
@@ -341,7 +361,10 @@ export default function YouTubeAdminPage() {
     try {
       await axios.put(
         `${API_URL}/api/admin/youtube/${linkId}`,
-        { display_order: newOrder }
+        { display_order: newOrder },
+        {
+          headers: getAuthHeaders(),
+        }
       );
       await reloadBook();
     } catch (err: any) {

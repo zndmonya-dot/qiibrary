@@ -275,7 +275,8 @@ async def delete_youtube_link(
 @router.delete("/books/{book_id}/youtube/all")
 async def delete_all_youtube_links(
     book_id: int,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    _: bool = Depends(verify_admin_token)
 ):
     """書籍に紐付いた全てのYouTube動画を削除"""
     # 書籍の存在確認
