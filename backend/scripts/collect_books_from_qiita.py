@@ -298,32 +298,25 @@ def update_book_statistics(db: Session, book_ids: Optional[list] = None):
     logger.info(f"[OK] 書籍統計情報を更新完了: {processed}件処理")
 
 
-def main():
-    """メイン処理"""
-    parser = argparse.ArgumentParser(description='Qiita記事から書籍情報を収集')
-    parser.add_argument(
-        '--tags',
-        nargs='*',
-        default=None,
-        help='収集対象のタグ（スペース区切り）。指定なしの場合は全記事を対象'
-    )
-    parser.add_argument(
-        '--max-articles',
-        type=int,
-        default=5000,
-        help='タグごとの最大記事数（タグ未指定の場合は全記事）'
-    )
+def run_data_collection(tags=None, max_articles=5000):
+    """
+    データ収集を実行する関数（スケジューラーから呼び出し可能）
     
-    args = parser.parse_args()
+    Args:
+        tags: 収集対象のタグリスト（Noneの場合は全記事を対象）
+        max_articles: 最大記事数
     
+    Raises:
+        Exception: データ収集でエラーが発生した場合
+    """
     logger.info("=" * 80)
     logger.info("Qiita記事から書籍情報を抽出")
-    if args.tags:
-        logger.info(f"対象タグ: {', '.join(args.tags)}")
-        logger.info(f"最大記事数: {args.max_articles}件/タグ")
+    if tags:
+        logger.info(f"対象タグ: {', '.join(tags)}")
+        logger.info(f"最大記事数: {max_articles}件/タグ")
     else:
         logger.info("対象: 全記事（タグ制限なし）")
-        logger.info(f"最大記事数: {args.max_articles}件")
+        logger.info(f"最大記事数: {max_articles}件")
     logger.info("=" * 80)
     
     # サービスインスタンスを取得
@@ -340,7 +333,7 @@ def main():
         updated_book_ids = set()  # 統計情報を更新する書籍IDを記録
         
         # タグが指定されている場合は各タグごとに処理、未指定の場合は全記事を処理
-        tags_to_process = args.tags if args.tags else [None]
+        tags_to_process = tags if tags else [None]
         
         for tag in tags_to_process:
             if tag:
@@ -355,7 +348,7 @@ def main():
             # Step 1: 書籍への言及がある記事を取得
             articles_with_books = qiita_service.get_articles_with_book_references(
                 tag=tag,
-                max_articles=args.max_articles
+                max_articles=max_articles
             )
             
             logger.info(f"[OK] 書籍言及記事: {len(articles_with_books)} 件")
@@ -469,10 +462,35 @@ def main():
     except Exception as e:
         logger.error(f"[ERROR] エラー: {e}", exc_info=True)
         db.rollback()
-        sys.exit(1)
+        raise  # 例外を再発生させてスケジューラーで処理できるようにする
     
     finally:
         db.close()
+
+
+def main():
+    """メイン処理（コマンドライン実行用）"""
+    parser = argparse.ArgumentParser(description='Qiita記事から書籍情報を収集')
+    parser.add_argument(
+        '--tags',
+        nargs='*',
+        default=None,
+        help='収集対象のタグ（スペース区切り）。指定なしの場合は全記事を対象'
+    )
+    parser.add_argument(
+        '--max-articles',
+        type=int,
+        default=5000,
+        help='タグごとの最大記事数（タグ未指定の場合は全記事）'
+    )
+    
+    args = parser.parse_args()
+    
+    try:
+        run_data_collection(tags=args.tags, max_articles=args.max_articles)
+    except Exception as e:
+        logger.error(f"データ収集でエラーが発生しました: {e}")
+        sys.exit(1)
 
 
 if __name__ == '__main__':

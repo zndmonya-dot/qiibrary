@@ -14,7 +14,7 @@ import pytz
 backend_dir = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(backend_dir))
 
-from scripts.collect_books_by_date_range import collect_qiita_articles_by_date
+from scripts.collect_books_from_qiita import run_data_collection
 from app.database import SessionLocal
 from app.services.ranking_service import RankingService
 from app.models.book import Book
@@ -37,28 +37,23 @@ def format_number(num: int) -> str:
 def daily_data_update():
     """
     毎日実行されるデータ更新タスク
-    昨日のデータを収集する
+    全記事から最新の書籍情報を収集する（タグ制限なし）
     """
     try:
         logger.info("=" * 80)
-        logger.info("🔄 定期データ更新開始")
+        logger.info("定期データ更新開始")
         logger.info("=" * 80)
         
-        # 昨日のデータを収集
-        end_date = date.today() - timedelta(days=1)
-        start_date = end_date
-        
-        logger.info(f"📅 収集期間: {start_date} 〜 {end_date}")
-        
-        # データ収集実行
-        collect_qiita_articles_by_date(start_date, end_date)
+        # 全記事から書籍情報を収集（タグ制限なし、最大5000件）
+        # 既存の記事は重複チェックでスキップされるため、新規記事のみが追加される
+        run_data_collection(tags=None, max_articles=5000)
         
         logger.info("=" * 80)
-        logger.info("✅ 定期データ更新完了")
+        logger.info("定期データ更新完了")
         logger.info("=" * 80)
         
     except Exception as e:
-        logger.error(f"❌ 定期データ更新エラー: {e}", exc_info=True)
+        logger.error(f"定期データ更新エラー: {e}", exc_info=True)
 
 
 def daily_tweet_generation():
@@ -69,7 +64,7 @@ def daily_tweet_generation():
     db = SessionLocal()
     try:
         logger.info("=" * 80)
-        logger.info("📱 ツイート文生成開始")
+        logger.info("ツイート文生成開始")
         logger.info("=" * 80)
         
         # 24時間ランキングを取得
@@ -80,7 +75,7 @@ def daily_tweet_generation():
         rankings_data = rankings_result.get('rankings', [])
         
         if not rankings_data or len(rankings_data) == 0:
-            logger.warning("⚠️  24時間以内のランキングデータがありません")
+            logger.warning("24時間以内のランキングデータがありません")
             return
         
         # 1位を取得
@@ -90,7 +85,7 @@ def daily_tweet_generation():
         # 書籍の累計データを取得
         book = db.query(Book).filter(Book.id == book_id).first()
         if not book:
-            logger.error("❌ 書籍データが見つかりません")
+            logger.error("書籍データが見つかりません")
             return
         
         # 累計いいね数を計算
@@ -125,8 +120,8 @@ def daily_tweet_generation():
 
 {book.title}
 
-📝 記事掲載数: {article_count}件
-❤️ 総評価数: {likes_display}
+記事掲載数: {article_count}件
+総評価数: {likes_display}
 
 Qiitaで話題の技術書をランキング化
 
@@ -137,17 +132,17 @@ Qiitaで話題の技術書をランキング化
         
         # ログに出力
         logger.info("=" * 80)
-        logger.info("📋 本日のツイート文:")
+        logger.info("本日のツイート文:")
         logger.info("=" * 80)
         logger.info(tweet)
         logger.info("=" * 80)
-        logger.info(f"📊 文字数: {len(tweet)} / 280")
+        logger.info(f"文字数: {len(tweet)} / 280")
         logger.info("=" * 80)
-        logger.info("✅ ツイート文生成完了")
+        logger.info("ツイート文生成完了")
         logger.info("=" * 80)
         
     except Exception as e:
-        logger.error(f"❌ ツイート文生成エラー: {e}", exc_info=True)
+        logger.error(f"ツイート文生成エラー: {e}", exc_info=True)
     finally:
         db.close()
 
@@ -155,11 +150,11 @@ Qiitaで話題の技術書をランキング化
 def start_scheduler():
     """
     スケジューラーを起動
-    毎日深夜3時（日本時間）にデータ更新を実行
+    毎日深夜0時（日本時間）にデータ更新を実行
     """
     # 環境変数でスケジューラーを無効化できるようにする（開発時など）
     if os.getenv("DISABLE_SCHEDULER", "false").lower() == "true":
-        logger.info("⏸️  スケジューラーは無効化されています（DISABLE_SCHEDULER=true）")
+        logger.info("スケジューラーは無効化されています（DISABLE_SCHEDULER=true）")
         return None
     
     scheduler = BackgroundScheduler(timezone=JST)
@@ -185,9 +180,9 @@ def start_scheduler():
     scheduler.start()
     
     logger.info("=" * 80)
-    logger.info("🚀 スケジューラー起動完了")
-    logger.info("⏰ 毎日 00:00 (JST) にデータ更新を実行します")
-    logger.info("⏰ 毎日 08:00 (JST) にツイート文生成を実行します")
+    logger.info("スケジューラー起動完了")
+    logger.info("毎日 00:00 (JST) にデータ更新を実行します")
+    logger.info("毎日 08:00 (JST) にツイート文生成を実行します")
     logger.info("=" * 80)
     
     return scheduler
@@ -199,5 +194,5 @@ def stop_scheduler(scheduler):
     """
     if scheduler:
         scheduler.shutdown()
-        logger.info("⏹️  スケジューラー停止")
+        logger.info("スケジューラー停止")
 
