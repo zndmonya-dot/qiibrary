@@ -41,15 +41,15 @@ class QiitaService:
     
     def get_articles_by_tag(
         self,
-        tag: str,
+        tag: Optional[str] = None,
         max_results: int = 5000,
         per_page: int = 100
     ) -> List[Dict[str, Any]]:
         """
-        指定タグの記事を取得
+        指定タグの記事を取得（タグ未指定の場合は全記事）
         
         Args:
-            tag: タグ名（例: "Python", "JavaScript"）
+            tag: タグ名（例: "Python", "JavaScript"）。Noneの場合は全記事を取得
             max_results: 最大取得件数
             per_page: 1リクエストあたりの取得件数（最大100）
             
@@ -66,8 +66,11 @@ class QiitaService:
                 params = {
                     'page': page,
                     'per_page': min(per_page, 100),
-                    'query': f'tag:{tag}'
                 }
+                
+                # タグが指定されている場合のみqueryパラメータを追加
+                if tag:
+                    params['query'] = f'tag:{tag}'
                 
                 response = requests.get(
                     f"{self.base_url}/items",
@@ -86,7 +89,8 @@ class QiitaService:
                     article_info = self._extract_article_info(article)
                     all_articles.append(article_info)
                 
-                logger.info(f"✓ Tag '{tag}': {len(all_articles)} 件取得（Page {page}）")
+                tag_label = f"Tag '{tag}'" if tag else "全記事"
+                logger.info(f"[OK] {tag_label}: {len(all_articles)} 件取得（Page {page}）")
                 
                 # 最大100ページまで
                 if page >= 100 or len(articles) < per_page:
@@ -94,14 +98,17 @@ class QiitaService:
                 
                 page += 1
             
-            logger.info(f"✓ Tag '{tag}': 合計 {len(all_articles)} 件取得完了")
+            tag_label = f"Tag '{tag}'" if tag else "全記事"
+            logger.info(f"[OK] {tag_label}: 合計 {len(all_articles)} 件取得完了")
             return all_articles[:max_results]
             
         except requests.exceptions.Timeout:
-            logger.error(f"Qiita API timeout for tag: {tag}")
+            tag_label = f"tag: {tag}" if tag else "全記事"
+            logger.error(f"Qiita API timeout for {tag_label}")
             return all_articles
         except requests.exceptions.RequestException as e:
-            logger.error(f"Qiita API error for tag '{tag}': {e}")
+            tag_label = f"tag '{tag}'" if tag else "全記事"
+            logger.error(f"Qiita API error for {tag_label}: {e}")
             return all_articles
     
     def get_article_body(self, article_id: str) -> Optional[str]:
@@ -269,14 +276,14 @@ class QiitaService:
     
     def get_articles_with_book_references(
         self,
-        tag: str,
+        tag: Optional[str] = None,
         max_articles: int = 5000
     ) -> List[Dict[str, Any]]:
         """
         書籍への言及がある記事を取得
         
         Args:
-            tag: タグ名
+            tag: タグ名（Noneの場合は全記事を対象）
             max_articles: 最大取得記事数
             
         Returns:
@@ -295,7 +302,7 @@ class QiitaService:
             if book_refs:
                 article['book_references'] = list(book_refs)
                 articles_with_books.append(article)
-                logger.info(f"✓ 記事「{article['title']}」から書籍 {len(book_refs)} 件抽出")
+                logger.info(f"[OK] 記事「{article['title']}」から書籍 {len(book_refs)} 件抽出")
         
         logger.info(f"書籍言及記事: {len(articles_with_books)} / {len(articles)} 件")
         return articles_with_books

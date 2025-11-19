@@ -1,0 +1,39 @@
+name: Daily Data Refresh
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "30 0 * * *"
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  collect-books-from-qiita:
+    runs-on: ubuntu-latest
+    env:
+      DATABASE_URL: ${{ secrets.DATABASE_URL }}
+      QIITA_API_TOKEN: ${{ secrets.QIITA_API_TOKEN }}
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+          cache-dependency-path: backend/requirements.txt
+
+      - name: Install dependencies
+        working-directory: backend
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Collect latest Qiita book mentions
+        working-directory: backend
+        run: |
+          python -m scripts.collect_books_from_qiita
+

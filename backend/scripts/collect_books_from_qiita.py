@@ -84,7 +84,7 @@ def get_or_create_article(db: Session, article_data: dict) -> QiitaArticle:
     db.commit()
     db.refresh(new_article)
     
-    logger.info(f"✓ 新規記事作成: {qiita_id}")
+    logger.info(f"[OK] 新規記事作成: {qiita_id}")
     return new_article
 
 
@@ -129,8 +129,8 @@ def get_or_create_book_from_isbn(
         book_info = {
             'isbn': isbn,
             'title': f'書籍 {isbn}',
-            'author': '不明',
-            'publisher': '不明',
+            'author': '著者情報なし',
+            'publisher': '出版社情報なし',
             'publication_date': None,
             'description': None,
             'thumbnail_url': None,
@@ -163,7 +163,7 @@ def get_or_create_book_from_isbn(
     db.commit()
     db.refresh(new_book)
     
-    logger.info(f"✓ 新規書籍作成: {isbn} - {new_book.title}")
+    logger.info(f"[OK] 新規書籍作成: {isbn} - {new_book.title}")
     return new_book
 
 
@@ -209,28 +209,93 @@ def create_book_qiita_mention(
     return mention
 
 
-def update_book_statistics(db: Session):
-    """書籍の統計情報を更新"""
-    books = db.query(Book).all()
+def update_book_statistics(db: Session, book_ids: Optional[list] = None):
+    """
+    書籍の統計情報を更新
     
-    for book in books:
-        # total_mentionsを更新
-        mention_count = db.query(BookQiitaMention).filter(
-            BookQiitaMention.book_id == book.id
-        ).count()
-        
-        book.total_mentions = mention_count
-        
-        # latest_mention_atを更新
-        latest_mention = db.query(BookQiitaMention).filter(
-            BookQiitaMention.book_id == book.id
-        ).order_by(BookQiitaMention.mentioned_at.desc()).first()
-        
-        if latest_mention:
-            book.latest_mention_at = latest_mention.mentioned_at
+    Args:
+        db: データベースセッション
+        book_ids: 更新対象の書籍IDリスト（Noneの場合は全書籍を更新）
+    """
+    from sqlalchemy.exc import OperationalError
     
-    db.commit()
-    logger.info("✓ 書籍統計情報を更新")
+    if book_ids:
+        # 指定された書籍IDのみを更新
+        books = db.query(Book).filter(Book.id.in_(book_ids)).all()
+        logger.info(f"統計情報更新開始: {len(books)}件の書籍を処理します")
+    else:
+        # 全書籍を更新（過去のデータも含む）
+        books = db.query(Book).all()
+        logger.info(f"統計情報更新開始: 全{len(books)}件の書籍を処理します")
+    
+    batch_size = 100  # 100件ずつ処理してコミット
+    processed = 0
+    
+    for i in range(0, len(books), batch_size):
+        batch = books[i:i + batch_size]
+        try:
+            for book in batch:
+                try:
+                    # total_mentionsを更新（1から始まる）
+                    mention_count = db.query(BookQiitaMention).filter(
+                        BookQiitaMention.book_id == book.id
+                    ).count()
+                    
+                    # mentionがある場合は1から始まる値、ない場合は0
+                    book.total_mentions = mention_count if mention_count > 0 else 0
+                    
+                    # latest_mention_atとfirst_mentioned_atを更新
+                    mentions = db.query(BookQiitaMention).filter(
+                        BookQiitaMention.book_id == book.id
+                    ).order_by(BookQiitaMention.mentioned_at.asc()).all()
+                    
+                    if mentions:
+                        # 最も古い言及日時
+                        book.first_mentioned_at = mentions[0].mentioned_at
+                        # 最も新しい言及日時
+                        book.latest_mention_at = mentions[-1].mentioned_at
+                    else:
+                        # mentionがない場合はNULL
+                        book.first_mentioned_at = None
+                        book.latest_mention_at = None
+                except Exception as e:
+                    logger.warning(f"書籍ID {book.id} の統計情報更新でエラー: {e}")
+                    continue
+            
+            # バッチごとにコミット
+            db.commit()
+            processed += len(batch)
+            
+            if processed % 1000 == 0:
+                logger.info(f"統計情報更新進捗: {processed}/{len(books)}件処理完了")
+                
+        except OperationalError as e:
+            logger.error(f"データベース接続エラー: {e}")
+            logger.info("再接続を試みます...")
+            try:
+                db.rollback()
+            except:
+                pass
+            try:
+                db.close()
+            except:
+                pass
+            # 新しいセッションを作成
+            db = SessionLocal()
+            # 再接続後、書籍を再取得して同じバッチから再開
+            if book_ids:
+                books = db.query(Book).filter(Book.id.in_(book_ids)).all()
+            else:
+                books = db.query(Book).all()
+            # 同じバッチを再処理
+            batch = books[i:i + batch_size]
+            continue
+        except Exception as e:
+            logger.error(f"統計情報更新でエラー: {e}")
+            db.rollback()
+            continue
+    
+    logger.info(f"[OK] 書籍統計情報を更新完了: {processed}件処理")
 
 
 def main():
@@ -238,23 +303,27 @@ def main():
     parser = argparse.ArgumentParser(description='Qiita記事から書籍情報を収集')
     parser.add_argument(
         '--tags',
-        nargs='+',
-        default=['Python', 'JavaScript'],
-        help='収集対象のタグ（スペース区切り）'
+        nargs='*',
+        default=None,
+        help='収集対象のタグ（スペース区切り）。指定なしの場合は全記事を対象'
     )
     parser.add_argument(
         '--max-articles',
         type=int,
         default=5000,
-        help='タグごとの最大記事数'
+        help='タグごとの最大記事数（タグ未指定の場合は全記事）'
     )
     
     args = parser.parse_args()
     
     logger.info("=" * 80)
     logger.info("Qiita記事から書籍情報を抽出")
-    logger.info(f"対象タグ: {', '.join(args.tags)}")
-    logger.info(f"最大記事数: {args.max_articles}件/タグ")
+    if args.tags:
+        logger.info(f"対象タグ: {', '.join(args.tags)}")
+        logger.info(f"最大記事数: {args.max_articles}件/タグ")
+    else:
+        logger.info("対象: 全記事（タグ制限なし）")
+        logger.info(f"最大記事数: {args.max_articles}件")
     logger.info("=" * 80)
     
     # サービスインスタンスを取得
@@ -268,11 +337,20 @@ def main():
         total_articles = 0
         total_books = 0
         total_mentions = 0
+        updated_book_ids = set()  # 統計情報を更新する書籍IDを記録
         
-        for tag in args.tags:
-            logger.info(f"\n{'='*80}")
-            logger.info(f"[タグ: {tag}] データ収集開始")
-            logger.info(f"{'='*80}")
+        # タグが指定されている場合は各タグごとに処理、未指定の場合は全記事を処理
+        tags_to_process = args.tags if args.tags else [None]
+        
+        for tag in tags_to_process:
+            if tag:
+                logger.info(f"\n{'='*80}")
+                logger.info(f"[タグ: {tag}] データ収集開始")
+                logger.info(f"{'='*80}")
+            else:
+                logger.info(f"\n{'='*80}")
+                logger.info("[全記事] データ収集開始")
+                logger.info(f"{'='*80}")
             
             # Step 1: 書籍への言及がある記事を取得
             articles_with_books = qiita_service.get_articles_with_book_references(
@@ -280,37 +358,108 @@ def main():
                 max_articles=args.max_articles
             )
             
-            logger.info(f"✓ 書籍言及記事: {len(articles_with_books)} 件")
+            logger.info(f"[OK] 書籍言及記事: {len(articles_with_books)} 件")
             total_articles += len(articles_with_books)
             
             # Step 2: 記事と書籍をデータベースに保存
-            for article_data in articles_with_books:
-                # 記事を保存
-                article = get_or_create_article(db, article_data)
-                
-                # 書籍参照を処理
-                book_refs = article_data.get('book_references', [])
-                
-                for identifier in book_refs:
-                    # 書籍を取得または作成
-                    book = get_or_create_book_from_isbn(db, identifier, openbd_service)
-                    
-                    if book:
-                        total_books += 1
-                        
-                        # 書籍と記事の関連を作成
-                        create_book_qiita_mention(db, book, article, identifier)
-                        total_mentions += 1
+            from sqlalchemy.exc import OperationalError
             
-            logger.info(f"✓ [タグ: {tag}] 完了")
+            processed_article_ids = set()  # 処理済み記事IDを記録
+            
+            for article_data in articles_with_books:
+                qiita_id = article_data.get('qiita_id')
+                
+                # 既に処理済みの記事はスキップ（再接続後の再処理を防ぐ）
+                if qiita_id in processed_article_ids:
+                    continue
+                
+                max_retries = 3
+                retry_count = 0
+                
+                while retry_count < max_retries:
+                    try:
+                        # 記事を保存
+                        article = get_or_create_article(db, article_data)
+                        
+                        # 書籍参照を処理
+                        book_refs = article_data.get('book_references', [])
+                        
+                        for identifier in book_refs:
+                            try:
+                                # 書籍を取得または作成
+                                book = get_or_create_book_from_isbn(db, identifier, openbd_service)
+                                
+                                if book:
+                                    total_books += 1
+                                    updated_book_ids.add(book.id)  # 統計情報更新対象に追加
+                                    
+                                    # 書籍と記事の関連を作成（重複チェック済み）
+                                    create_book_qiita_mention(db, book, article, identifier)
+                                    total_mentions += 1
+                            except OperationalError as e:
+                                logger.warning(f"データベース接続エラー（書籍保存中）: {e}")
+                                logger.info("再接続を試みます...")
+                                try:
+                                    db.rollback()
+                                except:
+                                    pass
+                                try:
+                                    db.close()
+                                except:
+                                    pass
+                                db = SessionLocal()
+                                # 再接続後、同じ書籍から再開（重複チェックで既存データはスキップされる）
+                                article = get_or_create_article(db, article_data)
+                                book = get_or_create_book_from_isbn(db, identifier, openbd_service)
+                                if book:
+                                    total_books += 1
+                                    updated_book_ids.add(book.id)
+                                    create_book_qiita_mention(db, book, article, identifier)
+                                    total_mentions += 1
+                            except Exception as e:
+                                logger.warning(f"書籍保存でエラー（ISBN: {identifier}）: {e}")
+                                continue
+                        
+                        # 記事の処理が成功したら記録
+                        processed_article_ids.add(qiita_id)
+                        break  # 成功したらループを抜ける
+                        
+                    except OperationalError as e:
+                        retry_count += 1
+                        logger.warning(f"データベース接続エラー（記事保存中、リトライ {retry_count}/{max_retries}）: {e}")
+                        if retry_count < max_retries:
+                            logger.info("再接続を試みます...")
+                            try:
+                                db.rollback()
+                            except:
+                                pass
+                            try:
+                                db.close()
+                            except:
+                                pass
+                            db = SessionLocal()
+                            # 再接続後、同じ記事から再開（重複チェックで既存データはスキップされる）
+                        else:
+                            logger.error(f"記事保存が{max_retries}回失敗しました。スキップします: {qiita_id}")
+                            break
+                    except Exception as e:
+                        logger.warning(f"記事保存でエラー: {e}")
+                        # エラーが発生しても処理済みとして記録（次回再実行時にスキップされる）
+                        processed_article_ids.add(qiita_id)
+                        break
+            
+            if tag:
+                logger.info(f"[OK] [タグ: {tag}] 完了")
+            else:
+                logger.info(f"[OK] [全記事] 完了")
         
-        # Step 3: 統計情報を更新
+        # Step 3: 統計情報を更新（新規作成/更新された書籍のみ）
         logger.info(f"\n{'='*80}")
-        logger.info("[統計情報更新中...]")
-        update_book_statistics(db)
+        logger.info(f"[統計情報更新中...] (対象: {len(updated_book_ids)}件の書籍)")
+        update_book_statistics(db, book_ids=list(updated_book_ids))
         
         logger.info(f"\n{'='*80}")
-        logger.info("✅ データ収集完了！")
+        logger.info("[OK] データ収集完了！")
         logger.info(f"{'='*80}")
         logger.info(f"収集記事数: {total_articles} 件")
         logger.info(f"書籍数: {total_books} 件")
@@ -318,7 +467,7 @@ def main():
         logger.info(f"{'='*80}")
         
     except Exception as e:
-        logger.error(f"❌ エラー: {e}", exc_info=True)
+        logger.error(f"[ERROR] エラー: {e}", exc_info=True)
         db.rollback()
         sys.exit(1)
     

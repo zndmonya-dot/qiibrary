@@ -23,6 +23,14 @@ Qiita記事で言及されたIT技術書を収集し、ランキング形式で�
   - OpenBD APIとGoogle Books APIから書籍情報を取得
   - 言及数をベースにランキングを計算
 
+### 自動更新（GitHub Actions）
+- `.github/workflows/daily_data_refresh.yml` が毎日 UTC 00:30（JST 09:30）に実行
+- `scripts/collect_books_from_qiita.py` を起動し、Neon 本番DBを更新
+- リポジトリ Secrets で以下を設定
+  - `DATABASE_URL`: Neon 接続URL
+  - `QIITA_API_TOKEN`: Qiita API トークン
+- `Actions > Daily Data Refresh > Run workflow` から手動実行も可能
+
 ### データフロー
 
 ```
