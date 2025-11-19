@@ -19,7 +19,7 @@ sys.path.insert(0, str(backend_dir))
 import logging
 import argparse
 from typing import Optional
-from datetime import datetime, date
+from datetime import datetime, date, timedelta
 from sqlalchemy.orm import Session
 
 from app.database import SessionLocal
@@ -298,19 +298,24 @@ def update_book_statistics(db: Session, book_ids: Optional[list] = None):
     logger.info(f"[OK] 書籍統計情報を更新完了: {processed}件処理")
 
 
-def run_data_collection(tags=None, max_articles=5000):
+def run_data_collection(tags=None, max_articles=5000, hours=24):
     """
     データ収集を実行する関数（スケジューラーから呼び出し可能）
     
     Args:
         tags: 収集対象のタグリスト（Noneの場合は全記事を対象）
         max_articles: 最大記事数
+        hours: 過去何時間以内の記事を取得するか（デフォルト: 24時間）
     
     Raises:
         Exception: データ収集でエラーが発生した場合
     """
+    # 24時間前の日時を計算
+    created_after = datetime.now() - timedelta(hours=hours)
+    
     logger.info("=" * 80)
     logger.info("Qiita記事から書籍情報を抽出")
+    logger.info(f"取得期間: 過去{hours}時間以内（{created_after.strftime('%Y-%m-%d %H:%M:%S')}以降）")
     if tags:
         logger.info(f"対象タグ: {', '.join(tags)}")
         logger.info(f"最大記事数: {max_articles}件/タグ")
@@ -345,10 +350,11 @@ def run_data_collection(tags=None, max_articles=5000):
                 logger.info("[全記事] データ収集開始")
                 logger.info(f"{'='*80}")
             
-            # Step 1: 書籍への言及がある記事を取得
+            # Step 1: 書籍への言及がある記事を取得（24時間以内）
             articles_with_books = qiita_service.get_articles_with_book_references(
                 tag=tag,
-                max_articles=max_articles
+                max_articles=max_articles,
+                created_after=created_after
             )
             
             logger.info(f"[OK] 書籍言及記事: {len(articles_with_books)} 件")

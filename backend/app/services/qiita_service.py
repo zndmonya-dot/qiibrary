@@ -43,7 +43,8 @@ class QiitaService:
         self,
         tag: Optional[str] = None,
         max_results: int = 5000,
-        per_page: int = 100
+        per_page: int = 100,
+        created_after: Optional[datetime] = None
     ) -> List[Dict[str, Any]]:
         """
         指定タグの記事を取得（タグ未指定の場合は全記事）
@@ -52,6 +53,7 @@ class QiitaService:
             tag: タグ名（例: "Python", "JavaScript"）。Noneの場合は全記事を取得
             max_results: 最大取得件数
             per_page: 1リクエストあたりの取得件数（最大100）
+            created_after: この日時以降に作成された記事のみを取得（Noneの場合は制限なし）
             
         Returns:
             記事情報のリスト
@@ -68,9 +70,17 @@ class QiitaService:
                     'per_page': min(per_page, 100),
                 }
                 
-                # タグが指定されている場合のみqueryパラメータを追加
+                # クエリパラメータを構築
+                query_parts = []
                 if tag:
-                    params['query'] = f'tag:{tag}'
+                    query_parts.append(f'tag:{tag}')
+                if created_after:
+                    # Qiita APIの日付フィルタ形式: created:>YYYY-MM-DD
+                    date_str = created_after.strftime('%Y-%m-%d')
+                    query_parts.append(f'created:>{date_str}')
+                
+                if query_parts:
+                    params['query'] = ' '.join(query_parts)
                 
                 response = requests.get(
                     f"{self.base_url}/items",
@@ -87,6 +97,15 @@ class QiitaService:
                 
                 for article in articles:
                     article_info = self._extract_article_info(article)
+                    
+                    # 日付フィルタリング（クライアント側でもチェック）
+                    if created_after:
+                        published_at = article_info.get('published_at')
+                        if published_at and published_at < created_after:
+                            # この記事より古い記事が来た場合、これ以降のページには新しい記事がない
+                            # ただし、APIの並び順が保証されていないため、一旦追加して後でフィルタリング
+                            pass
+                    
                     all_articles.append(article_info)
                 
                 tag_label = f"Tag '{tag}'" if tag else "全記事"
@@ -97,6 +116,15 @@ class QiitaService:
                     break
                 
                 page += 1
+            
+            # 日付フィルタリング（最終チェック）
+            if created_after:
+                filtered_articles = [
+                    article for article in all_articles
+                    if article.get('published_at') and article.get('published_at') >= created_after
+                ]
+                all_articles = filtered_articles
+                logger.info(f"日付フィルタ適用後: {len(all_articles)} 件（{created_after.strftime('%Y-%m-%d %H:%M:%S')}以降）")
             
             tag_label = f"Tag '{tag}'" if tag else "全記事"
             logger.info(f"[OK] {tag_label}: 合計 {len(all_articles)} 件取得完了")
@@ -277,7 +305,8 @@ class QiitaService:
     def get_articles_with_book_references(
         self,
         tag: Optional[str] = None,
-        max_articles: int = 5000
+        max_articles: int = 5000,
+        created_after: Optional[datetime] = None
     ) -> List[Dict[str, Any]]:
         """
         書籍への言及がある記事を取得
@@ -285,12 +314,13 @@ class QiitaService:
         Args:
             tag: タグ名（Noneの場合は全記事を対象）
             max_articles: 最大取得記事数
+            created_after: この日時以降に作成された記事のみを取得（Noneの場合は制限なし）
             
         Returns:
             記事情報のリスト（book_referencesキーに抽出された書籍識別子を含む）
         """
         # 記事一覧を取得
-        articles = self.get_articles_by_tag(tag, max_results=max_articles)
+        articles = self.get_articles_by_tag(tag, max_results=max_articles, created_after=created_after)
         
         articles_with_books = []
         
