@@ -29,27 +29,27 @@ export default function Footer() {
               <li>
                 <Link 
                   href="/privacy" 
-                  className="text-gray-300 hover:text-white transition-colors duration-150 flex items-center gap-2"
+                  className="text-gray-300 hover-text-white flex items-center gap-2"
                 >
-                  <i className="ri-shield-check-line text-gray-400"></i>
+                  <i className="ri-shield-check-line text-gray-300"></i>
                   <span>プライバシーポリシー</span>
                 </Link>
               </li>
               <li>
                 <Link 
                   href="/terms" 
-                  className="text-gray-300 hover:text-white transition-colors duration-150 flex items-center gap-2"
+                  className="text-gray-300 hover-text-white flex items-center gap-2"
                 >
-                  <i className="ri-file-text-line text-gray-400"></i>
+                  <i className="ri-file-text-line text-gray-300"></i>
                   <span>利用規約</span>
                 </Link>
               </li>
               <li>
                 <Link 
                   href="/legal" 
-                  className="text-gray-300 hover:text-white transition-colors duration-150 flex items-center gap-2"
+                  className="text-gray-300 hover-text-white flex items-center gap-2"
                 >
-                  <i className="ri-scales-3-line text-gray-400"></i>
+                  <i className="ri-scales-3-line text-gray-300"></i>
                   <span>特定商取引法</span>
                 </Link>
               </li>
@@ -65,18 +65,18 @@ export default function Footer() {
               <li>
                 <Link 
                   href="/about" 
-                  className="text-gray-300 hover:text-white transition-colors duration-150 flex items-center gap-2"
+                  className="text-gray-300 hover-text-white flex items-center gap-2"
                 >
-                  <i className="ri-information-line text-gray-400"></i>
+                  <i className="ri-information-line text-gray-300"></i>
                   <span>このサイトについて</span>
                 </Link>
               </li>
               <li>
                 <Link 
                   href="/contact" 
-                  className="text-gray-300 hover:text-white transition-colors duration-150 flex items-center gap-2"
+                  className="text-gray-300 hover-text-white flex items-center gap-2"
                 >
-                  <i className="ri-mail-line text-gray-400"></i>
+                  <i className="ri-mail-line text-gray-300"></i>
                   <span>お問い合わせ</span>
                 </Link>
               </li>
@@ -93,7 +93,7 @@ export default function Footer() {
                 href="https://twitter.com/your_account"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-12 h-12 bg-gray-700 hover:bg-gray-600 rounded-lg flex items-center justify-center transition-colors duration-150"
+                className="w-12 h-12 bg-gray-700 hover-footer-icon rounded-lg flex items-center justify-center"
                 aria-label="X (Twitter)"
               >
                 <i className="ri-twitter-x-line text-xl text-white"></i>
@@ -102,7 +102,7 @@ export default function Footer() {
                 href="https://github.com/your_account"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-12 h-12 bg-gray-700 hover:bg-gray-600 rounded-lg flex items-center justify-center transition-colors duration-150"
+                className="w-12 h-12 bg-gray-700 hover-footer-icon rounded-lg flex items-center justify-center"
                 aria-label="GitHub"
               >
                 <i className="ri-github-line text-xl text-white"></i>
@@ -114,7 +114,7 @@ export default function Footer() {
         {/* Amazon Associates Disclosure */}
         <div className="pt-8 pb-6 border-t border-gray-600">
           <div className="max-w-3xl mx-auto text-center">
-            <p className="text-xs text-gray-400 leading-relaxed mb-4">
+            <p className="text-xs text-gray-300 leading-relaxed mb-4">
               当サイトは、Amazon.co.jpを宣伝しリンクすることによってサイトが紹介料を獲得できる手段を提供することを目的に設定されたアフィリエイトプログラムである、Amazonアソシエイト・プログラムの参加者です。
             </p>
           </div>
@@ -122,7 +122,7 @@ export default function Footer() {
 
         {/* Bottom Bar */}
         <div className="pt-4 border-t border-gray-600">
-          <div className="flex justify-center items-center gap-2 text-xs text-gray-400">
+          <div className="flex justify-center items-center gap-2 text-xs text-gray-300">
             <i className="ri-copyright-line"></i>
             <span>{currentYear} Qiibrary. All rights reserved.</span>
           </div>

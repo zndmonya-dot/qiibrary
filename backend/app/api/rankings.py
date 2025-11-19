@@ -28,21 +28,25 @@ async def get_rankings(
     days: Optional[int] = Query(None, ge=1, le=365, description="過去N日間（指定なし=全期間）"),
     year: Optional[int] = Query(None, ge=2015, le=2030, description="特定の年（例: 2024）"),
     month: Optional[int] = Query(None, ge=1, le=12, description="特定の月（1-12、yearと併用）"),
-    limit: Optional[int] = Query(None, ge=1, le=100000, description="取得件数（指定なし=全件）"),
+    limit: Optional[int] = Query(100, ge=1, le=10000, description="取得件数（デフォルト: 100）"),
+    offset: Optional[int] = Query(0, ge=0, description="オフセット（ページネーション用）"),
+    search: Optional[str] = Query(None, description="検索キーワード（書籍名、著者、出版社、ISBN）"),
     db: Session = Depends(get_db)
 ):
     """
-    書籍ランキング取得（タグ、期間、年、月でフィルタ可能）
+    書籍ランキング取得（サーバーサイド検索・ページネーション対応）
     
     Args:
         tags: フィルタするタグ（カンマ区切り）
         days: 過去N日間（latest_mention_at基準、Noneの場合は全期間）
         year: 特定の年（例: 2024）
         month: 特定の月（1-12、yearと併用、例: 10）
-        limit: 取得件数 (1-100)
+        limit: 取得件数（デフォルト: 100）
+        offset: オフセット（ページネーション用、デフォルト: 0）
+        search: 検索キーワード
     
     Returns:
-        ランキングデータ
+        ランキングデータと総件数
     """
     try:
         # タグをリストに変換
@@ -51,13 +55,15 @@ async def get_rankings(
             tag_list = [tag.strip() for tag in tags.split(",") if tag.strip()]
         
         ranking_service = RankingService(db)
-        rankings = ranking_service.get_ranking(
+        # 高速版を使用（NEONでも高速動作、検索・ページネーション対応）
+        result = ranking_service.get_ranking_fast(
             tags=tag_list,
             days=days,
             year=year,
             month=month,
             limit=limit,
-            scoring_method="quality"  # 品質重視方式を使用
+            offset=offset,
+            search=search
         )
         
         # 期間ラベルを生成
@@ -81,7 +87,10 @@ async def get_rankings(
                 "month": month,
                 "label": period_label
             },
-            "rankings": rankings,
+            "rankings": result["rankings"],
+            "total": result["total"],
+            "limit": result["limit"],
+            "offset": result["offset"],
             "updated_at": date.today().isoformat()
         }
     

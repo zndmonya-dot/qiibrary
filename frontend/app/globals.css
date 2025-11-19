@@ -24,7 +24,7 @@ html.dark {
 
 body {
   background-color: #f5f6f6;
-  color: #7a7a7a;
+  color: #6a6a6a;
   font-family: 'Roboto', 'Hiragino Kaku Gothic ProN', 'メイリオ', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   font-weight: 500;
   /* transitionを削除してフラッシュを防止 */
@@ -60,12 +60,15 @@ body {
   background: #4a4d4d;
 }
 
-::-webkit-scrollbar-thumb:hover {
-  background: #357a00;
-}
+/* スクロールバーのホバー：デスクトップのみ */
+@media (hover: hover) and (pointer: fine) {
+  ::-webkit-scrollbar-thumb:hover {
+    background: #357a00;
+  }
 
-.dark ::-webkit-scrollbar-thumb:hover {
-  background: #4a9900;
+  .dark ::-webkit-scrollbar-thumb:hover {
+    background: #4a9900;
+  }
 }
 
 /* ページトランジションの最適化 */
@@ -175,34 +178,57 @@ html {
 @layer components {
   /* プライマリボタン（Qiita緑） */
   .btn-primary {
-    @apply bg-qiita-green hover:bg-qiita-green-dark text-white font-medium px-4 py-2 rounded 
+    @apply bg-qiita-green text-white font-medium px-4 py-2 rounded 
            transition-colors duration-150 ease-out;
+  }
+  
+  @media (hover: hover) and (pointer: fine) {
+    .btn-primary {
+      @apply hover:bg-qiita-green-dark;
+    }
+    
+    .btn-youtube {
+      @apply hover:bg-red-600;
+    }
+    
+    .btn-amazon {
+      @apply hover:bg-[#ff8800];
+    }
   }
   
   /* YouTubeボタン（動画用） */
   .btn-youtube {
-    @apply bg-youtube-red hover:bg-red-600 text-white font-semibold px-4 py-2 rounded 
+    @apply bg-youtube-red text-white font-semibold px-4 py-2 rounded 
            transition-colors duration-150 ease-out inline-flex items-center gap-2;
   }
   
   /* Amazonボタン */
   .btn-amazon {
-    @apply bg-[#FF9900] hover:bg-[#ff8800] text-white font-semibold px-4 py-2 rounded 
+    @apply bg-[#FF9900] text-white font-semibold px-4 py-2 rounded 
            transition-colors duration-150 ease-out inline-flex items-center gap-2;
   }
   
   /* カード */
   .card-primary {
     @apply bg-qiita-card dark:bg-dark-surface rounded-lg p-4 border border-qiita-border dark:border-dark-border
-           transition-all duration-150 ease-out
-           hover:shadow-sm;
+           transition-all duration-150 ease-out;
+  }
+  
+  /* カードのホバー効果：デスクトップのみ */
+  @media (hover: hover) and (pointer: fine) {
+    .card-primary {
+      @apply hover:shadow-sm;
+    }
+    
+    .card-youtube {
+      @apply hover:shadow-sm;
+    }
   }
   
   /* YouTubeカード（動画埋め込み用） */
   .card-youtube {
     @apply bg-qiita-surface-2 dark:bg-dark-surface rounded-lg p-4 border border-qiita-border dark:border-dark-border
-           transition-all duration-150 ease-out
-           hover:shadow-sm;
+           transition-all duration-150 ease-out;
   }
   
   /* セカンダリテキスト */
@@ -214,30 +240,82 @@ html {
   .tab-button {
     @apply px-6 py-3 font-medium transition-colors duration-150 ease-out
            relative flex-1
-           text-qiita-text dark:text-dark-text hover:text-qiita-text-dark dark:hover:text-white;
+           text-qiita-text dark:text-dark-text;
+  }
+  
+  @media (hover: hover) and (pointer: fine) {
+    .tab-button {
+      @apply hover:text-qiita-text-dark dark:hover:text-white;
+    }
   }
   
   .tab-button.active {
     @apply text-qiita-text-dark dark:text-white;
   }
   
-  /* 共通ホバー効果 */
-  .hover-primary {
-    @apply hover:bg-qiita-green/10 dark:hover:bg-qiita-green/20 
-           transition-all duration-200;
-  }
-  
-  .hover-link {
-    @apply hover:text-qiita-green dark:hover:text-dark-green 
-           transition-colors duration-200;
-  }
-  
-  .hover-scale {
-    @apply hover:opacity-80 transition-opacity duration-200;
-  }
-  
-  .hover-card {
-    @apply hover:bg-qiita-green/10 dark:hover:bg-qiita-green/20 
-           transition-all duration-200;
+  /* 共通ホバー効果（デスクトップのみ） */
+  @media (hover: hover) and (pointer: fine) {
+    .hover-primary {
+      @apply hover:bg-qiita-green/10 dark:hover:bg-qiita-green/20 
+             transition-all duration-200;
+    }
+    
+    .hover-link {
+      @apply hover:text-qiita-green dark:hover:text-dark-green 
+             transition-colors duration-200;
+    }
+    
+    .hover-scale {
+      @apply hover:opacity-80 transition-opacity duration-200;
+    }
+    
+    .hover-card {
+      @apply hover:bg-qiita-green/10 dark:hover:bg-qiita-green/20 
+             transition-all duration-200;
+    }
+
+    /* Footer links */
+    .hover-footer-link {
+      @apply hover:text-white transition-colors duration-150;
+    }
+
+    .hover-footer-icon {
+      @apply hover:bg-gray-600 transition-colors duration-150;
+    }
+
+    /* Book detail page */
+    .hover-text-green {
+      @apply hover:text-qiita-green dark:hover:text-dark-green transition-colors duration-200;
+    }
+
+    .hover-text-white {
+      @apply hover:text-white transition-colors duration-150;
+    }
+
+    /* Contact & other pages */
+    .hover-bg-green-dark {
+      @apply hover:bg-qiita-green-dark transition-all duration-200;
+    }
+
+    .hover-bg-surface {
+      @apply hover:bg-qiita-green/10 dark:hover:bg-qiita-green/20 transition-all duration-200;
+    }
+
+    .hover-underline {
+      @apply hover:underline;
+    }
+
+    .hover-opacity-90 {
+      @apply hover:opacity-90 transition-opacity;
+    }
+
+    .hover-opacity-80 {
+      @apply hover:opacity-80 transition-opacity duration-200;
+    }
+
+    /* Group hover for nested elements */
+    .group:hover .group-hover-text-green {
+      @apply text-qiita-green dark:text-dark-green transition-colors;
+    }
   }
 }

@@ -9,7 +9,7 @@ export default function LegalPage() {
       <Header />
       
       <main className="container mx-auto px-4 py-8 max-w-4xl">
-        <div className="bg-qiita-card dark:bg-dark-surface rounded-lg p-6 md:p-8 border border-qiita-border dark:border-dark-border shadow-lg">
+        <div className="bg-qiita-card dark:bg-dark-surface rounded-lg p-6 md:p-8 border border-qiita-border dark:border-dark-border shadow-lg animate-fade-in">
           {/* ヘッダー */}
           <div className="mb-8 pb-6 border-b border-qiita-border dark:border-dark-border">
             <h1 className="text-2xl md:text-3xl font-bold mb-3 flex items-center gap-2 md:gap-3 text-qiita-text-dark dark:text-white">
@@ -72,7 +72,7 @@ export default function LegalPage() {
                 <div className="flex flex-col md:flex-row gap-2">
                   <span className="font-semibold min-w-[140px]">お問い合わせ:</span>
                   <span>
-                    <Link href="/contact" className="text-qiita-green hover:underline font-semibold">
+                    <Link href="/contact" className="text-qiita-green hover-underline font-semibold">
                       お問い合わせページ
                     </Link>
                     からご連絡ください
@@ -95,15 +95,17 @@ export default function LegalPage() {
               </h2>
               <div className="bg-qiita-surface dark:bg-dark-surface-light rounded-lg p-4">
                 <p className="mb-3">
-                  当サイトは、Qiitaで話題のIT技術書の情報を収集・整理し、ランキング形式で表示する情報提供サービスです。
+                  当サイトは、Qiita記事やYouTube動画で話題のIT技術書の情報を収集・整理し、ランキング形式で表示する情報提供サービスです。
                 </p>
                 <p className="font-semibold text-qiita-text-dark dark:text-white mb-2">提供する主な機能：</p>
                 <ul className="list-disc list-inside space-y-1 ml-4 text-sm">
                   <li>IT技術書のランキング表示（24時間・30日間・365日間・年別・全期間）</li>
+                  <li>YouTube動画で紹介された技術書の情報表示</li>
                   <li>書籍の詳細情報の表示（OpenBD、Google Books APIを利用）</li>
-                  <li>関連するQiita記事の紹介</li>
+                  <li>関連するQiita記事の一覧と外部リンク</li>
+                  <li>関連するYouTube動画の一覧と視聴機能</li>
                   <li>Amazon.co.jpへの商品リンクの提供</li>
-                  <li>書籍検索機能</li>
+                  <li>書籍名・著者・出版社・ISBNによる検索機能</li>
                 </ul>
               </div>
               <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-4 mt-3">
@@ -112,9 +114,8 @@ export default function LegalPage() {
                   書籍情報について
                 </h3>
                 <p className="text-sm text-yellow-700 dark:text-yellow-400">
-                  現在、Amazonアソシエイト・プログラムの審査中のため、Amazon Product Advertising APIは使用できません。
-                  そのため、OpenBDおよびGoogle Books APIを代替として使用しており、書籍情報の精度が低い場合があります。
-                  審査承認後は、速やかにAmazon APIを使用するようシステム改修を行い、より正確な情報を提供いたします。
+                  書籍情報は、OpenBDおよびGoogle Books APIから取得しており、一部の書籍情報が不正確または不完全な場合があります。
+                  最新かつ正確な情報は、購入前に必ずAmazon.co.jpの商品ページでご確認ください。
                 </p>
               </div>
             </section>
@@ -170,10 +171,10 @@ export default function LegalPage() {
               <div className="bg-qiita-surface dark:bg-dark-surface-light rounded-lg p-4">
                 <p className="mb-3">
                   当サイトは、Amazon.co.jpを宣伝しリンクすることによってサイトが紹介料を獲得できる手段を提供することを目的に設定されたアフィリエイトプログラムである、
-                  <span className="font-semibold">Amazonアソシエイト・プログラム</span>に参加申請中です。
+                  <span className="font-semibold">Amazonアソシエイト・プログラム</span>の参加者です。
                 </p>
                 <p className="mb-3">
-                  審査承認後、当サイトに掲載されている書籍情報のリンクをクリックし、Amazon.co.jpで商品を購入された場合、
+                  当サイトに掲載されている書籍情報のリンクをクリックし、Amazon.co.jpで商品を購入された場合、
                   当サイトは商品価格の一定割合を紹介料として受け取ることがあります。
                 </p>
                 <p className="text-sm bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded p-3">
@@ -210,7 +211,7 @@ export default function LegalPage() {
               </h2>
               <div className="bg-qiita-surface dark:bg-dark-surface-light rounded-lg p-4 space-y-3 text-sm">
                 <p>
-                  当サイトで提供する情報は、Qiita API、OpenBD API、Google Books API等の外部APIから取得したものです。
+                  当サイトで提供する情報は、Qiita API、YouTube Data API、OpenBD API、Google Books API等の外部APIから取得したものです。
                 </p>
                 <p>
                   情報の正確性、完全性、有用性、最新性については保証いたしかねます。
@@ -227,7 +228,7 @@ export default function LegalPage() {
               <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4 mt-3">
                 <p className="text-sm text-red-700 dark:text-red-400">
                   <i className="ri-alert-line mr-1"></i>
-                  <strong>重要:</strong> Amazonアソシエイト審査中のため、書籍情報の精度が低い場合があります。購入前に必ずAmazon.co.jpで最新情報をご確認ください。
+                  <strong>重要:</strong> 書籍情報は外部APIから取得しているため、情報の精度が低い場合があります。購入前に必ずAmazon.co.jpで最新情報をご確認ください。
                 </p>
               </div>
             </section>
@@ -239,7 +240,7 @@ export default function LegalPage() {
               <div className="bg-qiita-surface dark:bg-dark-surface-light rounded-lg p-4">
                 <p className="mb-2">
                   著作権者ご本人から、書籍情報の削除または修正のご要望がある場合は、
-                  <Link href="/contact" className="text-qiita-green hover:underline mx-1 font-semibold">
+                  <Link href="/contact" className="text-qiita-green hover-underline mx-1 font-semibold">
                     お問い合わせページ
                   </Link>
                   よりご連絡ください。
@@ -269,10 +270,10 @@ export default function LegalPage() {
           <div className="mt-8 pt-6 border-t border-qiita-border dark:border-dark-border text-sm text-qiita-text-light dark:text-dark-text-light">
             <div className="flex items-center justify-between">
               <div>
-                <div>制定日: 2025年10月20日</div>
-                <div>最終更新日: 2025年10月20日</div>
+                <div>制定日: 2024年10月20日</div>
+                <div>最終更新日: 2024年10月23日</div>
               </div>
-              <Link href="/" className="text-qiita-green hover:underline flex items-center gap-1">
+              <Link href="/" className="text-qiita-green hover-underline flex items-center gap-1">
                 <i className="ri-home-line"></i>
                 トップに戻る
               </Link>

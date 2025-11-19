@@ -78,8 +78,11 @@ export interface RankingItem {
  */
 export interface RankingResponse {
   rankings: RankingItem[];
+  total: number;           // 総件数（サーバーサイドページネーション用）
+  limit: number;           // 取得件数
+  offset: number;          // オフセット
   period: {
-    type: 'daily' | 'monthly' | 'yearly';
+    type?: 'daily' | 'monthly' | 'yearly';
     date?: string;
     year?: number;
     month?: number;
@@ -97,6 +100,8 @@ export interface YouTubeVideo {
   video_url: string;
   view_count: number;
   like_count: number;
+  subscriber_count: number;
+  popularity_score: number;
   published_at: string;
 }
 
@@ -130,74 +135,94 @@ export interface BookDetail extends Book {
 // ========================================
 
 /**
- * ランキング取得API
+ * ランキング取得オプション
+ */
+export interface RankingOptions {
+  tags?: string[];
+  days?: number;
+  year?: number;
+  month?: number;
+  limit?: number;
+  offset?: number;
+  search?: string;
+}
+
+/**
+ * ランキング取得API（統一インターフェース）
  */
 export const getRankings = {
   /**
-   * 全期間ランキング（全件取得）
-   * @param tags フィルタリングするタグ
+   * 汎用ランキング取得（サーバーサイド検索・ページネーション対応）
    */
-  all: async (tags?: string[]): Promise<RankingResponse> => {
+  get: async (options: RankingOptions = {}): Promise<RankingResponse> => {
     const params = new URLSearchParams();
-    if (tags && tags.length > 0) {
-      params.append('tags', tags.join(','));
+    
+    if (options.tags && options.tags.length > 0) {
+      params.append('tags', options.tags.join(','));
     }
+    if (options.days !== undefined) {
+      params.append('days', options.days.toString());
+    }
+    if (options.year !== undefined) {
+      params.append('year', options.year.toString());
+    }
+    if (options.month !== undefined) {
+      params.append('month', options.month.toString());
+    }
+    if (options.limit !== undefined) {
+      params.append('limit', options.limit.toString());
+    }
+    if (options.offset !== undefined) {
+      params.append('offset', options.offset.toString());
+    }
+    if (options.search) {
+      params.append('search', options.search);
+    }
+    
     const response = await api.get(`/api/rankings/?${params}`);
     return response.data;
   },
   
   /**
-   * 24時間のランキング（latest_mention_at基準、全件取得）
+   * 全期間ランキング
    */
-  daily: async (): Promise<RankingResponse> => {
-    const params = new URLSearchParams();
-    params.append('days', '1');
-    const response = await api.get(`/api/rankings/?${params}`);
-    return response.data;
+  all: async (options: RankingOptions = {}): Promise<RankingResponse> => {
+    return getRankings.get(options);
   },
   
   /**
-   * 過去30日間のランキング（latest_mention_at基準、全件取得）
+   * 24時間のランキング
    */
-  monthly: async (): Promise<RankingResponse> => {
-    const params = new URLSearchParams();
-    params.append('days', '30');
-    const response = await api.get(`/api/rankings/?${params}`);
-    return response.data;
+  daily: async (options: RankingOptions = {}): Promise<RankingResponse> => {
+    return getRankings.get({ ...options, days: 1 });
   },
   
   /**
-   * 過去365日間のランキング（latest_mention_at基準、全件取得）
+   * 過去30日間のランキング
    */
-  yearly: async (): Promise<RankingResponse> => {
-    const params = new URLSearchParams();
-    params.append('days', '365');
-    const response = await api.get(`/api/rankings/?${params}`);
-    return response.data;
+  monthly: async (options: RankingOptions = {}): Promise<RankingResponse> => {
+    return getRankings.get({ ...options, days: 30 });
   },
   
   /**
-   * 特定の年のランキング（全件取得）
-   * @param year 年（例: 2024）
+   * 過去365日間のランキング
    */
-  byYear: async (year: number): Promise<RankingResponse> => {
-    const params = new URLSearchParams();
-    params.append('year', year.toString());
-    const response = await api.get(`/api/rankings/?${params}`);
-    return response.data;
+  yearly: async (options: RankingOptions = {}): Promise<RankingResponse> => {
+    return getRankings.get({ ...options, days: 365 });
   },
   
   /**
-   * 特定の年月のランキング（全件取得）
-   * @param year 年（例: 2024）
-   * @param month 月（1-12）
+   * 特定の年のランキング
    */
-  byMonth: async (year: number, month: number): Promise<RankingResponse> => {
-    const params = new URLSearchParams();
-    params.append('year', year.toString());
-    params.append('month', month.toString());
-    const response = await api.get(`/api/rankings/?${params}`);
-    return response.data;
+  byYear: async (year: number, options: RankingOptions = {}): Promise<RankingResponse> => {
+    return getRankings.get({ ...options, year });
+  },
+  
+  /**
+   * 特定の年月のランキング
+   */
+  byMonth: async (year: number, month: number, options: RankingOptions = {}): Promise<RankingResponse> => {
+    return getRankings.get({ ...options, year, month });
   },
 };
 
@@ -225,12 +250,14 @@ export const getBookDetail = async (asin: string): Promise<BookDetail> => {
     return {
       video_id: videoId,
       title: link.title || '動画タイトル',
-      channel_name: 'YouTube',
+      channel_name: link.channel_name || 'YouTube',
       thumbnail_url: link.thumbnail_url || getYouTubeThumbnailUrl(videoId),
       video_url: link.youtube_url || getYouTubeVideoUrl(videoId),
-      view_count: 0,
-      like_count: 0,
-      published_at: new Date().toISOString(),
+      view_count: link.view_count || 0,
+      like_count: link.like_count || 0,
+      subscriber_count: link.subscriber_count || 0,
+      popularity_score: link.popularity_score || 0,
+      published_at: link.published_at || new Date().toISOString(),
     };
   });
   

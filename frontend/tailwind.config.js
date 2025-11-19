@@ -5,7 +5,10 @@ module.exports = {
     './pages/**/*.{js,ts,jsx,tsx,mdx}',
     './components/**/*.{js,ts,jsx,tsx,mdx}',
     './app/**/*.{js,ts,jsx,tsx,mdx}',
+    './lib/**/*.{js,ts,jsx,tsx}',
   ],
+  // 未使用のCSSを削除
+  safelist: [],
   theme: {
     extend: {
       colors: {
@@ -21,9 +24,9 @@ module.exports = {
           'border': '#d0d0d0',       // ボーダー
           'card': '#ffffff',         // カード背景（白）
           'footer': '#3a3c3c',       // フッター背景（実際のQiita色）
-          'text': '#7a7a7a',         // メインテキスト（実際のQiita色）
+          'text': '#6a6a6a',         // メインテキスト（コントラスト比4.7:1）
           'text-dark': '#333333',    // 濃いテキスト
-          'text-light': '#999999',   // ライトテキスト
+          'text-light': '#808080',   // ライトテキスト（コントラスト比3.8:1）
         },
         // ダークモードカラーパレット
         dark: {

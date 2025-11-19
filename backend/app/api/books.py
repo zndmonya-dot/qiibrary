@@ -10,6 +10,7 @@ from ..database import SessionLocal
 from ..models.book import Book, BookQiitaMention, BookYouTubeLink
 from ..models.qiita_article import QiitaArticle
 from ..services.openbd_service import get_openbd_service
+from ..services.cache_service import get_cache_service
 
 router = APIRouter()
 
@@ -29,7 +30,7 @@ async def get_book_detail(
     db: Session = Depends(get_db)
 ):
     """
-    書籍詳細情報取得
+    書籍詳細情報取得（キャッシュ5分）
     
     Args:
         isbn: ISBN-10 or ISBN-13
@@ -38,6 +39,13 @@ async def get_book_detail(
         書籍詳細（Qiita記事・YouTube動画リスト含む）
     """
     try:
+        # キャッシュから取得を試みる
+        cache = get_cache_service()
+        cache_key = cache._generate_key("book_detail", isbn=isbn)
+        cached_result = cache.get(cache_key)
+        if cached_result is not None:
+            return cached_result
+        
         # 書籍情報を取得
         book = db.query(Book).filter(Book.isbn == isbn).first()
         
@@ -53,12 +61,18 @@ async def get_book_detail(
             .all()
         )
         
-        # 関連するYouTube動画リンクを取得
+        # 関連するYouTube動画リンクを取得（人気度スコア順）
         youtube_links = (
             db.query(BookYouTubeLink)
             .filter(BookYouTubeLink.book_id == book.id)
-            .order_by(BookYouTubeLink.display_order)
             .all()
+        )
+        
+        # スコア計算してソート
+        youtube_links = sorted(
+            youtube_links,
+            key=lambda link: link.calculate_popularity_score(),
+            reverse=True
         )
         
         # 動的にAmazonアフィリエイトURLを生成
@@ -69,7 +83,7 @@ async def get_book_detail(
         book_dict = book.to_dict()
         book_dict["amazon_affiliate_url"] = amazon_affiliate_url  # アフィリエイトURLを上書き
         
-        return {
+        result = {
             "book": book_dict,
             "qiita_articles": [article.to_dict() for article in qiita_articles],
             "youtube_links": [
@@ -78,12 +92,22 @@ async def get_book_detail(
                     "youtube_url": link.youtube_url,
                     "youtube_video_id": link.youtube_video_id,
                     "title": link.title,
+                    "channel_name": getattr(link, 'channel_name', None),
                     "thumbnail_url": link.thumbnail_url,
+                    "view_count": getattr(link, 'view_count', 0) or 0,
+                    "like_count": getattr(link, 'like_count', 0) or 0,
+                    "subscriber_count": getattr(link, 'subscriber_count', 0) or 0,
                     "display_order": link.display_order,
+                    "popularity_score": link.calculate_popularity_score(),
                 }
                 for link in youtube_links
             ]
         }
+        
+        # キャッシュに保存（5分間）
+        cache.set(cache_key, result, ttl_seconds=300)
+        
+        return result
     
     except HTTPException:
         raise

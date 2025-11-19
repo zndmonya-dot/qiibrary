@@ -138,6 +138,13 @@ class BookYouTubeLink(Base):
     title = Column(String(500))
     thumbnail_url = Column(String(500))
     
+    # YouTube動画詳細情報（YouTube API v3から取得）
+    channel_name = Column(String(255))  # チャンネル名
+    view_count = Column(Integer, default=0)  # 再生回数
+    like_count = Column(Integer, default=0)  # いいね数
+    subscriber_count = Column(Integer, default=0)  # チャンネル登録者数
+    published_at = Column(DateTime)  # 公開日時
+    
     # 表示順序（1, 2, 3）
     display_order = Column(Integer, default=1, nullable=False)
     
@@ -152,6 +159,24 @@ class BookYouTubeLink(Base):
     __table_args__ = (
         Index('idx_youtube_links_book', 'book_id', 'display_order'),
     )
+    
+    def calculate_popularity_score(self) -> float:
+        """
+        人気度スコアを計算
+        
+        計算式:
+        - 再生回数: 40%の重み
+        - いいね数: 30%の重み (いいね1つ = 再生30回相当)
+        - 登録者数: 30%の重み (登録者1人 = 再生100回相当)
+        
+        Returns:
+            float: 人気度スコア
+        """
+        view_score = (self.view_count or 0) * 0.4
+        like_score = (self.like_count or 0) * 30 * 0.3
+        subscriber_score = (self.subscriber_count or 0) * 0.01 * 0.3
+        
+        return view_score + like_score + subscriber_score
     
     def __repr__(self):
         return f"<BookYouTubeLink(book_id={self.book_id}, youtube_url='{self.youtube_url}')>"

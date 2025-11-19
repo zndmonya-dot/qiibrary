@@ -41,6 +41,19 @@ const nextConfig = {
   compiler: {
     removeConsole: process.env.NODE_ENV === 'production',
   },
+  // 実験的な最適化機能
+  experimental: {
+    optimizePackageImports: ['remixicon'], // アイコンパッケージの最適化
+    // optimizeCss: true, // Vercelでcritters依存の問題があるため無効化
+  },
+  // 圧縮設定
+  compress: true,
+  // CSS最適化
+  productionBrowserSourceMaps: false, // ソースマップを無効化してサイズ削減
+  // モダンブラウザターゲット
+  typescript: {
+    ignoreBuildErrors: false,
+  },
 }
 
 module.exports = nextConfig

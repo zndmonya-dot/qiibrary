@@ -1,8 +1,16 @@
-import type { Metadata } from 'next'
+import type { Metadata, Viewport } from 'next'
 import './globals.css'
 import PageTransition from '@/components/PageTransition'
 
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 5,
+  userScalable: true,
+}
+
 export const metadata: Metadata = {
+  metadataBase: new URL('https://qiibrary.com'),
   title: {
     default: 'Qiibrary - Qiitaで話題の技術書まとめ',
     template: '%s | Qiibrary'
@@ -21,7 +29,7 @@ export const metadata: Metadata = {
     type: 'website',
     locale: 'ja_JP',
     alternateLocale: ['en_US'],
-    url: 'https://qiibrary.example.com',
+    url: 'https://qiibrary.com',
     siteName: 'Qiibrary',
     title: 'Qiibrary - Qiitaで話題の技術書まとめ',
     description: 'エンジニアが実践で使い、Qiita記事で推薦した技術書ライブラリ',
@@ -73,11 +81,22 @@ export default function RootLayout({
     <html lang="ja" suppressHydrationWarning>
       <head />
       <body>
-        {/* デフォルトでダークモード（ユーザー設定は保存しない） */}
+        {/* OSのカラースキーム設定に従う（ちらつき防止） */}
         <script
           dangerouslySetInnerHTML={{
             __html: `
-              document.documentElement.classList.add('dark');
+              (function() {
+                try {
+                  const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+                  if (isDark) {
+                    document.documentElement.classList.add('dark');
+                  } else {
+                    document.documentElement.classList.remove('dark');
+                  }
+                } catch (e) {
+                  document.documentElement.classList.add('dark');
+                }
+              })();
             `,
           }}
         />

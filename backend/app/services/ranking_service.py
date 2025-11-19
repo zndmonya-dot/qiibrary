@@ -7,11 +7,12 @@ import math
 from typing import List, Dict, Optional
 from datetime import datetime, timedelta
 from sqlalchemy.orm import Session
-from sqlalchemy import func
+from sqlalchemy import func, text
 
 from ..models.book import Book, BookQiitaMention
 from ..models.qiita_article import QiitaArticle
 from ..services.openbd_service import get_openbd_service
+from ..services.cache_service import get_cache_service
 
 logger = logging.getLogger(__name__)
 
@@ -22,6 +23,290 @@ class RankingService:
     def __init__(self, db: Session):
         self.db = db
         self.openbd_service = get_openbd_service()
+        self.cache = get_cache_service()
+    
+    def get_ranking_fast(
+        self,
+        tags: Optional[List[str]] = None,
+        days: Optional[int] = None,
+        year: Optional[int] = None,
+        month: Optional[int] = None,
+        limit: Optional[int] = 100,
+        offset: Optional[int] = None,
+        search: Optional[str] = None
+    ) -> Dict:
+        """
+        高速ランキング取得（直接SQL使用、top_articlesも2クエリで効率取得）
+        
+        NEONなどネットワークレイテンシーが高い環境でも高速動作
+        
+        Args:
+            tags: タグフィルタ
+            days: 過去N日間
+            year: 年フィルタ
+            month: 月フィルタ
+            limit: 取得件数（ページネーション用）
+            offset: オフセット（ページネーション用）
+            search: 検索キーワード（書籍名、著者、出版社）
+        
+        Returns:
+            ランキングデータと総件数
+        
+        キャッシング戦略:
+        - 検索なし・全件: 10分間キャッシュ
+        - 検索あり: キャッシュしない（リアルタイム検索）
+        - ページネーションあり: 5分間キャッシュ
+        """
+        # 検索結果も短時間キャッシュ（同じ検索の重複を防ぐ）
+        use_cache = True  # 常にキャッシュを使用
+        
+        # キャッシュキーを生成（検索キーワードも含める）
+        cache_key_params = {
+            "tags": tuple(sorted(tags)) if tags else None,
+            "days": days,
+            "year": year,
+            "month": month,
+            "limit": limit,
+            "offset": offset,
+            "search": search,  # 検索キーワードもキャッシュキーに含める
+        }
+        cache_key = self.cache._generate_key("ranking_fast", **cache_key_params)
+            
+        # キャッシュから取得を試みる
+        cached_result = self.cache.get(cache_key)
+        if cached_result is not None:
+            logger.info(f"✅ ランキングキャッシュヒット: {cache_key[:50]}...")
+            return cached_result
+        
+        logger.info(f"🔍 ランキングキャッシュミス、DBクエリ実行: {cache_key[:50]}...")
+        # 期間条件を構築
+        date_condition = ""
+        if days is not None:
+            start_date = (datetime.now() - timedelta(days=days)).strftime('%Y-%m-%d')
+            date_condition = f"AND qa.published_at >= '{start_date}'"
+        elif year is not None and month is not None:
+            import calendar
+            last_day = calendar.monthrange(year, month)[1]
+            date_condition = f"AND qa.published_at >= '{year}-{month:02d}-01' AND qa.published_at <= '{year}-{month:02d}-{last_day}'"
+        elif year is not None:
+            date_condition = f"AND qa.published_at >= '{year}-01-01' AND qa.published_at <= '{year}-12-31'"
+        
+        # タグ条件を構築
+        tag_condition = ""
+        if tags:
+            tag_checks = " OR ".join([f"qa.tags ? '{tag}'" for tag in tags])
+            tag_condition = f"AND ({tag_checks})"
+        
+        # 検索条件を構築（SQLインジェクション対策強化）
+        search_condition = ""
+        search_params = {}
+        if search:
+            # 危険な文字を除去
+            search_term = search.replace("'", "").replace(";", "").replace("--", "").replace("/*", "").replace("*/", "")
+            # 長さ制限（100文字まで）
+            search_term = search_term[:100] if len(search_term) > 100 else search_term
+            
+            if search_term:  # 空文字列でない場合のみ
+                search_condition = f"""AND (
+                    LOWER(b.title) LIKE LOWER('%{search_term}%') OR
+                    LOWER(b.author) LIKE LOWER('%{search_term}%') OR
+                    LOWER(b.publisher) LIKE LOWER('%{search_term}%') OR
+                    LOWER(b.isbn) LIKE LOWER('%{search_term}%')
+                )"""
+        
+        # ページネーション句
+        pagination_clause = ""
+        if limit is not None:
+            pagination_clause = f"LIMIT {limit}"
+            if offset is not None:
+                pagination_clause += f" OFFSET {offset}"
+        
+        # 総件数取得用SQL（検索条件とフィルタを適用）
+        count_sql = text(f"""
+            SELECT COUNT(DISTINCT b.id) as total
+            FROM books b
+            JOIN book_qiita_mentions bqm ON b.id = bqm.book_id
+            JOIN qiita_articles qa ON bqm.article_id = qa.id
+            WHERE b.total_mentions > 0
+            {date_condition}
+            {tag_condition}
+            {search_condition}
+        """)
+        
+        count_result = self.db.execute(count_sql).fetchone()
+        total_count = int(count_result.total) if count_result else 0
+        
+        # 直接SQL（1回のクエリでランキングデータ取得）
+        # スコアを計算してソート（元のget_ranking()と同じロジック）
+        sql = text(f"""
+            WITH book_stats AS (
+                SELECT 
+                    b.id, b.isbn, b.title, b.author, b.publisher, b.publication_date,
+                    b.description, b.thumbnail_url, b.amazon_url, b.amazon_affiliate_url,
+                    b.total_mentions, b.first_mentioned_at,
+                    COUNT(DISTINCT bqm.id) as mention_count,
+                    COUNT(DISTINCT qa.id) as article_count,
+                    COUNT(DISTINCT qa.author_id) as unique_user_count,
+                    COALESCE(SUM(qa.likes_count), 0) as total_likes,
+                    MAX(bqm.mentioned_at) as latest_mention_at
+                FROM books b
+                JOIN book_qiita_mentions bqm ON b.id = bqm.book_id
+                JOIN qiita_articles qa ON bqm.article_id = qa.id
+                WHERE b.total_mentions > 0
+                {date_condition}
+                {tag_condition}
+                {search_condition}
+                GROUP BY b.id, b.isbn, b.title, b.author, b.publisher, b.publication_date,
+                         b.description, b.thumbnail_url, b.amazon_url, b.amazon_affiliate_url,
+                         b.total_mentions, b.first_mentioned_at
+            )
+            SELECT 
+                *,
+                -- 品質重視スコア: unique_user_count * (1 + ln(avg_likes + 1))
+                unique_user_count * (1 + LN(CASE WHEN article_count > 0 THEN (total_likes::float / article_count) + 1 ELSE 1 END)) as calculated_score
+            FROM book_stats
+            ORDER BY calculated_score DESC
+            {pagination_clause}
+        """)
+        
+        results = self.db.execute(sql).fetchall()
+        
+        # 取得した書籍IDのリストを作成
+        book_ids = [row.id for row in results]
+        
+        # トップ記事を一括取得（2回目のクエリ）
+        top_articles_map: dict[int, list[dict]] = {}
+        if book_ids:
+            # WINDOW関数でトップ3記事を一括取得
+            articles_sql = text(f"""
+                WITH ranked_articles AS (
+                    SELECT 
+                        bqm.book_id,
+                        qa.id,
+                        qa.qiita_id,
+                        qa.title,
+                        qa.url,
+                        qa.author_id,
+                        qa.author_name,
+                        qa.likes_count,
+                        qa.published_at,
+                        ROW_NUMBER() OVER (PARTITION BY bqm.book_id ORDER BY qa.likes_count DESC) as rn
+                    FROM book_qiita_mentions bqm
+                    JOIN qiita_articles qa ON bqm.article_id = qa.id
+                    WHERE bqm.book_id = ANY(:book_ids)
+                    {date_condition}
+                    {tag_condition}
+                )
+                SELECT * FROM ranked_articles WHERE rn <= 3
+                ORDER BY book_id, rn
+            """)
+            
+            articles_results = self.db.execute(articles_sql, {"book_ids": book_ids}).fetchall()
+            
+            # book_id別にトップ記事を整理
+            for article in articles_results:
+                if article.book_id not in top_articles_map:
+                    top_articles_map[article.book_id] = []
+                
+                top_articles_map[article.book_id].append({
+                    "id": article.id,
+                    "qiita_id": article.qiita_id,
+                    "title": article.title,
+                    "url": article.url,
+                    "author_id": article.author_id,
+                    "author_name": article.author_name,
+                    "likes_count": article.likes_count,
+                    "published_at": article.published_at.isoformat() if article.published_at else None,
+                })
+        
+        # ランキング形式に整形
+        rankings = []
+        now = datetime.now()
+        for rank, row in enumerate(results, start=1):
+            mention_count = int(row.mention_count) if row.mention_count else 0
+            article_count = int(row.article_count) if row.article_count else 0
+            unique_user_count = int(row.unique_user_count) if row.unique_user_count else 0
+            total_likes = int(row.total_likes) if row.total_likes else 0
+            avg_likes = total_likes / article_count if article_count > 0 else 0
+            
+            # スコア（SQLで計算済み）
+            score = float(row.calculated_score) if hasattr(row, 'calculated_score') else unique_user_count * (1 + math.log(avg_likes + 1))
+            
+            # NEWバッジ判定
+            is_new = False
+            if row.first_mentioned_at:
+                days_since_first = (now - row.first_mentioned_at).days
+                is_new = days_since_first <= 30
+            
+            # Amazonアフィリエイトリンク生成
+            amazon_affiliate_url = self.openbd_service.generate_amazon_affiliate_url(row.isbn)
+            
+            # トップ記事を取得
+            top_articles = top_articles_map.get(row.id, [])
+            
+            # offsetを考慮したランク計算
+            actual_rank = rank if offset is None else (offset + rank)
+            
+            rankings.append({
+                "rank": actual_rank,
+                "book": {
+                    "id": row.id,
+                    "isbn": row.isbn,
+                    "title": row.title,
+                    "author": row.author,
+                    "publisher": row.publisher,
+                    "publication_date": row.publication_date.isoformat() if row.publication_date else None,
+                    "description": row.description,
+                    "thumbnail_url": row.thumbnail_url,
+                    "amazon_url": row.amazon_url,
+                    "amazon_affiliate_url": amazon_affiliate_url,
+                    "total_mentions": row.total_mentions,
+                },
+                "stats": {
+                    "mention_count": mention_count,
+                    "article_count": article_count,
+                    "unique_user_count": unique_user_count,
+                    "total_likes": total_likes,
+                    "avg_likes": round(avg_likes, 2),
+                    "score": round(score, 2),
+                    "latest_mention_at": row.latest_mention_at.isoformat() if row.latest_mention_at else None,
+                    "is_new": is_new,
+                },
+                "top_articles": top_articles,
+            })
+        
+        result = {
+            "rankings": rankings,
+            "total": total_count,
+            "limit": limit,
+            "offset": offset or 0,
+        }
+        
+        # TTL決定（全て2-3倍に延長）
+        if search:
+            # 検索: 1分間キャッシュ（同じ検索の重複を防ぐ）
+            ttl = 60
+        elif days is None and year is None:
+            # 全期間ランキング: 30分間キャッシュ（10分→30分）
+            ttl = 1800
+        elif days and days >= 30:
+            # 30日以上: 15分間キャッシュ（5分→15分）
+            ttl = 900
+        elif days and days <= 7:
+            # 7日以内: 5分間キャッシュ（2分→5分）
+            ttl = 300
+        elif tags:
+            # タグフィルタあり: 15分間キャッシュ（5分→15分）
+            ttl = 900
+        else:
+            # その他: 10分間キャッシュ（3分→10分）
+            ttl = 600
+        
+        self.cache.set(cache_key, result, ttl_seconds=ttl)
+        cache_type = "検索" if search else "通常"
+        logger.info(f"ランキング取得完了（{cache_type}）: {len(rankings)}/{total_count}件、キャッシュ保存 (TTL: {ttl}s)")
+        
+        return result
     
     def get_ranking(
         self,
@@ -232,11 +517,20 @@ class RankingService:
     
     def get_all_tags(self) -> List[Dict]:
         """
-        すべてのタグとその書籍数を取得
+        すべてのタグとその書籍数を取得（キャッシュ15分）
         
         Returns:
             タグのリスト（書籍数でソート）
         """
+        # キャッシュから取得
+        cache_key = "all_tags"
+        cached_result = self.cache.get(cache_key)
+        if cached_result is not None:
+            logger.info("✅ タグリストキャッシュヒット")
+            return cached_result
+        
+        logger.info("🔍 タグリストキャッシュミス、DBクエリ実行")
+        
         # すべての記事からタグを抽出
         articles = self.db.query(QiitaArticle.tags).all()
         
@@ -254,6 +548,10 @@ class RankingService:
             key=lambda x: x["book_count"],
             reverse=True
         )
+        
+        # 15分間キャッシュ（更新頻度低い）
+        self.cache.set(cache_key, sorted_tags, ttl_seconds=900)
+        logger.info(f"タグリスト取得完了: {len(sorted_tags)}件、キャッシュ保存 (TTL: 900s)")
         
         return sorted_tags
     
@@ -342,23 +640,36 @@ class RankingService:
     
     def get_available_years(self) -> List[int]:
         """
-        データが存在する年のリストを取得
+        データが存在する年のリストを取得（高速版：直接SQL使用、キャッシュ15分）
         
         Returns:
             年のリスト（降順）
         """
-        from sqlalchemy import extract, distinct
-        from typing import Any, List as ListType
+        # キャッシュから取得
+        cache_key = "available_years"
+        cached_result = self.cache.get(cache_key)
+        if cached_result is not None:
+            logger.info("✅ 年リストキャッシュヒット")
+            return cached_result
         
-        # latest_mention_atから年を抽出
-        years: ListType[Any] = (
-            self.db.query(distinct(extract('year', Book.latest_mention_at)))
-            .filter(Book.latest_mention_at.isnot(None))
-            .order_by(extract('year', Book.latest_mention_at).desc())
-            .all()
-        )
+        logger.info("🔍 年リストキャッシュミス、DBクエリ実行")
         
-        return [int(year[0]) for year in years if year[0]]
+        # 直接SQLで高速化
+        sql = text("""
+            SELECT DISTINCT EXTRACT(YEAR FROM published_at)::int as year
+            FROM qiita_articles
+            WHERE published_at IS NOT NULL
+            ORDER BY year DESC
+        """)
+        
+        results = self.db.execute(sql).fetchall()
+        years = [int(row.year) for row in results if row.year]
+        
+        # 15分間キャッシュ（更新頻度低い）
+        self.cache.set(cache_key, years, ttl_seconds=900)
+        logger.info(f"年リスト取得完了: {len(years)}件、キャッシュ保存 (TTL: 900s)")
+        
+        return years
 
 
 # ヘルパー関数

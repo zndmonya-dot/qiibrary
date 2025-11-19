@@ -1,46 +1,123 @@
 'use client';
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { useParams, useRouter } from 'next/navigation';
+import { useParams } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
+import Script from 'next/script';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import LoadingSpinner from '@/components/LoadingSpinner';
 import { getBookDetail, BookDetail } from '@/lib/api';
 import { formatNumber, formatPublicationDate } from '@/lib/utils';
+import { generateBookStructuredData, generateBreadcrumbStructuredData } from '@/lib/seo';
+import { BOOK_DETAIL } from '@/lib/constants';
 
-const INITIAL_ARTICLES_COUNT = 10;
-const SHOW_MORE_INCREMENT = 10;
-const ANIMATION_TIMEOUT_MORE = 1200;
-const ANIMATION_TIMEOUT_ALL = 2000;
-const MIN_LOADING_DELAY = 300;
+// グローバルキャッシュ（コンポーネント外で管理）
+const bookDetailsCache = new Map<string, BookDetail>();
+// スクロール位置キャッシュ
+const scrollPositionCache = new Map<string, number>();
 
 export default function BookDetailPage() {
   const params = useParams();
-  const router = useRouter();
   const asin = params.asin as string;
   
   const [book, setBook] = useState<BookDetail | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [displayedArticlesCount, setDisplayedArticlesCount] = useState(INITIAL_ARTICLES_COUNT);
-  const previousCountRef = useRef(INITIAL_ARTICLES_COUNT);
+  const [isFromCache, setIsFromCache] = useState(false);
+  const [displayedArticlesCount, setDisplayedArticlesCount] = useState<number>(BOOK_DETAIL.INITIAL_ARTICLES_COUNT);
+  const previousCountRef = useRef<number>(BOOK_DETAIL.INITIAL_ARTICLES_COUNT);
   const [newlyAddedStart, setNewlyAddedStart] = useState<number | null>(null);
+  const [selectedVideoId, setSelectedVideoId] = useState<string | null>(null);
+  const [displayedVideosCount, setDisplayedVideosCount] = useState<number>(BOOK_DETAIL.INITIAL_VIDEOS_COUNT);
+  const [newlyAddedVideosStart, setNewlyAddedVideosStart] = useState<number | null>(null);
+
+  // SEO: 動的メタデータ更新
+  useEffect(() => {
+    if (!book) return;
+    
+    const articleCount = book.qiita_articles?.length || 0;
+    const totalLikes = book.qiita_articles?.reduce((sum, article) => sum + (article.likes_count || 0), 0) || 0;
+    
+    // タイトル更新
+    document.title = `${book.title} 評判・レビュー【Qiita ${articleCount}記事で紹介】 | Qiibrary`;
+    
+    // メタディスクリプション更新
+    const description = `「${book.title}」はQiitaで${articleCount}記事、${formatNumber(totalLikes)}いいねを獲得。実際に使ったエンジニアのレビューと評判をまとめました。${book.author ? `著者: ${book.author}` : ''}`;
+    
+    let metaDescription = document.querySelector('meta[name="description"]');
+    if (!metaDescription) {
+      metaDescription = document.createElement('meta');
+      metaDescription.setAttribute('name', 'description');
+      document.head.appendChild(metaDescription);
+    }
+    metaDescription.setAttribute('content', description);
+    
+    // OGP更新
+    let ogTitle = document.querySelector('meta[property="og:title"]');
+    if (!ogTitle) {
+      ogTitle = document.createElement('meta');
+      ogTitle.setAttribute('property', 'og:title');
+      document.head.appendChild(ogTitle);
+    }
+    ogTitle.setAttribute('content', `${book.title} - Qiitaで話題の技術書`);
+    
+    let ogDescription = document.querySelector('meta[property="og:description"]');
+    if (!ogDescription) {
+      ogDescription = document.createElement('meta');
+      ogDescription.setAttribute('property', 'og:description');
+      document.head.appendChild(ogDescription);
+    }
+    ogDescription.setAttribute('content', `${articleCount}記事で紹介された人気の技術書`);
+    
+    if (book.thumbnail_url) {
+      let ogImage = document.querySelector('meta[property="og:image"]');
+      if (!ogImage) {
+        ogImage = document.createElement('meta');
+        ogImage.setAttribute('property', 'og:image');
+        document.head.appendChild(ogImage);
+      }
+      ogImage.setAttribute('content', book.thumbnail_url);
+    }
+  }, [book]);
 
   useEffect(() => {
     const fetchBook = async () => {
+      // キャッシュにデータがあればそれを使用
+      const cachedData = bookDetailsCache.get(asin);
+      if (cachedData) {
+        setBook(cachedData);
+        setLoading(false);
+        setIsFromCache(true);
+        setDisplayedArticlesCount(BOOK_DETAIL.INITIAL_ARTICLES_COUNT);
+        previousCountRef.current = BOOK_DETAIL.INITIAL_ARTICLES_COUNT;
+        setNewlyAddedStart(null);
+        setDisplayedVideosCount(BOOK_DETAIL.INITIAL_VIDEOS_COUNT);
+        setNewlyAddedVideosStart(null);
+        return;
+      }
+      
+      // 新規取得時のみページトップにスクロール
+      window.scrollTo(0, 0);
+      
       setLoading(true);
       setError(null);
-      setDisplayedArticlesCount(INITIAL_ARTICLES_COUNT);
-      previousCountRef.current = INITIAL_ARTICLES_COUNT;
+      setIsFromCache(false);
+      setDisplayedArticlesCount(BOOK_DETAIL.INITIAL_ARTICLES_COUNT);
+      previousCountRef.current = BOOK_DETAIL.INITIAL_ARTICLES_COUNT;
       setNewlyAddedStart(null);
+      setDisplayedVideosCount(BOOK_DETAIL.INITIAL_VIDEOS_COUNT);
+      setNewlyAddedVideosStart(null);
       
       try {
         const data = await getBookDetail(asin);
-        const minDelay = new Promise(resolve => setTimeout(resolve, MIN_LOADING_DELAY));
+        const minDelay = new Promise(resolve => setTimeout(resolve, BOOK_DETAIL.MIN_LOADING_DELAY));
         await Promise.all([data, minDelay]);
         setBook(data);
+        
+        // データをグローバルキャッシュに保存
+        bookDetailsCache.set(asin, data);
       } catch (err) {
         setError('書籍情報の取得に失敗しました');
         console.error(err);
@@ -52,6 +129,38 @@ export default function BookDetailPage() {
     fetchBook();
   }, [asin]);
 
+  // スクロール位置の保存と復元（ちらつき防止版）
+  useEffect(() => {
+    // ブラウザのデフォルト復元を無効化
+    if ('scrollRestoration' in window.history) {
+      window.history.scrollRestoration = 'manual';
+    }
+
+    // 保存：スクロールイベント
+    const saveScroll = () => {
+      scrollPositionCache.set(asin, window.scrollY);
+    };
+
+    window.addEventListener('scroll', saveScroll, { passive: true });
+    
+    return () => {
+      window.removeEventListener('scroll', saveScroll);
+      saveScroll(); // 最後に保存
+    };
+  }, [asin]);
+
+  // 復元：データ表示直後（ちらつき防止のため即座に実行）
+  useEffect(() => {
+    if (!book) return;
+    
+    const savedPosition = scrollPositionCache.get(asin) || 0;
+    
+    if (savedPosition > 0) {
+      // 同期的に即座に復元
+      window.scrollTo(0, savedPosition);
+    }
+  }, [asin, book]);
+
   const handleShowMore = useCallback((increment: number) => {
     const currentCount = displayedArticlesCount;
     const newCount = Math.min(currentCount + increment, book?.qiita_articles.length || currentCount);
@@ -60,7 +169,7 @@ export default function BookDetailPage() {
     setDisplayedArticlesCount(newCount);
     previousCountRef.current = newCount;
     
-    setTimeout(() => setNewlyAddedStart(null), ANIMATION_TIMEOUT_MORE);
+    setTimeout(() => setNewlyAddedStart(null), BOOK_DETAIL.ANIMATION_TIMEOUT_MORE);
   }, [displayedArticlesCount, book?.qiita_articles?.length]);
 
   const handleShowAll = useCallback(() => {
@@ -73,8 +182,75 @@ export default function BookDetailPage() {
     setDisplayedArticlesCount(totalCount);
     previousCountRef.current = totalCount;
     
-    setTimeout(() => setNewlyAddedStart(null), ANIMATION_TIMEOUT_ALL);
+    setTimeout(() => setNewlyAddedStart(null), BOOK_DETAIL.ANIMATION_TIMEOUT_ALL);
   }, [displayedArticlesCount, book?.qiita_articles]);
+
+  const handleShowMoreVideos = useCallback((increment: number) => {
+    const currentCount = displayedVideosCount;
+    const newCount = Math.min(currentCount + increment, book?.youtube_videos?.length || currentCount);
+    
+    setNewlyAddedVideosStart(currentCount);
+    setDisplayedVideosCount(newCount);
+    
+    setTimeout(() => setNewlyAddedVideosStart(null), BOOK_DETAIL.ANIMATION_TIMEOUT_MORE);
+  }, [displayedVideosCount, book?.youtube_videos?.length]);
+
+  const handleShowAllVideos = useCallback(() => {
+    if (!book?.youtube_videos) return;
+    
+    const currentCount = displayedVideosCount;
+    const totalCount = book.youtube_videos.length;
+    
+    setNewlyAddedVideosStart(currentCount);
+    setDisplayedVideosCount(totalCount);
+    
+    setTimeout(() => setNewlyAddedVideosStart(null), BOOK_DETAIL.ANIMATION_TIMEOUT_ALL);
+  }, [displayedVideosCount, book?.youtube_videos]);
+
+  // 構造化データ（JSON-LD）を生成
+  const generateStructuredData = () => {
+    if (!book) return null;
+
+    const totalLikes = book.qiita_articles?.reduce((sum, article) => sum + (article.likes_count || 0), 0) || 0;
+    const articleCount = book.qiita_articles?.length || 0;
+
+    return {
+      '@context': 'https://schema.org',
+      '@type': 'Book',
+      '@id': `https://qiibrary.com/books/${asin}`,
+      name: book.title,
+      author: book.author ? {
+        '@type': 'Person',
+        name: book.author
+      } : undefined,
+      isbn: book.isbn,
+      image: book.thumbnail_url || undefined,
+      publisher: book.publisher ? {
+        '@type': 'Organization',
+        name: book.publisher
+      } : undefined,
+      datePublished: book.publication_date || undefined,
+      aggregateRating: totalLikes > 0 ? {
+        '@type': 'AggregateRating',
+        ratingValue: Math.min(5, (totalLikes / articleCount) / 20), // いいね数を5点満点に正規化
+        reviewCount: articleCount,
+        bestRating: 5,
+        worstRating: 1
+      } : undefined,
+      offers: book.amazon_affiliate_url ? {
+        '@type': 'Offer',
+        url: book.amazon_affiliate_url,
+        availability: 'https://schema.org/InStock',
+        seller: {
+          '@type': 'Organization',
+          name: 'Amazon.co.jp'
+        }
+      } : undefined,
+      description: `Qiitaで話題の技術書「${book.title}」。${articleCount}件の記事で紹介され、${totalLikes}のいいねを獲得しています。`,
+      inLanguage: 'ja',
+      genre: '技術書'
+    };
+  };
 
   if (loading) {
     return (
@@ -98,13 +274,17 @@ export default function BookDetailPage() {
               <span>{error || '書籍が見つかりませんでした'}</span>
             </div>
           </div>
-          <button
-            onClick={() => router.push('/')}
-            className="mt-4 text-qiita-green dark:text-dark-green hover:text-qiita-green-dark dark:hover:text-dark-green transition-colors duration-200 inline-flex items-center gap-1"
+          <a
+            href="/"
+            className="mt-4 text-qiita-green dark:text-dark-green hover-text-green inline-flex items-center gap-1 cursor-pointer"
+            onClick={(e) => {
+              e.preventDefault();
+              window.history.back();
+            }}
           >
             <i className="ri-arrow-left-line"></i>
             ランキングに戻る
-          </button>
+          </a>
         </div>
       </div>
     );
@@ -112,20 +292,37 @@ export default function BookDetailPage() {
 
       return (
         <div className="min-h-screen bg-qiita-bg dark:bg-dark-bg">
+          {/* 構造化データ（JSON-LD） */}
+          {book && (
+            <Script
+              id="structured-data"
+              type="application/ld+json"
+              dangerouslySetInnerHTML={{
+                __html: JSON.stringify(generateStructuredData()),
+              }}
+            />
+          )}
+          
           <Header />
           
-          <main className="container mx-auto px-3 md:px-4 py-4 md:py-8">
+          <main className="container mx-auto px-3 md:px-4 pt-6 pb-4 md:py-8 animate-fade-in">
             {/* 戻るボタン */}
-            <button
-              onClick={() => router.push('/')}
-              className="flex items-center gap-1.5 md:gap-2 text-qiita-text dark:text-dark-text hover:text-qiita-green dark:hover:text-dark-green mb-4 md:mb-8 transition-colors duration-200 text-xs md:text-sm font-medium"
-            >
-              <i className="ri-arrow-left-line text-sm md:text-base"></i>
-              <span>ランキングに戻る</span>
-            </button>
+            <div className="animate-slide-down" style={{ animationDelay: '0ms' }}>
+              <a
+                href="/"
+                className="inline-flex items-center gap-2 text-qiita-text dark:text-dark-text hover-text-green mb-4 md:mb-8 text-sm md:text-base font-medium py-2 px-3 rounded-lg transition-all duration-200 hover:bg-qiita-surface dark:hover:bg-dark-surface-light hover:pl-2 cursor-pointer"
+                onClick={(e) => {
+                  e.preventDefault();
+                  window.history.back();
+                }}
+              >
+                <i className="ri-arrow-left-line text-base md:text-lg transition-transform duration-200 group-hover:-translate-x-1"></i>
+                <span>ランキングに戻る</span>
+              </a>
+            </div>
             
             {/* タイトル */}
-            <div className="mb-4 md:mb-8">
+            <div className="mb-4 md:mb-8 animate-slide-up" style={{ animationDelay: '100ms' }}>
               <h1 className="text-xl md:text-3xl font-bold text-qiita-text-dark dark:text-white leading-tight">
                 {book.title}
               </h1>
@@ -133,7 +330,7 @@ export default function BookDetailPage() {
             
             {/* Qiita記事セクション */}
             {book.qiita_articles && book.qiita_articles.length > 0 && (
-              <div id="qiita-articles" className="mb-12 scroll-mt-24">
+              <div id="qiita-articles" className="mb-12 scroll-mt-24 animate-slide-up" style={{ animationDelay: '200ms' }}>
                 {/* セクションヘッダー */}
                 <div className="mb-4 md:mb-6">
                   <div className="flex items-center gap-2 md:gap-3 mb-1.5 md:mb-2">
@@ -153,21 +350,22 @@ export default function BookDetailPage() {
                   {book.qiita_articles.slice(0, displayedArticlesCount).map((article, index) => {
                     let style: React.CSSProperties = {};
                     
-                    if (newlyAddedStart !== null && index >= newlyAddedStart) {
-                      const relativeIndex = index - newlyAddedStart;
-                      const delayMs = Math.min(relativeIndex, 9) * 100;
-                      style = {
-                        animation: `fadeInUp 0.5s ease-out ${delayMs}ms forwards`,
-                        opacity: 0,
-                        transform: 'translateY(20px)'
-                      };
-                    } else if (index < INITIAL_ARTICLES_COUNT && displayedArticlesCount === INITIAL_ARTICLES_COUNT) {
-                      const delayMs = index * 100;
-                      style = {
-                        animation: `fadeInUp 0.5s ease-out ${delayMs}ms forwards`,
-                        opacity: 0,
-                        transform: 'translateY(20px)'
-                      };
+                    // キャッシュから復元時はアニメーションをスキップ
+                    if (!isFromCache) {
+                      if (newlyAddedStart !== null && index >= newlyAddedStart) {
+                        const relativeIndex = index - newlyAddedStart;
+                        const delayMs = Math.min(relativeIndex, 9) * 100;
+                        style = {
+                          animation: `fadeInUp 0.5s ease-out ${delayMs}ms forwards`,
+                          opacity: 0
+                        };
+                      } else if (index < BOOK_DETAIL.INITIAL_ARTICLES_COUNT && displayedArticlesCount === BOOK_DETAIL.INITIAL_ARTICLES_COUNT) {
+                        const delayMs = index * 100;
+                        style = {
+                          animation: `fadeInUp 0.5s ease-out ${delayMs}ms forwards`,
+                          opacity: 0
+                        };
+                      }
                     }
                     
                     return (
@@ -185,7 +383,7 @@ export default function BookDetailPage() {
                         </div>
                         
                         <div className="flex-1 min-w-0">
-                          <h3 className="text-sm md:text-base font-bold text-qiita-text-dark dark:text-white mb-1.5 md:mb-2 group-hover:text-qiita-green dark:group-hover:text-dark-green transition-colors line-clamp-2 leading-relaxed">
+                          <h3 className="text-sm md:text-base font-bold text-qiita-text-dark dark:text-white mb-1.5 md:mb-2 group-hover-text-green line-clamp-2 leading-relaxed">
                             {article.title}
                           </h3>
                           
@@ -239,7 +437,7 @@ export default function BookDetailPage() {
                         </div>
                         
                         <div className="flex-shrink-0 pt-0.5 md:pt-1">
-                          <i className="ri-external-link-line text-qiita-text-light dark:text-dark-text-light group-hover:text-qiita-green dark:group-hover:text-dark-green text-sm md:text-base transition-colors"></i>
+                          <i className="ri-external-link-line text-qiita-text-light dark:text-dark-text-light group-hover-text-green text-sm md:text-base"></i>
                         </div>
                       </div>
                     </a>
@@ -249,16 +447,16 @@ export default function BookDetailPage() {
                 
                 {/* もっと見る / すべて表示ボタン */}
                 {book.qiita_articles.length > displayedArticlesCount && (
-                  <div className="mt-4 md:mt-6 flex gap-2 md:gap-3 justify-center flex-wrap">
+                  <div className="mt-4 md:mt-6 flex gap-3 justify-center flex-wrap">
                     <button
-                      onClick={() => handleShowMore(SHOW_MORE_INCREMENT)}
-                      className="px-3 md:px-4 py-1.5 md:py-2 text-xs md:text-sm bg-qiita-green dark:bg-dark-green text-white rounded-lg hover:opacity-90 transition-opacity font-medium"
+                      onClick={() => handleShowMore(BOOK_DETAIL.SHOW_MORE_INCREMENT)}
+                      className="px-4 md:px-5 py-2.5 md:py-3 text-sm md:text-base bg-qiita-green dark:bg-dark-green text-white rounded-lg hover-opacity-90 font-semibold"
                     >
-                      もっと見る（+{SHOW_MORE_INCREMENT}件）
+                      もっと見る（+{BOOK_DETAIL.SHOW_MORE_INCREMENT}件）
                     </button>
                     <button
                       onClick={handleShowAll}
-                      className="px-3 md:px-4 py-1.5 md:py-2 text-xs md:text-sm bg-qiita-surface dark:bg-dark-surface-light text-qiita-text-dark dark:text-white rounded-lg hover-primary font-medium"
+                      className="px-4 md:px-5 py-2.5 md:py-3 text-sm md:text-base bg-qiita-surface dark:bg-dark-surface-light text-qiita-text-dark dark:text-white rounded-lg hover-primary font-semibold"
                     >
                       すべて表示（全{book.qiita_articles.length}件）
                     </button>
@@ -266,7 +464,195 @@ export default function BookDetailPage() {
                 )}
               </div>
             )}
+
+            {/* YouTube動画セクション */}
+            {book.youtube_videos && book.youtube_videos.length > 0 && (
+              <div id="youtube-videos" className="mb-12 scroll-mt-24 animate-slide-up" style={{ animationDelay: '300ms' }}>
+                {/* セクションヘッダー */}
+                <div className="mb-4 md:mb-6">
+                  <div className="flex items-center gap-2 md:gap-3 mb-1.5 md:mb-2">
+                    <h2 className="text-base md:text-lg font-bold text-qiita-text-dark dark:text-white">
+                      関連動画
+                    </h2>
+                    <span className="text-xs md:text-sm font-bold text-red-500 dark:text-red-400 px-1.5 md:px-2 py-0.5 bg-red-500/10 dark:bg-red-500/20 rounded">
+                      {book.youtube_videos.length}件
+                    </span>
+                  </div>
+                  <p className="text-xs md:text-sm text-qiita-text dark:text-dark-text">
+                    この本について詳しく解説している動画
+                  </p>
+                </div>
+                
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-3">
+                  {book.youtube_videos.slice(0, displayedVideosCount).map((video, index) => {
+                    let style: React.CSSProperties = {};
+                    
+                    // キャッシュから復元時はアニメーションをスキップ
+                    if (!isFromCache) {
+                      if (newlyAddedVideosStart !== null && index >= newlyAddedVideosStart) {
+                        const relativeIndex = index - newlyAddedVideosStart;
+                        const delayMs = Math.min(relativeIndex, 8) * 100;
+                        style = {
+                          animation: `fadeInUp 0.5s ease-out ${delayMs}ms forwards`,
+                          opacity: 0
+                        };
+                      } else if (index < 8 && displayedVideosCount === 8) {
+                        const delayMs = index * 100;
+                        style = {
+                          animation: `fadeInUp 0.5s ease-out ${delayMs}ms forwards`,
+                          opacity: 0
+                        };
+                      }
+                    }
+
+                    return (
+                      <button
+                        key={video.video_id}
+                        onClick={() => setSelectedVideoId(video.video_id)}
+                        className="block rounded-lg bg-qiita-surface dark:bg-[#2f3232] overflow-hidden w-full text-left border border-qiita-border dark:border-dark-border hover-card"
+                        style={style}
+                      >
+                        {/* サムネイル */}
+                        <div className="relative aspect-video bg-gray-200 dark:bg-gray-800 overflow-hidden">
+                          {video.thumbnail_url && (
+                            <img
+                              src={video.thumbnail_url}
+                              alt={video.title}
+                              className="w-full h-full object-cover"
+                            />
+                          )}
+                          <div className="absolute inset-0 flex items-center justify-center">
+                            <div className="w-10 h-10 md:w-12 md:h-12 bg-red-600 rounded-full flex items-center justify-center shadow-lg">
+                              <i className="ri-play-fill text-white text-lg md:text-2xl ml-0.5"></i>
+                            </div>
+                          </div>
+                        </div>
+                        
+                        {/* 動画情報 */}
+                        <div className="p-2 md:p-3">
+                          <h3 className="text-xs md:text-sm font-bold text-qiita-text-dark dark:text-white mb-1.5 md:mb-2 line-clamp-2 leading-relaxed">
+                            {video.title}
+                          </h3>
+                          
+                          <div className="flex items-center gap-1.5 text-[10px] md:text-xs text-qiita-text dark:text-dark-text mb-1 md:mb-1.5">
+                            <div className="flex items-center gap-0.5 md:gap-1 truncate">
+                              <i className="ri-youtube-line text-red-500 flex-shrink-0"></i>
+                              <span className="truncate">{video.channel_name}</span>
+                            </div>
+                          </div>
+                          
+                          {/* 再生回数・いいね数 */}
+                          {(video.view_count > 0 || video.like_count > 0) && (
+                            <div className="flex items-center gap-2 text-[10px] md:text-xs text-qiita-text dark:text-dark-text">
+                              {video.view_count > 0 && (
+                                <div className="flex items-center gap-0.5 md:gap-1">
+                                  <i className="ri-play-circle-line"></i>
+                                  <span>{video.view_count.toLocaleString()}回</span>
+                                </div>
+                              )}
+                              {video.like_count > 0 && (
+                                <div className="flex items-center gap-0.5 md:gap-1">
+                                  <i className="ri-thumb-up-line"></i>
+                                  <span>{video.like_count.toLocaleString()}</span>
+                                </div>
+                              )}
+                            </div>
+                          )}
+                        </div>
+                      </button>
+                    );
+                  })}
+                </div>
+                
+                {/* もっと見る / すべて表示ボタン */}
+                {book.youtube_videos.length > displayedVideosCount && (
+                  <div className="mt-4 md:mt-6 flex gap-3 justify-center flex-wrap">
+                    <button
+                      onClick={() => handleShowMoreVideos(12)}
+                      className="px-4 md:px-5 py-2.5 md:py-3 text-sm md:text-base bg-red-500 dark:bg-red-600 text-white rounded-lg hover-opacity-90 font-semibold"
+                    >
+                      もっと見る（+12件）
+                    </button>
+                    <button
+                      onClick={handleShowAllVideos}
+                      className="px-4 md:px-5 py-2.5 md:py-3 text-sm md:text-base bg-qiita-surface dark:bg-dark-surface-light text-qiita-text-dark dark:text-white rounded-lg hover-primary font-semibold"
+                    >
+                      すべて表示（全{book.youtube_videos.length}件）
+                    </button>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Amazonで購入ボタン */}
+            {book.amazon_affiliate_url && (
+              <div className="mt-8 md:mt-12 flex justify-center">
+                <a
+                  href={book.amazon_affiliate_url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 md:gap-3 px-6 md:px-8 py-3 md:py-3.5 bg-[#FF9900] hover:bg-[#E88B00] text-white font-bold text-sm md:text-base rounded-lg transition-colors duration-200"
+                >
+                  <i className="ri-shopping-cart-line text-lg md:text-xl"></i>
+                  <span>Amazonで購入する</span>
+                  <i className="ri-external-link-line text-sm md:text-base"></i>
+                </a>
+              </div>
+            )}
+
+            {/* 動画再生モーダル */}
+            {selectedVideoId && (
+              <div
+                className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4 animate-fade-in"
+                onClick={() => setSelectedVideoId(null)}
+              >
+                <div
+                  className="relative w-full max-w-3xl aspect-video bg-black rounded-lg overflow-hidden shadow-2xl"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  {/* 閉じるボタン */}
+                  <button
+                    onClick={() => setSelectedVideoId(null)}
+                    className="absolute top-2 right-2 md:top-4 md:right-4 w-10 h-10 bg-black/50 hover:bg-black/70 text-white rounded-full flex items-center justify-center z-10 transition-colors"
+                    aria-label="閉じる"
+                  >
+                    <i className="ri-close-line text-2xl"></i>
+                  </button>
+                  
+                  {/* YouTube埋め込み */}
+                  <iframe
+                    src={`https://www.youtube.com/embed/${selectedVideoId}?autoplay=1`}
+                    className="w-full h-full"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowFullScreen
+                  ></iframe>
+                </div>
+              </div>
+            )}
       </main>
+      
+      {/* 構造化データ（JSON-LD） */}
+      {book && (
+        <>
+          <script
+            type="application/ld+json"
+            dangerouslySetInnerHTML={{
+              __html: JSON.stringify(generateBookStructuredData(book)),
+            }}
+          />
+          <script
+            type="application/ld+json"
+            dangerouslySetInnerHTML={{
+              __html: JSON.stringify(
+                generateBreadcrumbStructuredData([
+                  { name: 'ホーム', url: '/' },
+                  { name: book.title || '書籍詳細', url: `/books/${asin}` },
+                ])
+              ),
+            }}
+          />
+        </>
+      )}
       
       <Footer />
     </div>

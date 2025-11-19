@@ -1,11 +1,24 @@
 'use client';
 
-import { Theme, DEFAULT_THEME } from './constants';
+/**
+ * システムのカラースキーム設定を取得
+ */
+function getSystemTheme(): 'light' | 'dark' {
+  if (typeof window === 'undefined') return 'dark';
+  
+  try {
+    return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+  } catch (e) {
+    return 'dark';
+  }
+}
 
 /**
- * テーマをDOMに適用（ユーザー設定は保存しない）
+ * OSのテーマ設定をDOMに適用
  */
-export function applyTheme(theme: Theme): void {
+export function applySystemTheme(): void {
+  const theme = getSystemTheme();
+  
   if (theme === 'dark') {
     document.documentElement.classList.add('dark');
   } else {
@@ -14,28 +27,21 @@ export function applyTheme(theme: Theme): void {
 }
 
 /**
- * 現在のテーマを取得（DOMから）
+ * システム設定の変更を監視
+ * @param callback システム設定が変更されたときに呼ばれる関数
+ * @returns クリーンアップ関数
  */
-export function getCurrentTheme(): Theme {
-  if (typeof window === 'undefined') return DEFAULT_THEME;
+export function watchSystemTheme(callback: () => void): () => void {
+  if (typeof window === 'undefined') return () => {};
   
-  const isDark = document.documentElement.classList.contains('dark');
-  return isDark ? 'dark' : 'light';
-}
-
-/**
- * テーマを切り替え
- */
-export function toggleTheme(): Theme {
-  const current = getCurrentTheme();
-  const newTheme: Theme = current === 'dark' ? 'light' : 'dark';
-  applyTheme(newTheme);
-  return newTheme;
-}
-
-/**
- * テーマを初期化（ページロード時に呼び出す）
- */
-export function initTheme(): void {
-  applyTheme(DEFAULT_THEME);
+  try {
+    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+    const listener = () => callback();
+    
+    mediaQuery.addEventListener('change', listener);
+    
+    return () => mediaQuery.removeEventListener('change', listener);
+  } catch (e) {
+    return () => {};
+  }
 }
