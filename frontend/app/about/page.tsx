@@ -31,14 +31,17 @@ export default function AboutPage() {
               </h2>
               <div className="bg-qiita-surface dark:bg-dark-surface-light rounded-lg p-5">
                 <p className="mb-3">
-                  Qiibraryは、<span className="font-semibold text-qiita-text-dark dark:text-white">Qiitaで話題のIT技術書をランキング形式で可視化する</span>独立系メディアです。
+                  Qiibraryは、実務で役立つ技術書をすばやく見つけたいエンジニア・技術リーダーのための情報サイトです。
+                  Qiita上で話題になった書籍の動向を毎日集計し、「今、現場で読まれている本」をわかりやすく提示します。
                 </p>
                 <p className="mb-3">
-                  「Qiitaの現場で今どんな本が支持されているのか」「昨年と今年で何が変わったのか」を、毎日自動で追跡できるようにすることが私たちの使命です。
+                  新しいスキルを習得したい、若手メンバーへの推薦本を探したい、購買計画に確信を持ちたい――そんな場面で迷わないよう、
+                  データに裏付けられたランキングとサマリーを提供します。
                 </p>
                 <p>
-                  Qiita記事から抽出したAmazonリンクを解析し、Neon DBに蓄積したデータをもとに、
-                  <span className="font-semibold">24時間以内・30日・365日・年別</span>など複数の粒度でリアルタイムにランキングを生成しています。
+                  Qiita記事に含まれるAmazonリンクを解析し、Neon DBに蓄積した情報をもとに
+                  <span className="font-semibold">24時間・30日・365日・年別・全期間</span>の5視点で傾向を確認できます。
+                  特定ジャンルや著者名での検索にも対応し、意思決定に必要な情報を最短で取得できます。
                 </p>
               </div>
             </section>
@@ -58,7 +61,7 @@ export default function AboutPage() {
                         圧倒的なデータ量
                       </h3>
                       <p className="text-sm mb-2">
-                        <span className="font-bold text-qiita-green dark:text-dark-green text-lg">17,399冊</span>の技術書データを網羅
+                        <span className="font-bold text-qiita-green dark:text-dark-green text-lg">17,399冊</span>の技術書データを継続的に更新
                       </p>
                       <p className="text-xs text-qiita-text-light dark:text-dark-text-light">
                         他サイト: 数百〜数千冊程度
@@ -109,7 +112,7 @@ export default function AboutPage() {
                         最高のUI/UX
                       </h3>
                       <p className="text-sm mb-2">
-                        PageSpeed Insights <span className="font-bold text-qiita-green dark:text-dark-green">99点</span>、モバイル最適化済み
+                        PageSpeed Insights <span className="font-bold text-qiita-green dark:text-dark-green">99点</span>、モバイル利用でも快適
                       </p>
                       <p className="text-xs text-qiita-text-light dark:text-dark-text-light">
                         他サイト: 古いデザイン、動作が重い
@@ -125,8 +128,8 @@ export default function AboutPage() {
                   柔軟な期間設定
                 </h3>
                 <p className="text-sm mb-3">
-                  日次・月次・年次・全期間、さらに<span className="font-bold">2015年〜2025年の各年</span>で集計可能。
-                  期間ごとに重み付けを変えた指標で「旬」と「定番」を同時に追えます。
+                  日次・月次・年次・全期間、さらに<span className="font-bold">2015年〜2025年の各年</span>で集計できます。
+                  直近のトレンドと長期的な定番を同時に把握できる設計です。
                 </p>
                 <div className="flex flex-wrap gap-2">
                   <span className="px-3 py-1 bg-qiita-green/20 dark:bg-dark-green/20 text-qiita-green dark:text-dark-green rounded-full text-xs font-medium">
