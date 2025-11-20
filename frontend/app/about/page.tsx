@@ -31,19 +31,26 @@ export default function AboutPage() {
               </h2>
               <div className="bg-qiita-surface dark:bg-dark-surface-light rounded-lg p-5 space-y-4">
                 <p>
-                  Qiibraryは、Qiitaでの書籍言及データをもとに「現場でいま読まれている技術書」を可視化するサービスです。
-                  書籍探しにかける時間を最小化し、学習計画やチーム推奨図書のアップデートを支援します。
+                  Qiibraryは、「Qiitaで取り上げられた技術書」の動きを俯瞰し、いま現場で支持されている一冊をすぐ見つけられるようにするためのサービスです。
+                  研修教材の刷新やチームの推薦図書づくり、個人の学習計画づくりを、データに基づく客観的な視点で支援します。
                 </p>
-                <p className="text-sm bg-white/70 dark:bg-dark-surface rounded-lg p-4 border border-qiita-border/40 dark:border-dark-border/40">
-                  <span className="font-semibold text-qiita-text-dark dark:text-white">提供価値</span><br />
-                  ・Qiita記事を毎日クロールし、AmazonリンクからASIN/ISBNを抽出<br />
-                  ・Neon DBで履歴管理し、24h / 30d / 365d / 年別 / 全期間ランキングを生成<br />
-                  ・各書籍の初出日・最新言及日・累計言及数を自動で補正
-                </p>
-                <p>
-                  ユースケースは、開発チームの教材リスト刷新、個人のスキルマップ策定、法人の研修コンテンツ選定など。
-                  エンジニアリングマネージャーや技術顧問の定例資料にもそのまま転用できる粒度を意識しています。
-                </p>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-sm">
+                  <div className="bg-white/70 dark:bg-dark-surface rounded-lg p-4 border border-qiita-border/40 dark:border-dark-border/40">
+                    <p className="text-xs text-qiita-text-light dark:text-dark-text-light mb-1">毎日更新のランキング</p>
+                    <p className="font-semibold text-qiita-text-dark dark:text-white">24h / 30d / 365d / 年別 / 全期間</p>
+                    <p className="text-xs text-qiita-text-light mt-1">用途に合わせて切り替えられます</p>
+                  </div>
+                  <div className="bg-white/70 dark:bg-dark-surface rounded-lg p-4 border border-qiita-border/40 dark:border-dark-border/40">
+                    <p className="text-xs text-qiita-text-light dark:text-dark-text-light mb-1">信頼できる指標</p>
+                    <p className="font-semibold text-qiita-text-dark dark:text-white">初出日 / 最新言及 / 累計件数</p>
+                    <p className="text-xs text-qiita-text-light mt-1">書籍の熟成度や勢いを把握できます</p>
+                  </div>
+                  <div className="bg-white/70 dark:bg-dark-surface rounded-lg p-4 border border-qiita-border/40 dark:border-dark-border/40">
+                    <p className="text-xs text-qiita-text-light dark:text-dark-text-light mb-1">主な活用シーン</p>
+                    <p className="font-semibold text-qiita-text-dark dark:text-white">教材選定 / 採用オンボーディング / 個人学習</p>
+                    <p className="text-xs text-qiita-text-light mt-1">忙しいマネージャーや個人の指針に</p>
+                  </div>
+                </div>
               </div>
             </section>
 
@@ -257,63 +264,32 @@ export default function AboutPage() {
               </div>
             </section>
 
-            {/* 運用と品質管理 */}
+            {/* データの新鮮さと信頼性 */}
             <section>
               <h2 className="text-lg md:text-xl font-bold text-qiita-text-dark dark:text-white mb-4 pb-2 border-b border-qiita-border/50 dark:border-dark-border/50 flex items-center gap-2">
                 <i className="ri-shield-check-line text-qiita-green dark:text-dark-green"></i>
-                運用と品質管理
+                データの新鮮さと信頼性
               </h2>
               <div className="bg-qiita-surface dark:bg-dark-surface-light rounded-lg p-5 space-y-4 text-sm">
                 <div className="flex items-start gap-3">
                   <i className="ri-time-line text-qiita-green dark:text-dark-green text-lg"></i>
                   <div>
-                    <p className="font-semibold text-qiita-text-dark dark:text-white">日次ジョブ + 速報検知</p>
-                    <p>Renderで動作するFastAPIジョブが毎日00:00 JSTに前日分の記事を取得し、GitHub Actionsがバックアップ収集を担当します。</p>
+                    <p className="font-semibold text-qiita-text-dark dark:text-white">毎朝更新</p>
+                    <p>毎日00:00（日本時間）に前日分のQiita記事を取り込み、ランキングへ反映します。急なバズがあった場合は速報で確認し、必要に応じて即時反映します。</p>
                   </div>
                 </div>
                 <div className="flex items-start gap-3">
                   <i className="ri-database-line text-qiita-green dark:text-dark-green text-lg"></i>
                   <div>
-                    <p className="font-semibold text-qiita-text-dark dark:text-white">統計値の自動補正</p>
-                    <p>first_mentioned_at / latest_mention_at / total_mentions をバッチで再計算し、欠損や異常値が出た書籍は隔離テーブルで検査します。</p>
+                    <p className="font-semibold text-qiita-text-dark dark:text-white">自動チェック</p>
+                    <p>書籍ごとの初出日・最新言及日・累計件数を定期的に再計算し、欠損や異常値があれば公開前に弾いています。</p>
                   </div>
                 </div>
                 <div className="flex items-start gap-3">
                   <i className="ri-eye-line text-qiita-green dark:text-dark-green text-lg"></i>
                   <div>
-                    <p className="font-semibold text-qiita-text-dark dark:text-white">手動レビュー</p>
-                    <p>大きな順位変動や新規カテゴリが増えた際は、運営者が元記事を確認し、補足コメントやタグ調整を行います。</p>
-                  </div>
-                </div>
-              </div>
-            </section>
-
-            {/* データ更新と品質管理 */}
-            <section>
-              <h2 className="text-lg md:text-xl font-bold text-qiita-text-dark dark:text-white mb-4 pb-2 border-b border-qiita-border/50 dark:border-dark-border/50 flex items-center gap-2">
-                <i className="ri-refresh-line text-qiita-green dark:text-dark-green"></i>
-                データ更新と品質管理
-              </h2>
-              <div className="bg-qiita-surface dark:bg-dark-surface-light rounded-lg p-5 border border-qiita-border dark:border-dark-border space-y-4 text-sm">
-                <div className="flex items-start gap-3">
-                  <i className="ri-time-line text-qiita-green dark:text-dark-green text-xl mt-0.5"></i>
-                  <div>
-                    <p className="font-semibold text-qiita-text-dark dark:text-white">24時間ごとの自動収集</p>
-                    <p>Render上で稼働するFastAPIバッチとGitHub Actionsにより、毎日00:00 JSTに前日分の記事を取り込みます。</p>
-                  </div>
-                </div>
-                <div className="flex items-start gap-3">
-                  <i className="ri-database-2-line text-qiita-green dark:text-dark-green text-xl mt-0.5"></i>
-                  <div>
-                    <p className="font-semibold text-qiita-text-dark dark:text-white">Neon DBでの整合性チェック</p>
-                    <p>first_mentioned_at / latest_mention_at / total_mentions を必ず埋める統計ジョブを通し、欠損や重複を検知します。</p>
-                  </div>
-                </div>
-                <div className="flex items-start gap-3">
-                  <i className="ri-file-check-line text-qiita-green dark:text-dark-green text-xl mt-0.5"></i>
-                  <div>
-                    <p className="font-semibold text-qiita-text-dark dark:text-white">人手によるレビュー</p>
-                    <p>新しく追加されたID帯は、Amazonリンクの抽出精度・著者表記（「著者情報なし」等）を確認した上で公開しています。</p>
+                    <p className="font-semibold text-qiita-text-dark dark:text-white">目視での補正</p>
+                    <p>急激な順位変化やデータの偏りが確認された場合は、元記事を読み直してタグやジャンルの整合性を確認し、利用者にとって違和感のない表示に整えます。</p>
                   </div>
                 </div>
               </div>
