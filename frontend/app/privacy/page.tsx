@@ -27,8 +27,8 @@ export default function PrivacyPage() {
                 1. はじめに
               </h2>
               <p>
-                Qiibrary（以下「当サイト」といいます）は、利用者のプライバシーを尊重し、個人情報の保護に努めます。
-                本プライバシーポリシーは、当サイトが利用者の情報をどのように収集、使用、保護するかを説明するものです。
+                当サイト Qiibrary（以下「当サイト」）は、利用者のプライバシー保護を重要な責務と考えています。本ポリシーでは、
+                取得する情報の種類、利用目的、第三者提供、情報の管理方法等について説明します。
               </p>
             </section>
 
@@ -36,26 +36,20 @@ export default function PrivacyPage() {
               <h2 className="text-lg md:text-xl font-bold text-qiita-text-dark dark:text-white mb-4 pb-2 border-b border-qiita-border/50 dark:border-dark-border/50">
                 2. 収集する情報
               </h2>
-              <p className="mb-3">
-                当サイトでは、サービスの提供および改善のために、以下の情報を収集することがあります：
-              </p>
+              <p className="mb-3">当サイトは、サービスの提供および改善のために、以下の情報を取得することがあります。</p>
               <div className="space-y-4 ml-4">
-                <div className="bg-qiita-surface dark:bg-dark-surface-light rounded-lg p-4">
-                  <h3 className="font-semibold text-qiita-text-dark dark:text-white mb-2">2.1 自動的に収集される情報</h3>
+                <div className="bg-qiita-surface dark:bg-dark-surface-light rounded-lg p-4 space-y-2">
+                  <h3 className="font-semibold text-qiita-text-dark dark:text-white">2.1 自動的に取得する情報</h3>
                   <ul className="list-disc list-inside space-y-1 ml-4 text-sm">
-                    <li>IPアドレス</li>
-                    <li>ブラウザの種類とバージョン</li>
-                    <li>オペレーティングシステム</li>
-                    <li>アクセス日時</li>
-                    <li>閲覧ページのURL</li>
-                    <li>リファラー情報（どのサイトから訪問したか）</li>
+                    <li>IP アドレス</li>
+                    <li>ブラウザの種類・バージョンおよび利用端末のOS</li>
+                    <li>アクセス日時・閲覧ページのURL・リファラー情報</li>
                   </ul>
                 </div>
-                <div className="bg-qiita-surface dark:bg-dark-surface-light rounded-lg p-4">
-                  <h3 className="font-semibold text-qiita-text-dark dark:text-white mb-2">2.2 利用者が提供する情報</h3>
+                <div className="bg-qiita-surface dark:bg-dark-surface-light rounded-lg p-4 space-y-2">
+                  <h3 className="font-semibold text-qiita-text-dark dark:text-white">2.2 利用者が提供する情報</h3>
                   <p className="text-sm">
-                    当サイトは、現在のところ会員登録機能やお問い合わせフォームを提供していないため、
-                    利用者が直接提供する個人情報は収集していません。
+                    現時点では会員登録や問い合わせフォームを設けていないため、利用者から直接個人情報を取得することはありません。
                   </p>
                 </div>
               </div>
@@ -66,121 +60,100 @@ export default function PrivacyPage() {
                 3. テーマ設定について
               </h2>
               <div className="bg-qiita-surface dark:bg-dark-surface-light rounded-lg p-4">
-                <p className="mb-2">
-                  当サイトでは、ダークモード/ライトモードの表示設定について、ブラウザストレージ（localStorageやsessionStorage）は使用していません。
-                </p>
                 <p className="text-sm">
-                  テーマ設定は、利用者のデバイスのシステム設定（OSのダークモード設定）を自動的に検出して適用します。
-                  これにより、利用者の情報をブラウザに保存することなく、快適な表示環境を提供しています。
+                  当サイトではダーク/ライトテーマの設定情報をブラウザに保存していません。利用者の OS 設定を参照して表示を切り替えますので、テーマ設定に伴う個人情報の取得・保存は行っていません。
                 </p>
               </div>
             </section>
 
             <section>
               <h2 className="text-lg md:text-xl font-bold text-qiita-text-dark dark:text-white mb-4 pb-2 border-b border-qiita-border/50 dark:border-dark-border/50">
-                4. 外部サービスの利用
+                4. クッキーおよび広告識別子
               </h2>
-              <p className="mb-3">当サイトでは、以下の外部サービスを利用しています：</p>
-              <p className="mb-3 text-sm bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-3">
-                <i className="ri-information-line text-blue-600 dark:text-blue-400 mr-1"></i>
-                <strong>アクセス解析について:</strong> 現在、Google Analytics等のアクセス解析ツールは使用していません。
-                将来的に導入する場合は、本ポリシーを更新し、利用者に通知いたします。
-              </p>
-              <div className="space-y-4 ml-4">
-                <div className="bg-qiita-surface dark:bg-dark-surface-light rounded-lg p-4">
-                  <h3 className="font-semibold text-qiita-text-dark dark:text-white mb-2 flex items-center gap-2">
-                    <i className="ri-article-line text-qiita-green dark:text-dark-green"></i>
-                    4.1 Qiita API
-                  </h3>
-                  <p className="text-sm">
-                    技術記事の情報を取得するために、Qiita株式会社が提供するAPIを利用しています。
-                    当サイトからQiita APIへのリクエストには、利用者の個人情報は含まれません。
-                    Qiitaのプライバシーポリシーについては、
-                    <a href="https://qiita.com/privacy" target="_blank" rel="noopener noreferrer" className="text-qiita-green hover-underline mx-1">
-                      Qiita公式サイト
-                    </a>
-                    をご確認ください。
-                  </p>
-                </div>
-                <div className="bg-qiita-surface dark:bg-dark-surface-light rounded-lg p-4">
-                  <h3 className="font-semibold text-qiita-text-dark dark:text-white mb-2 flex items-center gap-2">
-                    <i className="ri-youtube-line text-red-500"></i>
-                    4.2 YouTube Data API
-                  </h3>
-                  <p className="text-sm">
-                    技術書を紹介するYouTube動画の情報を取得するために、Google LLCが提供するYouTube Data APIを利用しています。
-                    当サイトからYouTube Data APIへのリクエストには、利用者の個人情報は含まれません。
-                    YouTubeのプライバシーポリシーについては、
-                    <a href="https://www.youtube.com/intl/ja/howyoutubeworks/our-commitments/protecting-user-data/" target="_blank" rel="noopener noreferrer" className="text-qiita-green hover-underline mx-1">
-                      YouTube公式サイト
-                    </a>
-                    をご確認ください。
-                  </p>
-                </div>
-                <div className="bg-qiita-surface dark:bg-dark-surface-light rounded-lg p-4">
-                  <h3 className="font-semibold text-qiita-text-dark dark:text-white mb-2 flex items-center gap-2">
-                    <i className="ri-book-line text-qiita-green dark:text-dark-green"></i>
-                    4.3 書籍情報の取得
-                  </h3>
-                  <p className="text-sm mb-2">
-                    書籍情報を取得するために、以下のサービスを利用しています：
-                  </p>
-                  <ul className="list-disc list-inside space-y-1 ml-4 text-sm">
-                    <li><strong>OpenBD API</strong>: 日本の書籍データベースから書籍情報を取得</li>
-                    <li><strong>Google Books API</strong>: 書籍の詳細情報や表紙画像を取得</li>
-                  </ul>
-                  <p className="text-sm mt-2 text-qiita-text-light dark:text-dark-text-light">
-                    当サイトからこれらのAPIへのリクエストには、利用者の個人情報は含まれません。
-                  </p>
-                </div>
-              </div>
-            </section>
-
-            <section>
-              <h2 className="text-lg md:text-xl font-bold text-qiita-text-dark dark:text-white mb-4 pb-2 border-b border-qiita-border/50 dark:border-dark-border/50">
-                5. Amazonアソシエイトプログラムについて
-              </h2>
-              <div className="bg-qiita-surface dark:bg-dark-surface-light rounded-lg p-4 mb-3">
-                <p className="mb-3">
-                  当サイトは、Amazon.co.jpを宣伝しリンクすることによってサイトが紹介料を獲得できる手段を提供することを目的に設定されたアフィリエイトプログラムである、Amazonアソシエイト・プログラムの参加者です。
+              <div className="bg-qiita-surface dark:bg-dark-surface-light rounded-lg p-4 space-y-3 text-sm">
+                <p>
+                  当サイトは、サービス提供に不可欠な範囲でのみファーストパーティクッキーを使用します。ログイン機能などは設けておらず、当サイト側で個人を特定するための識別子を保持しません。
                 </p>
-                <div className="space-y-3 text-sm">
-                  <div>
-                    <strong className="text-qiita-text-dark dark:text-white">価格と在庫について：</strong>
-                    <span className="ml-2">当サイトに掲載されている書籍情報は、OpenBDおよびGoogle Books APIから取得しており、Amazon.co.jpの最新の価格や在庫状況とは異なる場合があります。
-                    最新の情報は、必ずAmazon.co.jpの商品ページでご確認ください。</span>
-                  </div>
-                  <div>
-                    <strong className="text-qiita-text-dark dark:text-white">紹介料について：</strong>
-                    <span className="ml-2">利用者が当サイト経由でAmazon.co.jpにアクセスし商品を購入した場合、当サイトはAmazonから紹介料を受け取ることがあります。
-                    これにより利用者に追加の費用が発生することはありません。</span>
-                  </div>
-                  <div>
-                    <strong className="text-qiita-text-dark dark:text-white">クッキーの使用：</strong>
-                    <span className="ml-2">Amazonアソシエイトプログラムでは、アフィリエイトリンクのトラッキングのためにAmazonがクッキーを使用します。
-                    これらのクッキーはAmazonによって管理され、当サイトはアクセスできません。</span>
-                  </div>
+                <p>
+                  ただし、Google AdSense 等の第三者配信事業者や Amazon アソシエイトの計測タグは、パーソナライズド広告表示や不正防止のためにクッキーや広告識別子を利用します。これらのクッキー情報は各事業者が管理し、当サイトが閲覧・保存することはありません。
+                </p>
+                <ul className="list-disc list-inside space-y-1 ml-4">
+                  <li>閲覧履歴に基づく広告表示の最適化</li>
+                  <li>広告表示回数・クリック数の計測と不正防止</li>
+                  <li>アフィリエイト成果の判断</li>
+                </ul>
+                <p>
+                  クッキーの使用を希望されない場合は、ブラウザの設定で無効化するか、
+                  <a
+                    href="https://adssettings.google.com/authenticated?hl=ja"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-qiita-green hover-underline mx-1 font-semibold"
+                  >
+                    Google 広告設定
+                  </a>
+                  でパーソナライズド広告を停止してください。詳細は
+                  <a
+                    href="https://policies.google.com/technologies/ads?hl=ja"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-qiita-green hover-underline mx-1 font-semibold"
+                  >
+                    Google の広告ポリシー
+                  </a>
+                  をご確認ください。
+                </p>
+              </div>
+            </section>
+
+            <section>
+              <h2 className="text-lg md:text-xl font-bold text-qiita-text-dark dark:text-white mb-4 pb-2 border-b border-qiita-border/50 dark:border-dark-border/50">
+                5. 外部サービスの利用
+              </h2>
+              <div className="space-y-4 text-sm">
+                <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-3">
+                  現在、Google Analytics などのアクセス解析ツールは利用していません。導入する場合は本ポリシーを改訂しお知らせします。
+                </div>
+                <div className="bg-qiita-surface dark:bg-dark-surface-light rounded-lg p-4">
+                  <p className="font-semibold text-qiita-text-dark dark:text-white">Qiita API</p>
+                  <p>Qiita 株式会社が提供する API を通じて記事情報を取得します。リクエストに利用者の個人情報は含まれません。</p>
+                </div>
+                <div className="bg-qiita-surface dark:bg-dark-surface-light rounded-lg p-4">
+                  <p className="font-semibold text-qiita-text-dark dark:text-white">YouTube Data API</p>
+                  <p>Google LLC が提供する API を利用し、技術書を紹介する動画情報を取得する場合があります。利用者情報は送信しません。</p>
+                </div>
+                <div className="bg-qiita-surface dark:bg-dark-surface-light rounded-lg p-4">
+                  <p className="font-semibold text-qiita-text-dark dark:text-white">OpenBD / Google Books API</p>
+                  <p>書籍の基本情報や表紙画像を取得するために利用します。これらのリクエストにも利用者の個人情報は含まれません。</p>
                 </div>
               </div>
             </section>
 
             <section>
               <h2 className="text-lg md:text-xl font-bold text-qiita-text-dark dark:text-white mb-4 pb-2 border-b border-qiita-border/50 dark:border-dark-border/50">
-                6. 情報の利用目的
+                6. 広告およびアフィリエイト
               </h2>
-              <p className="mb-2">収集した情報は、以下の目的で利用します：</p>
-              <ul className="list-disc list-inside space-y-1 ml-4 bg-qiita-surface dark:bg-dark-surface-light rounded-lg p-4">
-                <li>サービスの提供および運営</li>
-                <li>サービスの改善および新機能の開発</li>
-                <li>アクセス状況の分析</li>
-                <li>技術的な問題の診断と解決</li>
-                <li>不正利用の防止</li>
+              <div className="bg-qiita-surface dark:bg-dark-surface-light rounded-lg p-4 space-y-3 text-sm">
+                <p>当サイトは Google AdSense の審査および配信ポリシーに従い広告枠を設けます。広告枠では第三者配信事業者がクッキーや広告識別子を使用する場合があります。</p>
+                <p>また、Amazon アソシエイト・プログラムに参加しており、リンク経由で購入が発生した場合に紹介料を受領します。利用者に追加費用は発生せず、書籍情報は OpenBD / Google Books API を基に掲載しているため Amazon.co.jp の最新情報と差異が生じることがあります。</p>
+                <p>Google AdSense のデータ利用については Google ポリシーをご確認ください。Amazon アソシエイトで使用されるクッキーは Amazon が管理し、当サイトでは閲覧できません。</p>
+              </div>
+            </section>
+
+            <section>
+              <h2 className="text-lg md:text-xl font-bold text-qiita-text-dark dark:text-white mb-4 pb-2 border-b border-qiita-border/50 dark:border-dark-border/50">
+                7. 情報の利用目的
+              </h2>
+              <ul className="list-disc list-inside space-y-1 ml-4 bg-qiita-surface dark:bg-dark-surface-light rounded-lg p-4 text-sm">
+                <li>サービスの提供・運営</li>
+                <li>機能改善や不具合対応</li>
+                <li>アクセス状況の把握と不正利用防止</li>
               </ul>
             </section>
 
             <section>
               <h2 className="text-lg md:text-xl font-bold text-qiita-text-dark dark:text-white mb-4 pb-2 border-b border-qiita-border/50 dark:border-dark-border/50">
-                7. 情報の第三者提供
+                8. 情報の第三者提供
               </h2>
               <p className="mb-2">
                 当サイトは、以下の場合を除き、利用者の同意なく個人情報を第三者に提供することはありません：
@@ -195,58 +168,47 @@ export default function PrivacyPage() {
 
             <section>
               <h2 className="text-lg md:text-xl font-bold text-qiita-text-dark dark:text-white mb-4 pb-2 border-b border-qiita-border/50 dark:border-dark-border/50">
-                8. 情報の安全管理
+                9. 情報の安全管理
               </h2>
-              <p>
-                当サイトは、収集した情報の漏洩、滅失または毀損の防止その他の安全管理のために必要かつ適切な措置を講じます。
-                ただし、インターネット上での情報伝達は完全に安全とは言えないため、当サイトは情報の絶対的な安全性を保証するものではありません。
+              <p className="text-sm">
+                取得した情報は、漏洩・滅失・毀損を防ぐために適切な管理措置を講じます。ただし、インターネット通信は完全には安全でないことをご理解ください。
               </p>
             </section>
 
             <section>
               <h2 className="text-lg md:text-xl font-bold text-qiita-text-dark dark:text-white mb-4 pb-2 border-b border-qiita-border/50 dark:border-dark-border/50">
-                9. 外部リンク
+                10. 外部リンク
               </h2>
-              <p>
-                当サイトには、Amazon.co.jp、Qiita、YouTubeなどの外部サイトへのリンクが含まれています。
-                これらの外部サイトには、それぞれ独自のプライバシーポリシーが適用されます。
-                当サイトは、外部サイトにおける情報の取り扱いについて責任を負いません。
+              <p className="text-sm">
+                Amazon.co.jp、Qiita、YouTube 等の外部サイトには、それぞれのプライバシーポリシーが適用されます。リンク先での情報管理について当サイトは責任を負いません。
               </p>
             </section>
 
             <section>
               <h2 className="text-lg md:text-xl font-bold text-qiita-text-dark dark:text-white mb-4 pb-2 border-b border-qiita-border/50 dark:border-dark-border/50">
-                10. 子どもの個人情報
+                11. 子どもの個人情報
               </h2>
-              <p>
-                当サイトは、13歳未満の子どもから故意に個人情報を収集することはありません。
-                13歳未満の方が当サイトを利用する場合は、保護者の方の同意を得てください。
+              <p className="text-sm">
+                13 歳未満の方から個人情報を取得することは意図していません。該当する場合は保護者の同意を得たうえでご利用ください。
               </p>
             </section>
 
             <section>
               <h2 className="text-lg md:text-xl font-bold text-qiita-text-dark dark:text-white mb-4 pb-2 border-b border-qiita-border/50 dark:border-dark-border/50">
-                11. プライバシーポリシーの変更
+                12. プライバシーポリシーの変更
               </h2>
-              <p>
-                当サイトは、必要に応じて本プライバシーポリシーを変更することがあります。
-                重要な変更がある場合は、当サイト上で通知いたします。
-                変更後のプライバシーポリシーは、当サイトに掲載した時点で効力を生じます。
-              </p>
-              <p className="mt-2">
-                本ポリシーの変更後に当サイトを引き続き利用された場合、変更内容に同意したものとみなされます。
+              <p className="text-sm">
+                必要に応じて内容を更新します。重要な変更はサイト上で告知し、掲載時点から効力を生じます。変更後も利用を継続した場合、更新内容に同意したものとみなします。
               </p>
             </section>
 
             <section>
               <h2 className="text-lg md:text-xl font-bold text-qiita-text-dark dark:text-white mb-4 pb-2 border-b border-qiita-border/50 dark:border-dark-border/50">
-                12. お問い合わせ
+                13. お問い合わせ
               </h2>
-              <p>
-                本プライバシーポリシーに関するご質問やご不明な点がございましたら、
-                <Link href="/contact" className="text-qiita-green hover-underline mx-1 font-semibold">
-                  お問い合わせページ
-                </Link>
+              <p className="text-sm">
+                本ポリシーに関するご相談は
+                <Link href="/contact" className="text-qiita-green hover-underline mx-1 font-semibold">お問い合わせページ</Link>
                 からご連絡ください。
               </p>
             </section>

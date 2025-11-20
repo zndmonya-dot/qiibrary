@@ -45,7 +45,7 @@ export default function TermsPage() {
                 <ul className="list-disc list-inside space-y-1 ml-4 text-sm">
                   <li>Qiita記事で言及された書籍のランキングおよび統計値</li>
                   <li>書籍の基本情報と関連Qiita記事・Amazon商品ページ等へのリンク</li>
-                  <li>必要に応じた広告およびアフィリエイトリンクの掲出</li>
+                  <li>Google AdSense 等の広告枠および Amazon アソシエイト経由のリンク掲出</li>
                 </ul>
                 <p className="text-sm bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded p-2">
                   本サービスは情報提供を目的としており、書籍の販売・配送・決済には関与しません。
@@ -100,10 +100,17 @@ export default function TermsPage() {
               </h2>
               <div className="bg-qiita-surface dark:bg-dark-surface-light rounded-lg p-4 space-y-2">
                 <p>
-                  当サイトはAmazonアソシエイト・プログラムおよびGoogle AdSense等の広告サービスを利用する場合があります。利用者が広告リンク経由で商品を購入した際に当サイトが紹介料を受領することがありますが、利用者に追加費用は発生しません。
+                  当サイトは Google AdSense のプログラムポリシーに従い広告枠を設置し、Amazon アソシエイト・プログラムにも参加しています。広告配信事業者はクッキーや広告識別子を用いて利用者の興味に基づく広告を表示することがあります。
+                </p>
+                <p>
+                  利用者が広告リンク経由で商品を購入した場合、当サイトが紹介料や広告収益を受領することがありますが、利用者に追加費用は発生しません。広告およびクッキーの取り扱いは
+                  <Link href="/privacy" className="text-qiita-green hover-underline mx-1 font-semibold">
+                    プライバシーポリシー
+                  </Link>
+                  をご確認ください。
                 </p>
                 <p className="text-sm">
-                  広告・Cookieの取扱いはプライバシーポリシーをご参照ください。書籍の購入条件はAmazon.co.jp等の規約に従います。
+                  書籍の価格・在庫・配送条件などの取引条件は Amazon.co.jp 等の提供元が定める内容に従い、当サイトは介在しません。
                 </p>
               </div>
             </section>

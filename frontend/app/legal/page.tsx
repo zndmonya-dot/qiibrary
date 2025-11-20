@@ -22,41 +22,47 @@ export default function LegalPage() {
           </div>
 
           <div className="space-y-8 text-qiita-text dark:text-dark-text leading-relaxed">
-            {/* 重要な注意書き */}
-            <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
-              <h3 className="font-semibold text-blue-800 dark:text-blue-300 mb-2 flex items-center gap-2">
-                <i className="ri-information-line"></i>
-                重要なお知らせ
-              </h3>
-              <p className="text-sm text-blue-700 dark:text-blue-400">
-                当サイトは情報提供サービスであり、書籍や商品の直接販売は行っておりません。
-                書籍の購入は、当サイトのリンク先であるAmazon.co.jpにて行われます。
-                購入に関する取引条件、決済、配送、返品等はすべてAmazon.co.jpの規約に従います。
-              </p>
-            </div>
+            {/* 重要なお知らせ */}
+            <section>
+              <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
+                <h3 className="font-semibold text-blue-800 dark:text-blue-300 mb-2 flex items-center gap-2">
+                  <i className="ri-information-line"></i>
+                  重要なお知らせ
+                </h3>
+                <p className="text-sm text-blue-700 dark:text-blue-400">
+                  当サイトは情報提供サービスであり、書籍や商品の直接販売は行っておりません。
+                  書籍の購入はリンク先（Amazon.co.jpなど）で行われ、取引条件・決済方法・配送・返品等は各事業者の規約が適用されます。
+                </p>
+              </div>
+            </section>
 
             <section>
               <h2 className="text-lg md:text-xl font-bold text-qiita-text-dark dark:text-white mb-4 pb-2 border-b border-qiita-border/50 dark:border-dark-border/50">
                 事業者情報
               </h2>
-              <div className="bg-qiita-surface dark:bg-dark-surface-light rounded-lg p-4 space-y-3">
+              <div className="bg-qiita-surface dark:bg-dark-surface-light rounded-lg p-4 space-y-3 text-sm">
                 <div className="flex flex-col md:flex-row gap-2">
-                  <span className="font-semibold min-w-[140px]">サイト名:</span>
+                  <span className="font-semibold min-w-[140px]">サイト名</span>
                   <span>Qiibrary（キーブラリー）</span>
                 </div>
                 <div className="flex flex-col md:flex-row gap-2">
-                  <span className="font-semibold min-w-[140px]">運営形態:</span>
-                  <span>個人運営</span>
+                  <span className="font-semibold min-w-[140px]">運営形態</span>
+                  <span>個人事業（ITエンジニア）</span>
                 </div>
                 <div className="flex flex-col md:flex-row gap-2">
-                  <span className="font-semibold min-w-[140px]">運営責任者:</span>
-                  <span>[運営者名]</span>
-                </div>
-                <div className="flex flex-col md:flex-row gap-2">
-                  <span className="font-semibold min-w-[140px]">所在地:</span>
+                  <span className="font-semibold min-w-[140px]">運営責任者</span>
                   <div>
-                    <span>[所在地]</span><br />
-                    <span className="text-sm text-qiita-text-light dark:text-dark-text-light">
+                    <span>Qiibrary 運営代表（個人事業主）</span><br />
+                    <span className="text-xs text-qiita-text-light dark:text-dark-text-light">
+                      ※氏名は請求時に開示します
+                    </span>
+                  </div>
+                </div>
+                <div className="flex flex-col md:flex-row gap-2">
+                  <span className="font-semibold min-w-[140px]">所在地</span>
+                  <div>
+                    <span>東京都内（詳細所在地は請求時に開示）</span><br />
+                    <span className="text-xs text-qiita-text-light dark:text-dark-text-light">
                       ※請求があれば遅滞なく開示いたします
                     </span>
                   </div>
@@ -93,19 +99,20 @@ export default function LegalPage() {
               <h2 className="text-lg md:text-xl font-bold text-qiita-text-dark dark:text-white mb-4 pb-2 border-b border-qiita-border/50 dark:border-dark-border/50">
                 サービス内容
               </h2>
-              <div className="bg-qiita-surface dark:bg-dark-surface-light rounded-lg p-4">
-                <p className="mb-3">
-                  当サイトは、Qiita記事やYouTube動画で話題のIT技術書の情報を収集・整理し、ランキング形式で表示する情報提供サービスです。Neon DB上で24時間ごとに自動更新を行い、最新の記事差分を反映しています。
+              <div className="bg-qiita-surface dark:bg-dark-surface-light rounded-lg p-4 space-y-3 text-sm">
+                <p>
+                  当サイトは、Qiitaの記事や関連するYouTube動画で取り上げられた技術書を独自に抽出し、ランキングや統計情報を表示する情報提供サービスです。
+                  ランキングは24時間・30日・365日・年別・全期間の5種類で確認できます。
                 </p>
-                <p className="font-semibold text-qiita-text-dark dark:text-white mb-2">提供する主な機能：</p>
-                <ul className="list-disc list-inside space-y-1 ml-4 text-sm">
-                  <li>IT技術書のランキング表示（24時間・30日間・365日間・年別・全期間）</li>
-                  <li>YouTube動画で紹介された技術書の情報表示</li>
-                  <li>書籍の詳細情報の表示（OpenBD、Google Books APIを利用）</li>
-                  <li>関連するQiita記事の一覧と外部リンク</li>
-                  <li>関連するYouTube動画の一覧と視聴機能</li>
-                  <li>Amazon.co.jpへの商品リンクおよびGoogle AdSense等の広告表示</li>
-                  <li>書籍名・著者・出版社・ISBNによる検索機能</li>
+                <p>
+                  主な提供機能は以下のとおりです：
+                </p>
+                <ul className="list-disc list-inside space-y-1 ml-4">
+                  <li>Qiita言及データに基づくランキング表示</li>
+                  <li>書籍詳細（著者・出版社・出版日等）の表示</li>
+                  <li>関連Qiita記事およびAmazon等への外部リンク</li>
+                  <li>YouTubeで紹介された書籍情報の表示（準備中を含む）</li>
+                  <li>書籍名・著者名・出版社・ISBNによる検索機能</li>
                 </ul>
               </div>
               <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-4 mt-3">
@@ -127,38 +134,26 @@ export default function LegalPage() {
               <div className="bg-qiita-surface dark:bg-dark-surface-light rounded-lg p-4 space-y-4">
                 <div>
                   <h3 className="font-semibold text-qiita-text-dark dark:text-white mb-2">販売価格</h3>
-                  <p className="text-sm">
-                    当サイトは商品の直接販売を行っておりません。
-                    書籍の価格は、リンク先のAmazon.co.jpの販売ページに表示されている価格が適用されます。
-                    価格は予告なく変更される場合がありますので、購入時に必ずAmazon.co.jpでご確認ください。
+                  <p>
+                    当サイトでは商品の販売を行っていません。書籍の価格はAmazon.co.jpなどリンク先の表示に従います。
                   </p>
                 </div>
                 <div>
-                  <h3 className="font-semibold text-qiita-text-dark dark:text-white mb-2">支払方法</h3>
-                  <p className="text-sm">
-                    Amazon.co.jpが定める支払方法に従います。
-                    詳細はAmazon.co.jpの利用規約をご確認ください。
-                  </p>
-                </div>
-                <div>
-                  <h3 className="font-semibold text-qiita-text-dark dark:text-white mb-2">支払時期</h3>
-                  <p className="text-sm">
-                    Amazon.co.jpが定める支払時期に従います。
-                    通常、商品の注文確定時に決済が行われます。
+                  <h3 className="font-semibold text-qiita-text-dark dark:text-white mb-2">支払方法・支払時期</h3>
+                  <p>
+                    支払方法および支払時期はAmazon.co.jpの利用規約に準じます。
                   </p>
                 </div>
                 <div>
                   <h3 className="font-semibold text-qiita-text-dark dark:text-white mb-2">商品の引渡時期</h3>
-                  <p className="text-sm">
-                    Amazon.co.jpが定める配送条件に従います。
-                    配送日時、送料等の詳細はAmazon.co.jpでご確認ください。
+                  <p>
+                    Amazon.co.jpが定める配送条件に従います（送料・配送日時等もAmazon.co.jpの表示を参照してください）。
                   </p>
                 </div>
                 <div>
                   <h3 className="font-semibold text-qiita-text-dark dark:text-white mb-2">返品・交換・キャンセル</h3>
-                  <p className="text-sm">
-                    返品、交換、キャンセルに関しては、すべてAmazon.co.jpの返品・交換ポリシーに従います。
-                    詳細はAmazon.co.jpカスタマーサービスへお問い合わせください。
+                  <p>
+                    返品やキャンセルはAmazon.co.jpのポリシーに基づき、Amazon.co.jpに直接お問い合わせください。
                   </p>
                 </div>
               </div>
@@ -191,11 +186,41 @@ export default function LegalPage() {
               </h2>
               <div className="bg-qiita-surface dark:bg-dark-surface-light rounded-lg p-4 space-y-3">
                 <p>
-                  当サイトはGoogle AdSenseなど第三者配信の広告サービスを利用する場合があります。広告配信事業者は、ユーザーの興味に応じた広告を表示するためにCookieを使用することがあります。
+                  当サイトは Google AdSense のプログラムポリシーに基づき広告を掲載します。広告配信事業者は、ユーザーの興味関心に応じた広告を表示するために Cookie や広告識別子を使用する場合があります。
                 </p>
-                <p className="text-sm bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded p-3">
-                  Cookieを無効化する方法や、パーソナライズド広告の詳細については、Google広告設定やユーザー自身のブラウザ設定をご確認ください。
+                <p>
+                  また、Amazon アソシエイトの計測タグでも Cookie が利用されることがあります。いずれの Cookie も当サイト側では閲覧・保存できません。
                 </p>
+                <div className="text-sm bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded p-3 space-y-2">
+                  <p>
+                    Cookie の利用を制限したい場合はブラウザ設定の変更、または
+                    <a
+                      href="https://adssettings.google.com/authenticated?hl=ja"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-qiita-green hover-underline mx-1 font-semibold"
+                    >
+                      Google 広告設定
+                    </a>
+                    からパーソナライズド広告を停止してください。
+                  </p>
+                  <p>
+                    詳細は
+                    <a
+                      href="https://policies.google.com/technologies/ads?hl=ja"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-qiita-green hover-underline mx-1 font-semibold"
+                    >
+                      Google の広告ポリシー
+                    </a>
+                    および当サイトの
+                    <Link href="/privacy" className="text-qiita-green hover-underline mx-1 font-semibold">
+                      プライバシーポリシー
+                    </Link>
+                    をご参照ください。
+                  </p>
+                </div>
               </div>
             </section>
 
@@ -225,18 +250,13 @@ export default function LegalPage() {
               </h2>
               <div className="bg-qiita-surface dark:bg-dark-surface-light rounded-lg p-4 space-y-3 text-sm">
                 <p>
-                  当サイトで提供する情報は、Qiita API、YouTube Data API、OpenBD API、Google Books API等の外部APIから取得したものです。また、日次の自動バッチ処理により統計情報を更新していますが、完全な正確性を保証するものではありません。
+                  当サイトで提供する情報は、Qiita API、YouTube Data API、OpenBD API、Google Books API 等から取得したデータに基づきます。日次で統計値の更新を行いますが、完全な正確性は保証できません。
                 </p>
                 <p>
-                  情報の正確性、完全性、有用性、最新性については保証いたしかねます。
-                  最新の情報は、必ず各サービスの公式サイトでご確認ください。
+                  最新の情報は必ず公式サイト（Amazon.co.jp 等）でご確認ください。当サイトの利用により発生した損害について、当サイトは責任を負いません。
                 </p>
                 <p>
-                  当サイトの利用により生じたいかなる損害についても、当サイトは一切の責任を負いません。
-                </p>
-                <p>
-                  Amazon.co.jpでの商品購入に関するトラブル、問い合わせ等については、
-                  Amazon.co.jpカスタマーサービスへ直接お問い合わせください。
+                  Amazon.co.jp での購入に関する問い合わせは、Amazon.co.jp カスタマーサービスに直接ご連絡ください。
                 </p>
               </div>
               <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4 mt-3">
