@@ -54,7 +54,7 @@ export default function AboutPage() {
               </div>
             </section>
 
-            {/* 他のサイトとの違い */} ... ????
+            {/* 他のサイトとの違い */}
 
             {/* 主な機能 */}
             <section>
@@ -152,7 +152,7 @@ export default function AboutPage() {
                   <i className="ri-time-line text-qiita-green dark:text-dark-green text-lg"></i>
                   <div>
                     <p className="font-semibold text-qiita-text-dark dark:text-white">毎朝更新</p>
-                    <p>毎日00:00（日本時間）に前日分のQiita記事を取り込み、ランキングへ反映します。急なバズがあった場合は速報で確認し、必要に応じて即時反映します。</p>
+                    <p>毎日00:00（日本時間）に前日分のQiita記事を取り込み、ランキングへ反映します。</p>
                   </div>
                 </div>
                 <div className="flex items-start gap-3">
@@ -160,13 +160,6 @@ export default function AboutPage() {
                   <div>
                     <p className="font-semibold text-qiita-text-dark dark:text-white">自動チェック</p>
                     <p>書籍ごとの初出日・最新言及日・累計件数を定期的に再計算し、欠損や異常値があれば公開前に弾いています。</p>
-                  </div>
-                </div>
-                <div className="flex items-start gap-3">
-                  <i className="ri-eye-line text-qiita-green dark:text-dark-green text-lg"></i>
-                  <div>
-                    <p className="font-semibold text-qiita-text-dark dark:text-white">目視での補正</p>
-                    <p>急激な順位変化やデータの偏りが確認された場合は、元記事を読み直してタグやジャンルの整合性を確認し、利用者にとって違和感のない表示に整えます。</p>
                   </div>
                 </div>
               </div>
