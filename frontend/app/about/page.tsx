@@ -31,16 +31,25 @@ export default function AboutPage() {
               </h2>
               <div className="bg-qiita-surface dark:bg-dark-surface-light rounded-lg p-5 space-y-4 text-sm leading-relaxed">
                 <p className="text-base text-qiita-text dark:text-white">
-                  Qiibraryは、Qiita上で紹介された技術書データを基に、最新の選書トレンドと長期的定番を効率的に把握できるように設計されたリサーチツールです。
+                  Qiibraryは、Qiitaで扱われた技術書の言及データを整理し、選書や研修計画の判断材料を素早く揃えられるようにしたリサーチサービスです。
+                  現場で支持される書籍を短時間で把握し、学習計画や推奨図書の更新に伴う検証コストを下げることを目的としています。
                 </p>
-                <ul className="space-y-2 list-disc ml-5">
-                  <li>24h / 30d / 365d / 年別 / 全期間の5つの観点でランキングを提供</li>
-                  <li>初出日・最新言及日・累計言及数を併記し、書籍の成熟度と注目度を定量的に把握可能</li>
-                  <li>言及元の記事へ直接アクセスできるため、開発者の実際の使用背景を確認できる</li>
-                  <li>書籍名・著者・出版社・ISBNで横断検索が可能で、必要な情報に迅速に到達</li>
-                </ul>
-                <p>
-                  新人研修の教材選定、スキルアップ施策の立案、個人の学習計画づくりなど、意思決定にデータの裏付けを求める場面での活用を想定しています。
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="p-4 rounded-lg border border-qiita-border dark:border-dark-border bg-white/70 dark:bg-dark-surface">
+                    <p className="font-semibold text-qiita-text-dark dark:text-white mb-1">意思決定の迅速化</p>
+                    <p className="text-sm text-qiita-text dark:text-dark-text">
+                      24時間・30日・365日・年別・全期間の指標を切り替え、短期トレンドと長期定番を同時に確認できます。
+                    </p>
+                  </div>
+                  <div className="p-4 rounded-lg border border-qiita-border dark:border-dark-border bg-white/70 dark:bg-dark-surface">
+                    <p className="font-semibold text-qiita-text-dark dark:text-white mb-1">裏付けの提示</p>
+                    <p className="text-sm text-qiita-text dark:text-dark-text">
+                      初出日・最新言及日・累計言及数を併記し、書籍の熟成度や勢いを数値で添えて提案できます。
+                    </p>
+                  </div>
+                </div>
+                <p className="text-sm text-qiita-text dark:text-dark-text">
+                  主な利用シーンとしては、新人研修の教材選定、スキルアップ施策の企画、個人の学習計画づくり、書店での棚づくり検討などを想定しています。
                 </p>
               </div>
             </section>
@@ -53,22 +62,22 @@ export default function AboutPage() {
                 <i className="ri-function-line text-qiita-green dark:text-dark-green"></i>
                 主な機能
               </h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+              <div className="space-y-3 text-sm">
                 <div className="bg-qiita-surface dark:bg-dark-surface-light rounded-lg p-4 border border-qiita-border dark:border-dark-border">
                   <p className="font-semibold text-qiita-text-dark dark:text-white mb-1">期間別ランキング</p>
-                  <p>24時間・30日・365日・年別・全期間をワンクリックで切り替え可能です。</p>
+                  <p>24時間・30日・365日・年別・全期間を切り替え、目的に応じた視点で比較できます。</p>
                 </div>
                 <div className="bg-qiita-surface dark:bg-dark-surface-light rounded-lg p-4 border border-qiita-border dark:border-dark-border">
                   <p className="font-semibold text-qiita-text-dark dark:text-white mb-1">詳細検索</p>
-                  <p>書籍名、著者名、出版社、ISBNのいずれでも検索できます。</p>
+                  <p>書籍名・著者名・出版社・ISBNのいずれでも検索でき、必要な書籍に迅速にアクセスできます。</p>
                 </div>
                 <div className="bg-qiita-surface dark:bg-dark-surface-light rounded-lg p-4 border border-qiita-border dark:border-dark-border">
                   <p className="font-semibold text-qiita-text-dark dark:text-white mb-1">参照記事リンク</p>
-                  <p>ランキングから直接Qiita記事へ移動し、執筆者の意図を確認できます。</p>
+                  <p>ランキングからQiita記事へ遷移し、実際の使用事例や背景を確認できます。</p>
                 </div>
                 <div className="bg-qiita-surface dark:bg-dark-surface-light rounded-lg p-4 border border-qiita-border dark:border-dark-border">
                   <p className="font-semibold text-qiita-text-dark dark:text-white mb-1">書籍プロファイル</p>
-                  <p>著者・出版社・出版日などの基本情報をまとめて確認できます。</p>
+                  <p>著者・出版社・出版日などの基本情報を一画面に集約し、チーム内共有に適した形式で提示します。</p>
                 </div>
               </div>
             </section>
