@@ -23,25 +23,26 @@ export default function AboutPage() {
           </div>
 
           <div className="space-y-8 text-qiita-text dark:text-dark-text leading-relaxed">
-            {/* サイトの目的 */}
+            {/* サイト概要 */}
             <section>
               <h2 className="text-lg md:text-xl font-bold text-qiita-text-dark dark:text-white mb-4 pb-2 border-b border-qiita-border/50 dark:border-dark-border/50 flex items-center gap-2">
                 <i className="ri-lightbulb-line text-qiita-green dark:text-dark-green"></i>
-                サイトの目的
+                Qiibraryとは
               </h2>
-              <div className="bg-qiita-surface dark:bg-dark-surface-light rounded-lg p-5">
-                <p className="mb-3">
-                  Qiibraryは、実務で役立つ技術書をすばやく見つけたいエンジニア・技術リーダーのための情報サイトです。
-                  Qiita上で話題になった書籍の動向を毎日集計し、「今、現場で読まれている本」をわかりやすく提示します。
+              <div className="bg-qiita-surface dark:bg-dark-surface-light rounded-lg p-5 space-y-4">
+                <p>
+                  Qiibraryは、Qiitaでの書籍言及データをもとに「現場でいま読まれている技術書」を可視化するサービスです。
+                  書籍探しにかける時間を最小化し、学習計画やチーム推奨図書のアップデートを支援します。
                 </p>
-                <p className="mb-3">
-                  新しいスキルを習得したい、若手メンバーへの推薦本を探したい、購買計画に確信を持ちたい――そんな場面で迷わないよう、
-                  データに裏付けられたランキングとサマリーを提供します。
+                <p className="text-sm bg-white/70 dark:bg-dark-surface rounded-lg p-4 border border-qiita-border/40 dark:border-dark-border/40">
+                  <span className="font-semibold text-qiita-text-dark dark:text-white">提供価値</span><br />
+                  ・Qiita記事を毎日クロールし、AmazonリンクからASIN/ISBNを抽出<br />
+                  ・Neon DBで履歴管理し、24h / 30d / 365d / 年別 / 全期間ランキングを生成<br />
+                  ・各書籍の初出日・最新言及日・累計言及数を自動で補正
                 </p>
                 <p>
-                  Qiita記事に含まれるAmazonリンクを解析し、Neon DBに蓄積した情報をもとに
-                  <span className="font-semibold">24時間・30日・365日・年別・全期間</span>の5視点で傾向を確認できます。
-                  特定ジャンルや著者名での検索にも対応し、意思決定に必要な情報を最短で取得できます。
+                  ユースケースは、開発チームの教材リスト刷新、個人のスキルマップ策定、法人の研修コンテンツ選定など。
+                  エンジニアリングマネージャーや技術顧問の定例資料にもそのまま転用できる粒度を意識しています。
                 </p>
               </div>
             </section>
@@ -256,6 +257,37 @@ export default function AboutPage() {
               </div>
             </section>
 
+            {/* 運用と品質管理 */}
+            <section>
+              <h2 className="text-lg md:text-xl font-bold text-qiita-text-dark dark:text-white mb-4 pb-2 border-b border-qiita-border/50 dark:border-dark-border/50 flex items-center gap-2">
+                <i className="ri-shield-check-line text-qiita-green dark:text-dark-green"></i>
+                運用と品質管理
+              </h2>
+              <div className="bg-qiita-surface dark:bg-dark-surface-light rounded-lg p-5 space-y-4 text-sm">
+                <div className="flex items-start gap-3">
+                  <i className="ri-time-line text-qiita-green dark:text-dark-green text-lg"></i>
+                  <div>
+                    <p className="font-semibold text-qiita-text-dark dark:text-white">日次ジョブ + 速報検知</p>
+                    <p>Renderで動作するFastAPIジョブが毎日00:00 JSTに前日分の記事を取得し、GitHub Actionsがバックアップ収集を担当します。</p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-3">
+                  <i className="ri-database-line text-qiita-green dark:text-dark-green text-lg"></i>
+                  <div>
+                    <p className="font-semibold text-qiita-text-dark dark:text-white">統計値の自動補正</p>
+                    <p>first_mentioned_at / latest_mention_at / total_mentions をバッチで再計算し、欠損や異常値が出た書籍は隔離テーブルで検査します。</p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-3">
+                  <i className="ri-eye-line text-qiita-green dark:text-dark-green text-lg"></i>
+                  <div>
+                    <p className="font-semibold text-qiita-text-dark dark:text-white">手動レビュー</p>
+                    <p>大きな順位変動や新規カテゴリが増えた際は、運営者が元記事を確認し、補足コメントやタグ調整を行います。</p>
+                  </div>
+                </div>
+              </div>
+            </section>
+
             {/* データ更新と品質管理 */}
             <section>
               <h2 className="text-lg md:text-xl font-bold text-qiita-text-dark dark:text-white mb-4 pb-2 border-b border-qiita-border/50 dark:border-dark-border/50 flex items-center gap-2">
@@ -339,6 +371,37 @@ export default function AboutPage() {
               </div>
             </section>
 
+            {/* 安心してご利用いただくために */}
+            <section>
+              <h2 className="text-lg md:text-xl font-bold text-qiita-text-dark dark:text-white mb-4 pb-2 border-b border-qiita-border/50 dark:border-dark-border/50 flex items-center gap-2">
+                <i className="ri-hand-heart-line text-qiita-green dark:text-dark-green"></i>
+                安心してご利用いただくために
+              </h2>
+              <div className="bg-qiita-surface dark:bg-dark-surface-light rounded-lg p-5 space-y-4 text-sm">
+                <div className="flex items-start gap-3">
+                  <i className="ri-lock-line text-qiita-green dark:text-dark-green text-lg"></i>
+                  <div>
+                    <p className="font-semibold text-qiita-text-dark dark:text-white">個人情報の取扱い</p>
+                    <p>会員登録機能はなく、アクセスログは利用動向分析に必要な範囲でのみ保存します。詳細はプライバシーポリシーをご参照ください。</p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-3">
+                  <i className="ri-megaphone-line text-qiita-green dark:text-dark-green text-lg"></i>
+                  <div>
+                    <p className="font-semibold text-qiita-text-dark dark:text-white">広告・アフィリエイト</p>
+                    <p>Amazonアソシエイト・プログラムおよびGoogle AdSenseの審査完了後、明示的に区分した形で掲載します。書籍の価格や配送条件はAmazon.co.jpに準じます。</p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-3">
+                  <i className="ri-customer-service-2-line text-qiita-green dark:text-dark-green text-lg"></i>
+                  <div>
+                    <p className="font-semibold text-qiita-text-dark dark:text-white">コンテンツの修正依頼</p>
+                    <p>掲載内容に誤りがある場合や削除をご希望の場合は、お問い合わせフォームからご連絡ください。権利者確認のうえ速やかに対応します。</p>
+                  </div>
+                </div>
+              </div>
+            </section>
+
             {/* 作成者情報 */}
             <section>
               <h2 className="text-lg md:text-xl font-bold text-qiita-text-dark dark:text-white mb-4 pb-2 border-b border-qiita-border/50 dark:border-dark-border/50 flex items-center gap-2">
@@ -347,8 +410,8 @@ export default function AboutPage() {
               </h2>
               <div className="bg-qiita-surface dark:bg-dark-surface-light rounded-lg p-5">
                 <p className="mb-4">
-                  このサイトは、技術書好きなエンジニアによって個人で運営されています。
-                  より良い技術書選びの一助となることを目指して、日々改善を続けています。
+                  Qiibraryは国内在住のソフトウェアエンジニアが個人事業として運営しています。
+                  データ収集・審査・お問い合わせ対応まで一貫して担当し、透明性の高い改善サイクルを維持しています。
                 </p>
                 <div className="flex gap-3">
                   <a
@@ -360,18 +423,9 @@ export default function AboutPage() {
                     <i className="ri-twitter-x-line text-lg"></i>
                     <span>X (Twitter)</span>
                   </a>
-                  <a
-                    href="https://github.com/yourusername/qiibrary"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-2 bg-qiita-surface dark:bg-dark-surface-light text-qiita-text-dark dark:text-white px-4 py-2.5 rounded-lg transition-all duration-200 border border-qiita-border dark:border-dark-border hover-primary font-semibold shadow-sm"
-                  >
-                    <i className="ri-github-line text-lg"></i>
-                    <span>GitHub</span>
-                  </a>
                 </div>
                 <p className="text-xs mt-3 text-qiita-text-light dark:text-dark-text-light">
-                  ※ SNSアカウントとGitHubリポジトリは準備中です
+                  ※ SNSアカウントは順次公開予定です
                 </p>
               </div>
             </section>

@@ -98,15 +98,6 @@ export default function Footer() {
               >
                 <i className="ri-twitter-x-line text-xl text-white"></i>
               </a>
-              <a
-                href="https://github.com/your_account"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="w-12 h-12 bg-gray-700 hover-footer-icon rounded-lg flex items-center justify-center"
-                aria-label="GitHub"
-              >
-                <i className="ri-github-line text-xl text-white"></i>
-              </a>
             </div>
           </div>
         </div>

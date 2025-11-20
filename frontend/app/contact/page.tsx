@@ -75,31 +75,6 @@ export default function ContactPage() {
               </p>
             </div>
 
-            {/* GitHub Issues */}
-            <div className="bg-qiita-surface dark:bg-dark-surface-light rounded-lg p-5 border border-qiita-border dark:border-dark-border">
-              <h2 className="text-lg font-bold text-qiita-text-dark dark:text-white mb-3 flex items-center gap-2">
-                <i className="ri-github-line text-qiita-green dark:text-dark-green text-xl"></i>
-                GitHub Issues
-              </h2>
-              <p className="mb-4 text-sm">
-                バグ報告や機能要望は、GitHubのIssuesでも受け付けています。
-                技術的な内容や詳細な説明が必要な場合はこちらが便利です。
-              </p>
-              <a
-                href="https://github.com/yourusername/qiibrary/issues"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 bg-qiita-surface dark:bg-dark-surface-light hover-bg-surface border border-qiita-border dark:border-dark-border text-qiita-text-dark dark:text-white px-4 py-2.5 rounded-lg font-semibold shadow-sm"
-              >
-                <i className="ri-external-link-line"></i>
-                Issueを作成する
-              </a>
-              <p className="text-xs mt-3 text-qiita-text-light dark:text-dark-text-light bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded p-2">
-                <i className="ri-time-line mr-1"></i>
-                GitHubリポジトリは準備中です。
-              </p>
-            </div>
-
             {/* よくある質問 */}
             <div className="pt-6 border-t border-qiita-border dark:border-dark-border">
               <h2 className="text-xl font-bold text-qiita-text-dark dark:text-white mb-4 flex items-center gap-2">
