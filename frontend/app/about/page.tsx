@@ -23,184 +23,52 @@ export default function AboutPage() {
           </div>
 
           <div className="space-y-8 text-qiita-text dark:text-dark-text leading-relaxed">
-            {/* サイト概要 */}
+            {/* サービス概要 */}
             <section>
               <h2 className="text-lg md:text-xl font-bold text-qiita-text-dark dark:text-white mb-4 pb-2 border-b border-qiita-border/50 dark:border-dark-border/50 flex items-center gap-2">
                 <i className="ri-lightbulb-line text-qiita-green dark:text-dark-green"></i>
-                Qiibraryとは
+                サービス概要
               </h2>
-              <div className="bg-qiita-surface dark:bg-dark-surface-light rounded-lg p-5 space-y-4">
+              <div className="bg-qiita-surface dark:bg-dark-surface-light rounded-lg p-5 space-y-4 text-sm leading-relaxed">
+                <p className="text-base text-qiita-text dark:text-white">
+                  Qiibraryは、Qiita上で紹介された技術書データを基に、最新の選書トレンドと長期的定番を効率的に把握できるように設計されたリサーチツールです。
+                </p>
+                <ul className="space-y-2 list-disc ml-5">
+                  <li>24h / 30d / 365d / 年別 / 全期間の5つの観点でランキングを提供</li>
+                  <li>初出日・最新言及日・累計言及数を併記し、書籍の成熟度と注目度を定量的に把握可能</li>
+                  <li>言及元の記事へ直接アクセスできるため、開発者の実際の使用背景を確認できる</li>
+                  <li>書籍名・著者・出版社・ISBNで横断検索が可能で、必要な情報に迅速に到達</li>
+                </ul>
                 <p>
-                  Qiibraryは、「Qiitaで取り上げられた技術書」の動きを俯瞰し、いま現場で支持されている一冊をすぐ見つけられるようにするためのサービスです。
-                  研修教材の刷新やチームの推薦図書づくり、個人の学習計画づくりを、データに基づく客観的な視点で支援します。
+                  新人研修の教材選定、スキルアップ施策の立案、個人の学習計画づくりなど、意思決定にデータの裏付けを求める場面での活用を想定しています。
                 </p>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-sm">
-                  <div className="bg-white/70 dark:bg-dark-surface rounded-lg p-4 border border-qiita-border/40 dark:border-dark-border/40">
-                    <p className="text-xs text-qiita-text-light dark:text-dark-text-light mb-1">毎日更新のランキング</p>
-                    <p className="font-semibold text-qiita-text-dark dark:text-white">24h / 30d / 365d / 年別 / 全期間</p>
-                    <p className="text-xs text-qiita-text-light mt-1">用途に合わせて切り替えられます</p>
-                  </div>
-                  <div className="bg-white/70 dark:bg-dark-surface rounded-lg p-4 border border-qiita-border/40 dark:border-dark-border/40">
-                    <p className="text-xs text-qiita-text-light dark:text-dark-text-light mb-1">信頼できる指標</p>
-                    <p className="font-semibold text-qiita-text-dark dark:text-white">初出日 / 最新言及 / 累計件数</p>
-                    <p className="text-xs text-qiita-text-light mt-1">書籍の熟成度や勢いを把握できます</p>
-                  </div>
-                  <div className="bg-white/70 dark:bg-dark-surface rounded-lg p-4 border border-qiita-border/40 dark:border-dark-border/40">
-                    <p className="text-xs text-qiita-text-light dark:text-dark-text-light mb-1">主な活用シーン</p>
-                    <p className="font-semibold text-qiita-text-dark dark:text-white">教材選定 / 採用オンボーディング / 個人学習</p>
-                    <p className="text-xs text-qiita-text-light mt-1">忙しいマネージャーや個人の指針に</p>
-                  </div>
-                </div>
               </div>
             </section>
 
-            {/* 他のサイトとの違い */}
-            <section>
-              <h2 className="text-lg md:text-xl font-bold text-qiita-text-dark dark:text-white mb-4 pb-2 border-b border-qiita-border/50 dark:border-dark-border/50 flex items-center gap-2">
-                <i className="ri-star-line text-qiita-green dark:text-dark-green"></i>
-                Qiibraryが選ばれる理由
-              </h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-                <div className="bg-gradient-to-br from-qiita-green/10 to-qiita-green/5 dark:from-dark-green/20 dark:to-dark-green/10 rounded-lg p-5 border-2 border-qiita-green/30 dark:border-dark-green/30">
-                  <div className="flex items-start gap-3">
-                    <div className="text-3xl">📚</div>
-                    <div>
-                      <h3 className="font-bold text-qiita-text-dark dark:text-white mb-2">
-                        圧倒的なデータ量
-                      </h3>
-                      <p className="text-sm mb-2">
-                        <span className="font-bold text-qiita-green dark:text-dark-green text-lg">17,399冊</span>の技術書データを継続的に更新
-                      </p>
-                      <p className="text-xs text-qiita-text-light dark:text-dark-text-light">
-                        他サイト: 数百〜数千冊程度
-                      </p>
-                    </div>
-                  </div>
-                </div>
-                
-                <div className="bg-gradient-to-br from-qiita-green/10 to-qiita-green/5 dark:from-dark-green/20 dark:to-dark-green/10 rounded-lg p-5 border-2 border-qiita-green/30 dark:border-dark-green/30">
-                  <div className="flex items-start gap-3">
-                    <div className="text-3xl">📈</div>
-                    <div>
-                      <h3 className="font-bold text-qiita-text-dark dark:text-white mb-2">
-                        10年分の履歴データ
-                      </h3>
-                      <p className="text-sm mb-2">
-                        <span className="font-bold text-qiita-green dark:text-dark-green">2015年〜現在</span>までの全記録を日次で更新
-                      </p>
-                      <p className="text-xs text-qiita-text-light dark:text-dark-text-light">
-                        他サイト: 直近数年のみ
-                      </p>
-                    </div>
-                  </div>
-                </div>
-                
-                <div className="bg-gradient-to-br from-qiita-green/10 to-qiita-green/5 dark:from-dark-green/20 dark:to-dark-green/10 rounded-lg p-5 border-2 border-qiita-green/30 dark:border-dark-green/30">
-                  <div className="flex items-start gap-3">
-                    <div className="text-3xl">🔍</div>
-                    <div>
-                      <h3 className="font-bold text-qiita-text-dark dark:text-white mb-2">
-                        高速検索機能
-                      </h3>
-                      <p className="text-sm mb-2">
-                        17,000冊超から<span className="font-bold text-qiita-green dark:text-dark-green">瞬時に検索</span>
-                      </p>
-                      <p className="text-xs text-qiita-text-light dark:text-dark-text-light">
-                        他サイト: 検索機能なし or 基本的な検索のみ
-                      </p>
-                    </div>
-                  </div>
-                </div>
-                
-                <div className="bg-gradient-to-br from-qiita-green/10 to-qiita-green/5 dark:from-dark-green/20 dark:to-dark-green/10 rounded-lg p-5 border-2 border-qiita-green/30 dark:border-dark-green/30">
-                  <div className="flex items-start gap-3">
-                    <div className="text-3xl">✨</div>
-                    <div>
-                      <h3 className="font-bold text-qiita-text-dark dark:text-white mb-2">
-                        最高のUI/UX
-                      </h3>
-                      <p className="text-sm mb-2">
-                        PageSpeed Insights <span className="font-bold text-qiita-green dark:text-dark-green">99点</span>、モバイル利用でも快適
-                      </p>
-                      <p className="text-xs text-qiita-text-light dark:text-dark-text-light">
-                        他サイト: 古いデザイン、動作が重い
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              
-              <div className="bg-qiita-surface dark:bg-dark-surface-light rounded-lg p-5 border border-qiita-border dark:border-dark-border">
-                <h3 className="font-semibold text-qiita-text-dark dark:text-white mb-3 flex items-center gap-2">
-                  <i className="ri-time-line text-qiita-green dark:text-dark-green"></i>
-                  柔軟な期間設定
-                </h3>
-                <p className="text-sm mb-3">
-                  日次・月次・年次・全期間、さらに<span className="font-bold">2015年〜2025年の各年</span>で集計できます。
-                  直近のトレンドと長期的な定番を同時に把握できる設計です。
-                </p>
-                <div className="flex flex-wrap gap-2">
-                  <span className="px-3 py-1 bg-qiita-green/20 dark:bg-dark-green/20 text-qiita-green dark:text-dark-green rounded-full text-xs font-medium">
-                    24時間
-                  </span>
-                  <span className="px-3 py-1 bg-qiita-green/20 dark:bg-dark-green/20 text-qiita-green dark:text-dark-green rounded-full text-xs font-medium">
-                    30日間
-                  </span>
-                  <span className="px-3 py-1 bg-qiita-green/20 dark:bg-dark-green/20 text-qiita-green dark:text-dark-green rounded-full text-xs font-medium">
-                    365日間
-                  </span>
-                  <span className="px-3 py-1 bg-qiita-green/20 dark:bg-dark-green/20 text-qiita-green dark:text-dark-green rounded-full text-xs font-medium">
-                    全期間
-                  </span>
-                  <span className="px-3 py-1 bg-qiita-green/20 dark:bg-dark-green/20 text-qiita-green dark:text-dark-green rounded-full text-xs font-medium">
-                    2015年〜2025年（各年）
-                  </span>
-                </div>
-              </div>
-            </section>
+            {/* 他のサイトとの違い */} ... ????
 
-            {/* 機能紹介 */}
+            {/* 主な機能 */}
             <section>
               <h2 className="text-lg md:text-xl font-bold text-qiita-text-dark dark:text-white mb-4 pb-2 border-b border-qiita-border/50 dark:border-dark-border/50 flex items-center gap-2">
                 <i className="ri-function-line text-qiita-green dark:text-dark-green"></i>
                 主な機能
               </h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
                 <div className="bg-qiita-surface dark:bg-dark-surface-light rounded-lg p-4 border border-qiita-border dark:border-dark-border">
-                  <h3 className="font-semibold text-qiita-text-dark dark:text-white mb-2 flex items-center gap-2">
-                    <i className="ri-trophy-line text-qiita-green dark:text-dark-green"></i>
-                    多様なランキング期間
-                  </h3>
-                  <p className="text-sm">
-                    24時間、30日間、365日間、年別、全期間の5つの期間でランキングを確認できます。
-                  </p>
+                  <p className="font-semibold text-qiita-text-dark dark:text-white mb-1">期間別ランキング</p>
+                  <p>24時間・30日・365日・年別・全期間をワンクリックで切り替え可能です。</p>
                 </div>
                 <div className="bg-qiita-surface dark:bg-dark-surface-light rounded-lg p-4 border border-qiita-border dark:border-dark-border">
-                  <h3 className="font-semibold text-qiita-text-dark dark:text-white mb-2 flex items-center gap-2">
-                    <i className="ri-search-line text-qiita-green dark:text-dark-green"></i>
-                    書籍検索機能
-                  </h3>
-                  <p className="text-sm">
-                    書籍名、著者、出版社、ISBNで素早く検索できます。
-                  </p>
+                  <p className="font-semibold text-qiita-text-dark dark:text-white mb-1">詳細検索</p>
+                  <p>書籍名、著者名、出版社、ISBNのいずれでも検索できます。</p>
                 </div>
                 <div className="bg-qiita-surface dark:bg-dark-surface-light rounded-lg p-4 border border-qiita-border dark:border-dark-border">
-                  <h3 className="font-semibold text-qiita-text-dark dark:text-white mb-2 flex items-center gap-2">
-                    <i className="ri-article-line text-qiita-green dark:text-dark-green"></i>
-                    紹介記事へのリンク
-                  </h3>
-                  <p className="text-sm">
-                    各書籍を言及しているQiita記事へ直接アクセスでき、実際の開発者の声を確認できます。
-                  </p>
+                  <p className="font-semibold text-qiita-text-dark dark:text-white mb-1">参照記事リンク</p>
+                  <p>ランキングから直接Qiita記事へ移動し、執筆者の意図を確認できます。</p>
                 </div>
                 <div className="bg-qiita-surface dark:bg-dark-surface-light rounded-lg p-4 border border-qiita-border dark:border-dark-border">
-                  <h3 className="font-semibold text-qiita-text-dark dark:text-white mb-2 flex items-center gap-2">
-                    <i className="ri-book-open-line text-qiita-green dark:text-dark-green"></i>
-                    詳細な書籍情報
-                  </h3>
-                  <p className="text-sm">
-                    著者、出版社、出版日などの詳細情報を表示します。
-                  </p>
+                  <p className="font-semibold text-qiita-text-dark dark:text-white mb-1">書籍プロファイル</p>
+                  <p>著者・出版社・出版日などの基本情報をまとめて確認できます。</p>
                 </div>
               </div>
             </section>
@@ -296,56 +164,6 @@ export default function AboutPage() {
             </section>
 
             {/* 技術スタック */}
-            <section>
-              <h2 className="text-lg md:text-xl font-bold text-qiita-text-dark dark:text-white mb-4 pb-2 border-b border-qiita-border/50 dark:border-dark-border/50 flex items-center gap-2">
-                <i className="ri-code-box-line text-qiita-green dark:text-dark-green"></i>
-                技術スタック
-              </h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="bg-qiita-surface dark:bg-dark-surface-light rounded-lg p-4 border border-qiita-border dark:border-dark-border">
-                  <h3 className="font-semibold text-qiita-text-dark dark:text-white mb-3">フロントエンド</h3>
-                  <ul className="space-y-1.5 text-sm">
-                    <li className="flex items-center gap-2">
-                      <i className="ri-checkbox-circle-fill text-qiita-green dark:text-dark-green text-xs"></i>
-                      Next.js 14 (App Router)
-                    </li>
-                    <li className="flex items-center gap-2">
-                      <i className="ri-checkbox-circle-fill text-qiita-green dark:text-dark-green text-xs"></i>
-                      TypeScript
-                    </li>
-                    <li className="flex items-center gap-2">
-                      <i className="ri-checkbox-circle-fill text-qiita-green dark:text-dark-green text-xs"></i>
-                      Tailwind CSS
-                    </li>
-                    <li className="flex items-center gap-2">
-                      <i className="ri-checkbox-circle-fill text-qiita-green dark:text-dark-green text-xs"></i>
-                      Remix Icon
-                    </li>
-                  </ul>
-                </div>
-                <div className="bg-qiita-surface dark:bg-dark-surface-light rounded-lg p-4 border border-qiita-border dark:border-dark-border">
-                  <h3 className="font-semibold text-qiita-text-dark dark:text-white mb-3">バックエンド</h3>
-                  <ul className="space-y-1.5 text-sm">
-                    <li className="flex items-center gap-2">
-                      <i className="ri-checkbox-circle-fill text-qiita-green dark:text-dark-green text-xs"></i>
-                      FastAPI (Python)
-                    </li>
-                    <li className="flex items-center gap-2">
-                      <i className="ri-checkbox-circle-fill text-qiita-green dark:text-dark-green text-xs"></i>
-                      PostgreSQL
-                    </li>
-                    <li className="flex items-center gap-2">
-                      <i className="ri-checkbox-circle-fill text-qiita-green dark:text-dark-green text-xs"></i>
-                      SQLAlchemy ORM
-                    </li>
-                    <li className="flex items-center gap-2">
-                      <i className="ri-checkbox-circle-fill text-qiita-green dark:text-dark-green text-xs"></i>
-                      Alembic (マイグレーション)
-                    </li>
-                  </ul>
-                </div>
-              </div>
-            </section>
 
             {/* 安心してご利用いただくために */}
             <section>
