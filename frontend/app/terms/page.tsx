@@ -42,14 +42,14 @@ export default function TermsPage() {
                 第2条（サービスの内容）
               </h2>
               <div className="bg-qiita-surface dark:bg-dark-surface-light rounded-lg p-4">
-                <p className="mb-3">本サービスは、以下の機能を提供します：</p>
+                <p className="mb-3">本サービスは、以下の機能・情報提供を行います：</p>
                 <ul className="list-disc list-inside space-y-2 ml-4">
                   <li>Qiita記事で言及されたIT技術書のランキング表示（24時間・30日間・365日間・年別・全期間）</li>
+                  <li>日次で自動収集した最新記事の差分反映と、過去データの補正ログ表示</li>
                   <li>YouTube動画で紹介されたIT技術書の情報表示</li>
-                  <li>書籍の詳細情報の提供（OpenBD、Google Books APIを利用）</li>
+                  <li>書籍の詳細情報の提供（OpenBD、Google Books API等の外部APIを利用）</li>
                   <li>関連するQiita記事の一覧表示と外部リンク</li>
-                  <li>関連するYouTube動画の一覧表示と視聴機能</li>
-                  <li>Amazon.co.jpへのアフィリエイトリンクの提供</li>
+                  <li>Amazon.co.jpへのアフィリエイトリンクおよびGoogle AdSense等の広告枠の表示</li>
                   <li>書籍名・著者・出版社・ISBNによる検索機能</li>
                 </ul>
                 <p className="mt-3 text-sm bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded p-2">
@@ -156,7 +156,7 @@ export default function TermsPage() {
 
             <section>
               <h2 className="text-lg md:text-xl font-bold text-qiita-text-dark dark:text-white mb-4 pb-2 border-b border-qiita-border/50 dark:border-dark-border/50">
-                第7条（アフィリエイトプログラム）
+                第7条（広告およびアフィリエイト）
               </h2>
               <div className="bg-qiita-surface dark:bg-dark-surface-light rounded-lg p-4">
                 <p className="mb-3">
@@ -165,8 +165,11 @@ export default function TermsPage() {
                 <p className="mb-3">
                   利用者が当サイトのリンクを通じて商品を購入された場合、当サイトは紹介料を受け取ることがあります。これにより利用者に追加の費用が発生することはありません。
                 </p>
+                <p className="mb-3">
+                  また、当サイトではGoogle AdSense等の第三者配信の広告サービスを利用する場合があります。広告配信事業者は、ユーザーの興味に応じた広告を表示するためにCookieを使用することがあります。
+                </p>
                 <p className="text-sm">
-                  書籍の価格、在庫状況、配送などの取引条件は、すべてAmazon.co.jpが定めるものであり、当サイトは一切の責任を負いません。
+                  書籍の価格、在庫状況、配送などの取引条件は、すべてAmazon.co.jpが定めるものであり、当サイトは一切の責任を負いません。広告表示に関する詳細はプライバシーポリシーをご確認ください。
                 </p>
               </div>
             </section>
@@ -230,6 +233,24 @@ export default function TermsPage() {
                 </p>
               </div>
             </section>
+
+            <section>
+              <h2 className="text-lg md:text-xl font-bold text-qiita-text-dark dark:text-white mb-4 pb-2 border-b border-qiita-border/50 dark:border-dark-border/50">
+                第12条（お問い合わせ）
+              </h2>
+              <div className="bg-qiita-surface dark:bg-dark-surface-light rounded-lg p-4">
+                <p className="mb-2">
+                  本規約に関するご質問、掲載情報の訂正依頼、その他のお問い合わせは、
+                  <Link href="/contact" className="text-qiita-green hover-underline mx-1 font-semibold">
+                    お問い合わせページ
+                  </Link>
+                  からご連絡ください。
+                </p>
+                <p className="text-sm text-qiita-text-light dark:text-dark-text-light">
+                  24時間以内の自動返信と、原則2営業日以内の回答を目指しています。
+                </p>
+              </div>
+            </section>
           </div>
 
           {/* フッター */}
@@ -237,7 +258,7 @@ export default function TermsPage() {
             <div className="flex items-center justify-between">
               <div>
                 <div>制定日: 2024年10月20日</div>
-                <div>最終更新日: 2024年10月23日</div>
+                <div>最終更新日: 2025年11月20日</div>
               </div>
               <Link href="/" className="text-qiita-green hover-underline flex items-center gap-1">
                 <i className="ri-home-line"></i>

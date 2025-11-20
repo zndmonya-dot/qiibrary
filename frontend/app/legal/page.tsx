@@ -95,7 +95,7 @@ export default function LegalPage() {
               </h2>
               <div className="bg-qiita-surface dark:bg-dark-surface-light rounded-lg p-4">
                 <p className="mb-3">
-                  当サイトは、Qiita記事やYouTube動画で話題のIT技術書の情報を収集・整理し、ランキング形式で表示する情報提供サービスです。
+                  当サイトは、Qiita記事やYouTube動画で話題のIT技術書の情報を収集・整理し、ランキング形式で表示する情報提供サービスです。Neon DB上で24時間ごとに自動更新を行い、最新の記事差分を反映しています。
                 </p>
                 <p className="font-semibold text-qiita-text-dark dark:text-white mb-2">提供する主な機能：</p>
                 <ul className="list-disc list-inside space-y-1 ml-4 text-sm">
@@ -104,7 +104,7 @@ export default function LegalPage() {
                   <li>書籍の詳細情報の表示（OpenBD、Google Books APIを利用）</li>
                   <li>関連するQiita記事の一覧と外部リンク</li>
                   <li>関連するYouTube動画の一覧と視聴機能</li>
-                  <li>Amazon.co.jpへの商品リンクの提供</li>
+                  <li>Amazon.co.jpへの商品リンクおよびGoogle AdSense等の広告表示</li>
                   <li>書籍名・著者・出版社・ISBNによる検索機能</li>
                 </ul>
               </div>
@@ -187,6 +187,20 @@ export default function LegalPage() {
 
             <section>
               <h2 className="text-lg md:text-xl font-bold text-qiita-text-dark dark:text-white mb-4 pb-2 border-b border-qiita-border/50 dark:border-dark-border/50">
+                広告掲載について
+              </h2>
+              <div className="bg-qiita-surface dark:bg-dark-surface-light rounded-lg p-4 space-y-3">
+                <p>
+                  当サイトはGoogle AdSenseなど第三者配信の広告サービスを利用する場合があります。広告配信事業者は、ユーザーの興味に応じた広告を表示するためにCookieを使用することがあります。
+                </p>
+                <p className="text-sm bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded p-3">
+                  Cookieを無効化する方法や、パーソナライズド広告の詳細については、Google広告設定やユーザー自身のブラウザ設定をご確認ください。
+                </p>
+              </div>
+            </section>
+
+            <section>
+              <h2 className="text-lg md:text-xl font-bold text-qiita-text-dark dark:text-white mb-4 pb-2 border-b border-qiita-border/50 dark:border-dark-border/50">
                 著作権・商標について
               </h2>
               <div className="bg-qiita-surface dark:bg-dark-surface-light rounded-lg p-4 space-y-2 text-sm">
@@ -211,7 +225,7 @@ export default function LegalPage() {
               </h2>
               <div className="bg-qiita-surface dark:bg-dark-surface-light rounded-lg p-4 space-y-3 text-sm">
                 <p>
-                  当サイトで提供する情報は、Qiita API、YouTube Data API、OpenBD API、Google Books API等の外部APIから取得したものです。
+                  当サイトで提供する情報は、Qiita API、YouTube Data API、OpenBD API、Google Books API等の外部APIから取得したものです。また、日次の自動バッチ処理により統計情報を更新していますが、完全な正確性を保証するものではありません。
                 </p>
                 <p>
                   情報の正確性、完全性、有用性、最新性については保証いたしかねます。
@@ -271,7 +285,7 @@ export default function LegalPage() {
             <div className="flex items-center justify-between">
               <div>
                 <div>制定日: 2024年10月20日</div>
-                <div>最終更新日: 2024年10月23日</div>
+                <div>最終更新日: 2025年11月20日</div>
               </div>
               <Link href="/" className="text-qiita-green hover-underline flex items-center gap-1">
                 <i className="ri-home-line"></i>

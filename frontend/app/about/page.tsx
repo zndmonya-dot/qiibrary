@@ -31,15 +31,14 @@ export default function AboutPage() {
               </h2>
               <div className="bg-qiita-surface dark:bg-dark-surface-light rounded-lg p-5">
                 <p className="mb-3">
-                  Qiibraryは、<span className="font-semibold text-qiita-text-dark dark:text-white">Qiitaで話題のIT技術書をランキング形式でまとめた</span>サービスです。
+                  Qiibraryは、<span className="font-semibold text-qiita-text-dark dark:text-white">Qiitaで話題のIT技術書をランキング形式で可視化する</span>独立系メディアです。
                 </p>
                 <p className="mb-3">
-                  技術書選びに迷ったとき、「Qiitaで人気の本は何だろう？」と思ったことはありませんか？
-                  Qiibraryは、そんな疑問を解決するために生まれました。
+                  「Qiitaの現場で今どんな本が支持されているのか」「昨年と今年で何が変わったのか」を、毎日自動で追跡できるようにすることが私たちの使命です。
                 </p>
                 <p>
-                  Qiitaの技術記事で紹介・言及された技術書を集計し、
-                  今最も注目されている技術書をランキング形式でお届けします。
+                  Qiita記事から抽出したAmazonリンクを解析し、Neon DBに蓄積したデータをもとに、
+                  <span className="font-semibold">24時間以内・30日・365日・年別</span>など複数の粒度でリアルタイムにランキングを生成しています。
                 </p>
               </div>
             </section>
@@ -59,7 +58,7 @@ export default function AboutPage() {
                         圧倒的なデータ量
                       </h3>
                       <p className="text-sm mb-2">
-                        <span className="font-bold text-qiita-green dark:text-dark-green text-lg">17,346冊</span>の技術書データを網羅
+                        <span className="font-bold text-qiita-green dark:text-dark-green text-lg">17,399冊</span>の技術書データを網羅
                       </p>
                       <p className="text-xs text-qiita-text-light dark:text-dark-text-light">
                         他サイト: 数百〜数千冊程度
@@ -76,7 +75,7 @@ export default function AboutPage() {
                         10年分の履歴データ
                       </h3>
                       <p className="text-sm mb-2">
-                        <span className="font-bold text-qiita-green dark:text-dark-green">2015年〜現在</span>までの全記録
+                        <span className="font-bold text-qiita-green dark:text-dark-green">2015年〜現在</span>までの全記録を日次で更新
                       </p>
                       <p className="text-xs text-qiita-text-light dark:text-dark-text-light">
                         他サイト: 直近数年のみ
@@ -93,7 +92,7 @@ export default function AboutPage() {
                         高速検索機能
                       </h3>
                       <p className="text-sm mb-2">
-                        17,000冊から<span className="font-bold text-qiita-green dark:text-dark-green">瞬時に検索</span>
+                        17,000冊超から<span className="font-bold text-qiita-green dark:text-dark-green">瞬時に検索</span>
                       </p>
                       <p className="text-xs text-qiita-text-light dark:text-dark-text-light">
                         他サイト: 検索機能なし or 基本的な検索のみ
@@ -110,7 +109,7 @@ export default function AboutPage() {
                         最高のUI/UX
                       </h3>
                       <p className="text-sm mb-2">
-                        PageSpeed Insights <span className="font-bold text-qiita-green dark:text-dark-green">99点</span>
+                        PageSpeed Insights <span className="font-bold text-qiita-green dark:text-dark-green">99点</span>、モバイル最適化済み
                       </p>
                       <p className="text-xs text-qiita-text-light dark:text-dark-text-light">
                         他サイト: 古いデザイン、動作が重い
@@ -126,8 +125,8 @@ export default function AboutPage() {
                   柔軟な期間設定
                 </h3>
                 <p className="text-sm mb-3">
-                  日次・月次・年次・全期間、さらに<span className="font-bold">2015年〜2024年の各年</span>で集計可能。
-                  これほど柔軟な期間設定ができるのはQiibraryだけです。
+                  日次・月次・年次・全期間、さらに<span className="font-bold">2015年〜2025年の各年</span>で集計可能。
+                  期間ごとに重み付けを変えた指標で「旬」と「定番」を同時に追えます。
                 </p>
                 <div className="flex flex-wrap gap-2">
                   <span className="px-3 py-1 bg-qiita-green/20 dark:bg-dark-green/20 text-qiita-green dark:text-dark-green rounded-full text-xs font-medium">
@@ -143,7 +142,7 @@ export default function AboutPage() {
                     全期間
                   </span>
                   <span className="px-3 py-1 bg-qiita-green/20 dark:bg-dark-green/20 text-qiita-green dark:text-dark-green rounded-full text-xs font-medium">
-                    2015年〜2024年（各年）
+                    2015年〜2025年（各年）
                   </span>
                 </div>
               </div>
@@ -249,6 +248,37 @@ export default function AboutPage() {
                         審査承認後は、Amazon Product Advertising APIを使用して、より正確な書籍情報と価格情報を提供する予定です。
                       </p>
                     </div>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            {/* データ更新と品質管理 */}
+            <section>
+              <h2 className="text-lg md:text-xl font-bold text-qiita-text-dark dark:text-white mb-4 pb-2 border-b border-qiita-border/50 dark:border-dark-border/50 flex items-center gap-2">
+                <i className="ri-refresh-line text-qiita-green dark:text-dark-green"></i>
+                データ更新と品質管理
+              </h2>
+              <div className="bg-qiita-surface dark:bg-dark-surface-light rounded-lg p-5 border border-qiita-border dark:border-dark-border space-y-4 text-sm">
+                <div className="flex items-start gap-3">
+                  <i className="ri-time-line text-qiita-green dark:text-dark-green text-xl mt-0.5"></i>
+                  <div>
+                    <p className="font-semibold text-qiita-text-dark dark:text-white">24時間ごとの自動収集</p>
+                    <p>Render上で稼働するFastAPIバッチとGitHub Actionsにより、毎日00:00 JSTに前日分の記事を取り込みます。</p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-3">
+                  <i className="ri-database-2-line text-qiita-green dark:text-dark-green text-xl mt-0.5"></i>
+                  <div>
+                    <p className="font-semibold text-qiita-text-dark dark:text-white">Neon DBでの整合性チェック</p>
+                    <p>first_mentioned_at / latest_mention_at / total_mentions を必ず埋める統計ジョブを通し、欠損や重複を検知します。</p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-3">
+                  <i className="ri-file-check-line text-qiita-green dark:text-dark-green text-xl mt-0.5"></i>
+                  <div>
+                    <p className="font-semibold text-qiita-text-dark dark:text-white">人手によるレビュー</p>
+                    <p>新しく追加されたID帯は、Amazonリンクの抽出精度・著者表記（「著者情報なし」等）を確認した上で公開しています。</p>
                   </div>
                 </div>
               </div>
@@ -368,7 +398,7 @@ export default function AboutPage() {
           <div className="mt-8 pt-6 border-t border-qiita-border dark:border-dark-border text-sm text-qiita-text-light dark:text-dark-text-light">
             <div className="flex items-center justify-between">
               <div>
-                <div>最終更新日: 2025年10月20日</div>
+                <div>最終更新日: 2025年11月20日</div>
               </div>
               <Link href="/" className="text-qiita-green hover-underline flex items-center gap-1">
                 <i className="ri-home-line"></i>
