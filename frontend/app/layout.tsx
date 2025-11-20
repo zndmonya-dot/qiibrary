@@ -79,7 +79,13 @@ export default function RootLayout({
 }) {
   return (
     <html lang="ja" suppressHydrationWarning>
-      <head />
+      <head>
+        <script
+          async
+          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4335284954366086"
+          crossOrigin="anonymous"
+        />
+      </head>
       <body>
         {/* OSのカラースキーム設定に従う（ちらつき防止） */}
         <script
