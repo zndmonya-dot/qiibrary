@@ -6,7 +6,7 @@ on:
       days:
         description: '取得する過去の日数 (デフォルト: 1日)'
         required: false
-        default: '1'
+        default: '19'
         type: string
   schedule:
     - cron: "0 15 * * *"  # JST 0:00 (UTC 15:00)
