@@ -489,11 +489,28 @@ def main():
         default=5000,
         help='タグごとの最大記事数（タグ未指定の場合は全記事）'
     )
+    parser.add_argument(
+        '--hours',
+        type=int,
+        default=24,
+        help='過去何時間分の記事を取得するか（デフォルト: 24時間）'
+    )
+    parser.add_argument(
+        '--days',
+        type=int,
+        default=None,
+        help='過去何日分の記事を取得するか（hoursより優先）'
+    )
     
     args = parser.parse_args()
     
+    # 日数が指定されている場合は時間を計算
+    hours = args.hours
+    if args.days is not None:
+        hours = args.days * 24
+    
     try:
-        run_data_collection(tags=args.tags, max_articles=args.max_articles)
+        run_data_collection(tags=args.tags, max_articles=args.max_articles, hours=hours)
     except Exception as e:
         logger.error(f"データ収集でエラーが発生しました: {e}")
         sys.exit(1)

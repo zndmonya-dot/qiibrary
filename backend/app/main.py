@@ -84,11 +84,35 @@ app.add_middleware(SecurityHeadersMiddleware)
 # 管理者API認証ミドルウェア
 @app.middleware("http")
 async def admin_auth_middleware(request: Request, call_next):
-    """管理者APIへのアクセスを認証でチェック"""
+    """管理者APIへのアクセスを認証でチェック    """
     if request.url.path.startswith("/api/admin"):
         await verify_admin_access(request)
     response = await call_next(request)
     return response
+
+
+@app.get("/api/admin/scheduler/status")
+async def get_scheduler_status(request: Request):
+    """スケジューラーの稼働状況を確認（管理者のみ）"""
+    await verify_admin_access(request)
+    
+    if not scheduler:
+        return {"status": "not_initialized"}
+    
+    jobs = []
+    for job in scheduler.get_jobs():
+        jobs.append({
+            "id": job.id,
+            "name": job.name,
+            "next_run_time": str(job.next_run_time) if job.next_run_time else None
+        })
+        
+    return {
+        "status": "running" if scheduler.running else "stopped",
+        "timezone": str(scheduler.timezone),
+        "jobs": jobs
+    }
+
 
 # ルーター登録
 app.include_router(rankings.router, prefix="/api/rankings", tags=["rankings"])

@@ -4,6 +4,7 @@
 import logging
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.triggers.cron import CronTrigger
+from apscheduler.events import EVENT_JOB_EXECUTED, EVENT_JOB_ERROR
 from datetime import date, timedelta
 import sys
 from pathlib import Path
@@ -34,6 +35,16 @@ def format_number(num: int) -> str:
     return str(num)
 
 
+def job_listener(event):
+    """
+    ジョブの実行結果をログに出力するリスナー
+    """
+    if event.exception:
+        logger.error(f"ジョブ {event.job_id} が失敗しました: {event.exception}")
+    else:
+        logger.info(f"ジョブ {event.job_id} が正常に完了しました")
+
+
 def daily_data_update():
     """
     毎日実行されるデータ更新タスク
@@ -42,6 +53,7 @@ def daily_data_update():
     try:
         logger.info("=" * 80)
         logger.info("定期データ更新開始")
+        logger.info(f"実行時刻: {datetime.now(JST)}")
         logger.info("=" * 80)
         
         # 全記事から書籍情報を収集（タグ制限なし、最大5000件）
@@ -65,6 +77,7 @@ def daily_tweet_generation():
     try:
         logger.info("=" * 80)
         logger.info("ツイート文生成開始")
+        logger.info(f"実行時刻: {datetime.now(JST)}")
         logger.info("=" * 80)
         
         # 24時間ランキングを取得
@@ -159,6 +172,9 @@ def start_scheduler():
     
     scheduler = BackgroundScheduler(timezone=JST)
     
+    # ジョブの実行結果を監視するリスナーを追加
+    scheduler.add_listener(job_listener, EVENT_JOB_EXECUTED | EVENT_JOB_ERROR)
+    
     # 毎日深夜0時（日本時間）にデータ更新を実行
     scheduler.add_job(
         daily_data_update,
@@ -181,6 +197,7 @@ def start_scheduler():
     
     logger.info("=" * 80)
     logger.info("スケジューラー起動完了")
+    logger.info(f"現在のサーバー時刻: {datetime.now(JST)}")
     logger.info("毎日 00:00 (JST) にデータ更新を実行します")
     logger.info("毎日 08:00 (JST) にツイート文生成を実行します")
     logger.info("=" * 80)
