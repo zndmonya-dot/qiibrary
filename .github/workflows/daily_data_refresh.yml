@@ -45,4 +45,3 @@ jobs:
           DAYS="${{ inputs.days || '1' }}"
           echo "過去 ${DAYS} 日分のデータを取得します..."
           python -m scripts.collect_books_from_qiita --days "${DAYS}"
-
