@@ -5,7 +5,7 @@ import logging
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.triggers.cron import CronTrigger
 from apscheduler.events import EVENT_JOB_EXECUTED, EVENT_JOB_ERROR
-from datetime import date, timedelta
+from datetime import datetime, date, timedelta
 import sys
 from pathlib import Path
 import os
