@@ -43,8 +43,8 @@ export default function Header() {
 
   return (
     <>
-      <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 border-b-4 ${
-        isScrolled ? 'bg-black border-green-500 py-2' : 'bg-black/90 border-transparent py-4'
+      <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 border-b-4 bg-black ${
+        isScrolled ? 'border-green-500 py-2' : 'border-transparent py-4'
       }`}>
         <div className="container mx-auto px-4 flex items-center justify-between">
           <Link href="/" prefetch={true} onClick={handleLogoClick} className="flex items-center space-x-3 group">
