@@ -340,9 +340,13 @@ export default function Home() {
                       stats={item.stats}
                       topArticles={item.top_articles}
                     />
-                    {/* Insert ad after every 10th item */}
-                    {(index + 1) % 10 === 0 && index < paginatedRankings.length - 1 && (
+                    {/* Insert ad after 10th item */}
+                    {index === 9 && paginatedRankings.length > 10 && (
                       <AdSenseInFeed adSlot="1136714581" layoutKey="-f1+5d+7q-d8-2t" />
+                    )}
+                    {/* Insert ad after 20th item */}
+                    {index === 19 && paginatedRankings.length > 20 && (
+                      <AdSenseInFeed adSlot="3741152038" layoutKey="-f1+5g+7i-dn-1i" />
                     )}
                   </React.Fragment>
                 ))
