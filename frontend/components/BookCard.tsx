@@ -16,50 +16,19 @@ interface BookCardProps {
 }
 
 function BookCard({ rank, book, stats, topArticles, onNavigate }: BookCardProps) {
-  // ランクに応じたバッジのスタイル
-  const getRankDisplay = () => {
-    if (rank === 1) return {
-      bg: 'bg-yellow-400',
-      text: 'text-black',
-      border: 'border-yellow-600',
-      shadow: 'shadow-[3px_3px_0_#a16207]',
-      icon: '👑',
-      label: '1st'
-    };
-    if (rank === 2) return {
-      bg: 'bg-gray-300',
-      text: 'text-gray-800',
-      border: 'border-gray-500',
-      shadow: 'shadow-[3px_3px_0_#4b5563]',
-      icon: '🥈',
-      label: '2nd'
-    };
-    if (rank === 3) return {
-      bg: 'bg-amber-600',
-      text: 'text-white',
-      border: 'border-amber-800',
-      shadow: 'shadow-[3px_3px_0_#92400e]',
-      icon: '🥉',
-      label: '3rd'
-    };
-    return {
-      bg: 'bg-gray-800',
-      text: 'text-green-400',
-      border: 'border-green-600',
-      shadow: 'shadow-[2px_2px_0_#166534]',
-      icon: '',
-      label: `${rank}`
-    };
+  // ランクに応じたバッジのスタイル（統一デザイン）
+  const getRankStyle = () => {
+    if (rank === 1) return 'bg-yellow-500 text-black border-yellow-300 shadow-[3px_3px_0_#a16207]';
+    if (rank === 2) return 'bg-gray-400 text-black border-gray-200 shadow-[3px_3px_0_#4b5563]';
+    if (rank === 3) return 'bg-amber-600 text-black border-amber-400 shadow-[3px_3px_0_#92400e]';
+    return 'bg-gray-800 text-green-400 border-green-600 shadow-[2px_2px_0_#166534]';
   };
-
-  const rankStyle = getRankDisplay();
 
   return (
     <div className="bg-black border-2 border-gray-800 relative group hover:border-green-500 transition-all duration-300 shadow-[4px_4px_0_#1a1a1a] hover:shadow-[4px_4px_0_#166534]">
       {/* Rank Badge */}
-      <div className={`absolute -top-4 left-4 font-pixel text-xs px-3 py-1.5 z-10 border-2 flex items-center gap-1 ${rankStyle.bg} ${rankStyle.text} ${rankStyle.border} ${rankStyle.shadow}`}>
-        {rankStyle.icon && <span className="text-sm">{rankStyle.icon}</span>}
-        <span>{rankStyle.label}</span>
+      <div className={`absolute -top-4 left-4 font-pixel text-xs px-3 py-1.5 z-10 border-2 ${getRankStyle()}`}>
+        {rank}
       </div>
 
       <div className="flex flex-col md:flex-row gap-5 p-5 pt-6">
