@@ -73,23 +73,6 @@ export function formatPublicationDate(dateString: string): string {
 }
 
 /**
- * YouTubeサムネイルURLを生成
- * @param videoId YouTube動画ID
- * @param quality サムネイル品質（default, mqdefault, hqdefault, sddefault, maxresdefault）
- */
-export function getYouTubeThumbnailUrl(videoId: string, quality: string = 'mqdefault'): string {
-  return `https://img.youtube.com/vi/${videoId}/${quality}.jpg`;
-}
-
-/**
- * YouTube動画URLを生成
- * @param videoId YouTube動画ID
- */
-export function getYouTubeVideoUrl(videoId: string): string {
-  return `https://www.youtube.com/watch?v=${videoId}`;
-}
-
-/**
  * 安全にクエリパラメータを構築
  * @param params パラメータオブジェクト
  */

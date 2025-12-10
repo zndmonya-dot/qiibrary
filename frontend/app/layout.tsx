@@ -1,6 +1,6 @@
 import type { Metadata, Viewport } from 'next'
 import './globals.css'
-import PageTransition from '@/components/PageTransition'
+import RetroBackground from '@/components/RetroBackground'
 
 export const viewport: Viewport = {
   width: 'device-width',
@@ -46,7 +46,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'Qiibrary - Qiitaで話題の技術書まとめ',
     description: 'エンジニアが実践で使い、Qiita記事で推薦した技術書ライブラリ',
-    creator: '@your_account',
+    creator: '@Rasenooon',
     images: ['/og-image.png'],
   },
   robots: {
@@ -78,39 +78,19 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="ja" suppressHydrationWarning>
+    <html lang="ja">
       <head>
+        <link href="https://cdn.jsdelivr.net/npm/remixicon@4.0.0/fonts/remixicon.css" rel="stylesheet" />
         <script
           async
           src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4335284954366086"
           crossOrigin="anonymous"
         />
       </head>
-      <body>
-        {/* OSのカラースキーム設定に従う（ちらつき防止） */}
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `
-              (function() {
-                try {
-                  const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-                  if (isDark) {
-                    document.documentElement.classList.add('dark');
-                  } else {
-                    document.documentElement.classList.remove('dark');
-                  }
-                } catch (e) {
-                  document.documentElement.classList.add('dark');
-                }
-              })();
-            `,
-          }}
-        />
-        <PageTransition>
-          {children}
-        </PageTransition>
+      <body className="dark">
+        <RetroBackground />
+        {children}
       </body>
     </html>
   )
 }
-

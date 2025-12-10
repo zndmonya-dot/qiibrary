@@ -1,22 +1,17 @@
 'use client';
 
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useParams } from 'next/navigation';
-import Image from 'next/image';
 import Link from 'next/link';
 import Script from 'next/script';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import LoadingSpinner from '@/components/LoadingSpinner';
+import BookImage from '@/components/BookImage';
+import { AdSenseDisplay } from '@/components/AdSense';
 import { getBookDetail, BookDetail } from '@/lib/api';
 import { formatNumber, formatPublicationDate } from '@/lib/utils';
-import { generateBookStructuredData, generateBreadcrumbStructuredData } from '@/lib/seo';
-import { BOOK_DETAIL } from '@/lib/constants';
-
-// グローバルキャッシュ（コンポーネント外で管理）
-const bookDetailsCache = new Map<string, BookDetail>();
-// スクロール位置キャッシュ
-const scrollPositionCache = new Map<string, number>();
+import { generateBookStructuredData } from '@/lib/seo';
 
 export default function BookDetailPage() {
   const params = useParams();
@@ -25,637 +20,209 @@ export default function BookDetailPage() {
   const [book, setBook] = useState<BookDetail | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [isFromCache, setIsFromCache] = useState(false);
-  const [displayedArticlesCount, setDisplayedArticlesCount] = useState<number>(BOOK_DETAIL.INITIAL_ARTICLES_COUNT);
-  const previousCountRef = useRef<number>(BOOK_DETAIL.INITIAL_ARTICLES_COUNT);
-  const [newlyAddedStart, setNewlyAddedStart] = useState<number | null>(null);
-  const [selectedVideoId, setSelectedVideoId] = useState<string | null>(null);
-  const [displayedVideosCount, setDisplayedVideosCount] = useState<number>(BOOK_DETAIL.INITIAL_VIDEOS_COUNT);
-  const [newlyAddedVideosStart, setNewlyAddedVideosStart] = useState<number | null>(null);
-
-  // SEO: 動的メタデータ更新
-  useEffect(() => {
-    if (!book) return;
-    
-    const articleCount = book.qiita_articles?.length || 0;
-    const totalLikes = book.qiita_articles?.reduce((sum, article) => sum + (article.likes_count || 0), 0) || 0;
-    
-    // タイトル更新
-    document.title = `${book.title} 評判・レビュー【Qiita ${articleCount}記事で紹介】 | Qiibrary`;
-    
-    // メタディスクリプション更新
-    const description = `「${book.title}」はQiitaで${articleCount}記事、${formatNumber(totalLikes)}いいねを獲得。実際に使ったエンジニアのレビューと評判をまとめました。${book.author ? `著者: ${book.author}` : ''}`;
-    
-    let metaDescription = document.querySelector('meta[name="description"]');
-    if (!metaDescription) {
-      metaDescription = document.createElement('meta');
-      metaDescription.setAttribute('name', 'description');
-      document.head.appendChild(metaDescription);
-    }
-    metaDescription.setAttribute('content', description);
-    
-    // OGP更新
-    let ogTitle = document.querySelector('meta[property="og:title"]');
-    if (!ogTitle) {
-      ogTitle = document.createElement('meta');
-      ogTitle.setAttribute('property', 'og:title');
-      document.head.appendChild(ogTitle);
-    }
-    ogTitle.setAttribute('content', `${book.title} - Qiitaで話題の技術書`);
-    
-    let ogDescription = document.querySelector('meta[property="og:description"]');
-    if (!ogDescription) {
-      ogDescription = document.createElement('meta');
-      ogDescription.setAttribute('property', 'og:description');
-      document.head.appendChild(ogDescription);
-    }
-    ogDescription.setAttribute('content', `${articleCount}記事で紹介された人気の技術書`);
-    
-    if (book.thumbnail_url) {
-      let ogImage = document.querySelector('meta[property="og:image"]');
-      if (!ogImage) {
-        ogImage = document.createElement('meta');
-        ogImage.setAttribute('property', 'og:image');
-        document.head.appendChild(ogImage);
-      }
-      ogImage.setAttribute('content', book.thumbnail_url);
-    }
-  }, [book]);
+  const [displayedArticlesCount, setDisplayedArticlesCount] = useState(10);
 
   useEffect(() => {
     const fetchBook = async () => {
-      // キャッシュにデータがあればそれを使用
-      const cachedData = bookDetailsCache.get(asin);
-      if (cachedData) {
-        setBook(cachedData);
-        setLoading(false);
-        setIsFromCache(true);
-        setDisplayedArticlesCount(BOOK_DETAIL.INITIAL_ARTICLES_COUNT);
-        previousCountRef.current = BOOK_DETAIL.INITIAL_ARTICLES_COUNT;
-        setNewlyAddedStart(null);
-        setDisplayedVideosCount(BOOK_DETAIL.INITIAL_VIDEOS_COUNT);
-        setNewlyAddedVideosStart(null);
-        return;
-      }
-      
-      // 新規取得時のみページトップにスクロール
-      window.scrollTo(0, 0);
-      
       setLoading(true);
       setError(null);
-      setIsFromCache(false);
-      setDisplayedArticlesCount(BOOK_DETAIL.INITIAL_ARTICLES_COUNT);
-      previousCountRef.current = BOOK_DETAIL.INITIAL_ARTICLES_COUNT;
-      setNewlyAddedStart(null);
-      setDisplayedVideosCount(BOOK_DETAIL.INITIAL_VIDEOS_COUNT);
-      setNewlyAddedVideosStart(null);
-      
       try {
         const data = await getBookDetail(asin);
-        const minDelay = new Promise(resolve => setTimeout(resolve, BOOK_DETAIL.MIN_LOADING_DELAY));
-        await Promise.all([data, minDelay]);
         setBook(data);
-        
-        // データをグローバルキャッシュに保存
-        bookDetailsCache.set(asin, data);
-      } catch (err) {
-        setError('書籍情報の取得に失敗しました');
+        document.title = `${data.title} | Qiibrary`;
+      } catch (err: any) {
         console.error(err);
+        setError('Failed to load data from server mainframe.');
       } finally {
         setLoading(false);
       }
     };
-
     fetchBook();
   }, [asin]);
 
-  // スクロール位置の保存と復元（ちらつき防止版）
-  useEffect(() => {
-    // ブラウザのデフォルト復元を無効化
-    if ('scrollRestoration' in window.history) {
-      window.history.scrollRestoration = 'manual';
-    }
+  const handleShowMore = useCallback(() => {
+    setDisplayedArticlesCount(prev => prev + 10);
+  }, []);
 
-    // 保存：スクロールイベント
-    const saveScroll = () => {
-      scrollPositionCache.set(asin, window.scrollY);
-    };
-
-    window.addEventListener('scroll', saveScroll, { passive: true });
-    
-    return () => {
-      window.removeEventListener('scroll', saveScroll);
-      saveScroll(); // 最後に保存
-    };
-  }, [asin]);
-
-  // 復元：データ表示直後（ちらつき防止のため即座に実行）
-  useEffect(() => {
-    if (!book) return;
-    
-    const savedPosition = scrollPositionCache.get(asin) || 0;
-    
-    if (savedPosition > 0) {
-      // 同期的に即座に復元
-      window.scrollTo(0, savedPosition);
-    }
-  }, [asin, book]);
-
-  const handleShowMore = useCallback((increment: number) => {
-    const currentCount = displayedArticlesCount;
-    const newCount = Math.min(currentCount + increment, book?.qiita_articles.length || currentCount);
-    
-    setNewlyAddedStart(currentCount);
-    setDisplayedArticlesCount(newCount);
-    previousCountRef.current = newCount;
-    
-    setTimeout(() => setNewlyAddedStart(null), BOOK_DETAIL.ANIMATION_TIMEOUT_MORE);
-  }, [displayedArticlesCount, book?.qiita_articles?.length]);
-
-  const handleShowAll = useCallback(() => {
-    if (!book?.qiita_articles) return;
-    
-    const currentCount = displayedArticlesCount;
-    const totalCount = book.qiita_articles.length;
-    
-    setNewlyAddedStart(currentCount);
-    setDisplayedArticlesCount(totalCount);
-    previousCountRef.current = totalCount;
-    
-    setTimeout(() => setNewlyAddedStart(null), BOOK_DETAIL.ANIMATION_TIMEOUT_ALL);
-  }, [displayedArticlesCount, book?.qiita_articles]);
-
-  const handleShowMoreVideos = useCallback((increment: number) => {
-    const currentCount = displayedVideosCount;
-    const newCount = Math.min(currentCount + increment, book?.youtube_videos?.length || currentCount);
-    
-    setNewlyAddedVideosStart(currentCount);
-    setDisplayedVideosCount(newCount);
-    
-    setTimeout(() => setNewlyAddedVideosStart(null), BOOK_DETAIL.ANIMATION_TIMEOUT_MORE);
-  }, [displayedVideosCount, book?.youtube_videos?.length]);
-
-  const handleShowAllVideos = useCallback(() => {
-    if (!book?.youtube_videos) return;
-    
-    const currentCount = displayedVideosCount;
-    const totalCount = book.youtube_videos.length;
-    
-    setNewlyAddedVideosStart(currentCount);
-    setDisplayedVideosCount(totalCount);
-    
-    setTimeout(() => setNewlyAddedVideosStart(null), BOOK_DETAIL.ANIMATION_TIMEOUT_ALL);
-  }, [displayedVideosCount, book?.youtube_videos]);
-
-  // 構造化データ（JSON-LD）を生成
-  const generateStructuredData = () => {
-    if (!book) return null;
-
-    const totalLikes = book.qiita_articles?.reduce((sum, article) => sum + (article.likes_count || 0), 0) || 0;
-    const articleCount = book.qiita_articles?.length || 0;
-
-    return {
-      '@context': 'https://schema.org',
-      '@type': 'Book',
-      '@id': `https://qiibrary.com/books/${asin}`,
-      name: book.title,
-      author: book.author ? {
-        '@type': 'Person',
-        name: book.author
-      } : undefined,
-      isbn: book.isbn,
-      image: book.thumbnail_url || undefined,
-      publisher: book.publisher ? {
-        '@type': 'Organization',
-        name: book.publisher
-      } : undefined,
-      datePublished: book.publication_date || undefined,
-      aggregateRating: totalLikes > 0 ? {
-        '@type': 'AggregateRating',
-        ratingValue: Math.min(5, (totalLikes / articleCount) / 20), // いいね数を5点満点に正規化
-        reviewCount: articleCount,
-        bestRating: 5,
-        worstRating: 1
-      } : undefined,
-      offers: book.amazon_affiliate_url ? {
-        '@type': 'Offer',
-        url: book.amazon_affiliate_url,
-        availability: 'https://schema.org/InStock',
-        seller: {
-          '@type': 'Organization',
-          name: 'Amazon.co.jp'
-        }
-      } : undefined,
-      description: `Qiitaで話題の技術書「${book.title}」。${articleCount}件の記事で紹介され、${totalLikes}のいいねを獲得しています。`,
-      inLanguage: 'ja',
-      genre: '技術書'
-    };
-  };
-
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-qiita-bg dark:bg-dark-bg">
-        <Header />
-        <main className="container mx-auto px-4 min-h-[calc(100vh-120px)] flex items-center justify-center">
-          <LoadingSpinner />
-        </main>
+  if (loading) return (
+    <div className="min-h-screen bg-black flex flex-col">
+      <Header />
+      <div className="flex-1 flex items-center justify-center">
+        <LoadingSpinner />
       </div>
-    );
-  }
+      <Footer />
+    </div>
+  );
 
-  if (error || !book) {
-    return (
-      <div className="min-h-screen bg-qiita-bg dark:bg-dark-bg">
-        <Header />
-        <div className="container mx-auto px-4 py-8 animate-fade-in">
-          <div className="bg-red-50 dark:bg-red-900/20 border border-red-300 dark:border-red-800 text-red-700 dark:text-red-300 px-4 py-3 rounded animate-slide-down">
-            <div className="flex items-center gap-2">
-              <i className="ri-error-warning-line text-xl"></i>
-              <span>{error || '書籍が見つかりませんでした'}</span>
-            </div>
-          </div>
-          <a
-            href="/"
-            className="mt-4 text-qiita-green dark:text-dark-green hover-text-green inline-flex items-center gap-1 cursor-pointer"
-            onClick={(e) => {
-              e.preventDefault();
-              window.history.back();
-            }}
-          >
-            <i className="ri-arrow-left-line"></i>
-            ランキングに戻る
-          </a>
+  if (error || !book) return (
+    <div className="min-h-screen bg-black flex flex-col">
+      <Header />
+      <div className="flex-1 flex flex-col items-center justify-center p-8 text-center">
+        <div className="text-red-500 font-pixel text-4xl mb-4">GAME OVER</div>
+        <p className="text-gray-400 font-mono mb-8">{error}</p>
+        <Link href="/" className="retro-btn">
+          TRY AGAIN
+        </Link>
+      </div>
+      <Footer />
+    </div>
+  );
+
+  const totalLikes = book.qiita_articles?.reduce((sum, article) => sum + (article.likes_count || 0), 0) || 0;
+
+  return (
+    <div className="min-h-screen bg-black text-gray-200 font-mono">
+      <Script
+        id="structured-data"
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(generateBookStructuredData(book)) }}
+      />
+      
+      {/* Scanline Effect */}
+      <div className="crt-flicker"></div>
+      
+      <Header />
+      
+      <main className="container mx-auto px-4 pt-20 pb-12 relative z-10">
+        {/* Breadcrumbs - Sticky & Visible */}
+        <div className="sticky top-[60px] z-40 bg-black py-4 mb-8 flex flex-wrap items-center gap-2 text-xs font-pixel border-b-2 border-green-900 w-full shadow-lg">
+           <Link href="/" className="text-green-500 hover:text-white transition-colors uppercase text-sm">[HOME]</Link>
+           <span className="text-gray-500 text-sm">&gt;</span>
+           <span className="text-gray-300 break-words line-clamp-1 text-sm">{book.title}</span>
         </div>
-      </div>
-    );
-  }
 
-      return (
-        <div className="min-h-screen bg-qiita-bg dark:bg-dark-bg">
-          {/* 構造化データ（JSON-LD） */}
-          {book && (
-            <Script
-              id="structured-data"
-              type="application/ld+json"
-              dangerouslySetInnerHTML={{
-                __html: JSON.stringify(generateStructuredData()),
-              }}
-            />
-          )}
-          
-          <Header />
-          
-          <main className="container mx-auto px-3 md:px-4 pt-6 pb-4 md:py-8 animate-fade-in">
-            {/* 戻るボタン */}
-            <div className="animate-slide-down" style={{ animationDelay: '0ms' }}>
-              <a
-                href="/"
-                className="inline-flex items-center gap-2 text-qiita-text dark:text-dark-text hover-text-green mb-4 md:mb-8 text-sm md:text-base font-medium py-2 px-3 rounded-lg transition-all duration-200 hover:bg-qiita-surface dark:hover:bg-dark-surface-light hover:pl-2 cursor-pointer"
-                onClick={(e) => {
-                  e.preventDefault();
-                  window.history.back();
-                }}
-              >
-                <i className="ri-arrow-left-line text-base md:text-lg transition-transform duration-200 group-hover:-translate-x-1"></i>
-                <span>ランキングに戻る</span>
-              </a>
-            </div>
-            
-            {/* タイトル */}
-            <div className="mb-4 md:mb-8 animate-slide-up" style={{ animationDelay: '100ms' }}>
-              <h1 className="text-xl md:text-3xl font-bold text-qiita-text-dark dark:text-white leading-tight">
-                {book.title}
-              </h1>
-            </div>
-            
-            {/* Qiita記事セクション */}
-            {book.qiita_articles && book.qiita_articles.length > 0 && (
-              <div id="qiita-articles" className="mb-12 scroll-mt-24 animate-slide-up" style={{ animationDelay: '200ms' }}>
-                {/* セクションヘッダー */}
-                <div className="mb-4 md:mb-6">
-                  <div className="flex items-center gap-2 md:gap-3 mb-1.5 md:mb-2">
-                    <h2 className="text-base md:text-lg font-bold text-qiita-text-dark dark:text-white">
-                      この本を紹介しているQiita記事
-                    </h2>
-                    <span className="text-xs md:text-sm font-bold text-qiita-green dark:text-dark-green px-1.5 md:px-2 py-0.5 bg-qiita-green/10 dark:bg-qiita-green/20 rounded">
-                      {book.qiita_articles.length}件
-                    </span>
-                  </div>
-                  <p className="text-xs md:text-sm text-qiita-text dark:text-dark-text">
-                    実際に使ってみた開発者の声
-                  </p>
+        <div className="flex flex-col lg:flex-row gap-8 items-start">
+          {/* Left Column: Book Details - Fixed Layout */}
+          <div className="lg:w-1/3 lg:sticky lg:top-[140px] lg:self-start w-full max-w-[360px] mx-auto" style={{ willChange: 'transform' }}>
+             <div className="bg-black border-4 border-green-500 p-1 shadow-[8px_8px_0_#166534] relative group">
+                <div className="absolute -top-3 right-2 bg-yellow-500 text-black font-pixel text-xs px-2 py-1 z-10 shadow-[2px_2px_0_#a16207]">
+                  ITEM INFO
                 </div>
                 
-                <div className="space-y-1.5 md:space-y-2">
-                  {book.qiita_articles.slice(0, displayedArticlesCount).map((article, index) => {
-                    let style: React.CSSProperties = {};
-                    
-                    // キャッシュから復元時はアニメーションをスキップ
-                    if (!isFromCache) {
-                      if (newlyAddedStart !== null && index >= newlyAddedStart) {
-                        const relativeIndex = index - newlyAddedStart;
-                        const delayMs = Math.min(relativeIndex, 9) * 100;
-                        style = {
-                          animation: `fadeInUp 0.5s ease-out ${delayMs}ms forwards`,
-                          opacity: 0
-                        };
-                      } else if (index < BOOK_DETAIL.INITIAL_ARTICLES_COUNT && displayedArticlesCount === BOOK_DETAIL.INITIAL_ARTICLES_COUNT) {
-                        const delayMs = index * 100;
-                        style = {
-                          animation: `fadeInUp 0.5s ease-out ${delayMs}ms forwards`,
-                          opacity: 0
-                        };
-                      }
-                    }
-                    
-                    return (
-                    <a
-                      key={article.id}
-                      href={article.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="group block p-2 md:p-3 rounded-lg bg-qiita-surface dark:bg-[#2f3232] hover-card"
-                      style={style}
+                <div className="p-4 border border-gray-800 bg-black">
+                  <div className="w-56 mx-auto mb-6 border-4 border-white shadow-lg relative aspect-[2/3]">
+                     <BookImage
+                        src={book.thumbnail_url}
+                        alt={book.title}
+                        width={224}
+                        height={336}
+                        priority={true}
+                        className="w-full h-full object-cover filter contrast-125"
+                      />
+                  </div>
+                  
+                  <h1 className="font-pixel text-2xl text-white mb-2 leading-tight text-center text-shadow-glow">{book.title}</h1>
+                  <p className="font-mono text-center text-green-500 text-base mb-4">{book.author}</p>
+                  
+                  <div className="space-y-2 mb-6 font-mono text-sm border-t border-gray-800 pt-4">
+                     <div className="flex justify-between">
+                       <span className="text-gray-500">PUB:</span>
+                       <span>{book.publisher}</span>
+                     </div>
+                     <div className="flex justify-between">
+                       <span className="text-gray-500">DATE:</span>
+                       <span>{book.publication_date ? formatPublicationDate(book.publication_date) : 'UNKNOWN'}</span>
+                     </div>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-3 mb-6">
+                    <div className="bg-gray-900 border-2 border-cyan-600 p-3 text-center shadow-[3px_3px_0_#0e7490]">
+                      <div className="text-[10px] text-cyan-400 font-pixel mb-1">MENTIONS</div>
+                      <div className="text-2xl font-pixel text-cyan-300">{formatNumber(book.total_mentions)}</div>
+                    </div>
+                    <div className="bg-gray-900 border-2 border-pink-600 p-3 text-center shadow-[3px_3px_0_#86198f]">
+                      <div className="text-[10px] text-pink-400 font-pixel mb-1">LIKES</div>
+                      <div className="text-2xl font-pixel text-pink-300">{formatNumber(totalLikes)}</div>
+                    </div>
+                  </div>
+
+                  {book.amazon_affiliate_url && (
+                    <a 
+                      href={book.amazon_affiliate_url} 
+                      target="_blank" 
+                      rel="nofollow noreferrer"
+                      className="block w-full text-center py-3 bg-yellow-500 text-black font-pixel text-sm border-2 border-yellow-300 shadow-[4px_4px_0_#a16207] hover:bg-yellow-400 hover:shadow-none hover:translate-x-1 hover:translate-y-1 transition-all"
                     >
-                      <div className="flex gap-2 md:gap-3">
-                        <div className="flex-shrink-0 pt-0.5 md:pt-1">
-                          <i className="ri-article-line text-qiita-green dark:text-dark-green text-base md:text-lg"></i>
+                      ▶ BUY ON AMAZON
+                    </a>
+                  )}
+                </div>
+             </div>
+             
+             {/* Description Box */}
+             <div className="mt-6 border-2 border-gray-700 bg-black p-4 relative shadow-[4px_4px_0_#1a1a1a]">
+                <div className="absolute -top-3 left-4 bg-black px-2 font-pixel text-xs text-gray-500 border border-gray-700">DESCRIPTION</div>
+                <p className="text-base leading-relaxed text-gray-400 font-mono text-justify">
+                  {book.description || 'No data available in archives.'}
+                </p>
+             </div>
+          </div>
+
+          {/* Right Column: Qiita Articles */}
+          <div className="lg:w-2/3 w-full">
+            <h2 className="font-pixel text-2xl text-green-500 mb-8 flex items-center border-b-4 border-green-600 pb-3">
+              <i className="ri-file-list-2-line mr-3"></i>
+              QIITA BLOG ({book.qiita_articles.length})
+            </h2>
+            
+            {book.qiita_articles.length > 0 ? (
+              <div className="space-y-6">
+                {book.qiita_articles.slice(0, displayedArticlesCount).map((article, index) => (
+                  <div 
+                    key={article.id} 
+                    className="bg-black border-2 border-gray-800 p-5 hover:border-green-500 transition-colors group relative overflow-hidden shadow-[3px_3px_0_#1a1a1a] hover:shadow-[3px_3px_0_#166534]"
+                  >
+                    <div className="absolute left-0 top-0 bottom-0 w-1 bg-green-700 group-hover:bg-green-400 transition-colors"></div>
+                    
+                    <a href={article.url} target="_blank" rel="noopener noreferrer" className="block pl-4">
+                      <h3 className="font-pixel text-xl text-white mb-3 group-hover:text-green-400 truncate">
+                        {article.title}
+                      </h3>
+                      
+                      <div className="flex flex-wrap items-center gap-6 text-sm font-mono text-gray-500">
+                        <div className="flex items-center text-cyan-500">
+                          <i className="ri-user-smile-line mr-2"></i>
+                          {article.author_name || article.author_id}
                         </div>
-                        
-                        <div className="flex-1 min-w-0">
-                          <h3 className="text-sm md:text-base font-bold text-qiita-text-dark dark:text-white mb-1.5 md:mb-2 group-hover-text-green line-clamp-2 leading-relaxed">
-                            {article.title}
-                          </h3>
-                          
-                          <div className="flex flex-wrap items-center gap-2 md:gap-3 text-xs text-qiita-text dark:text-dark-text mb-1.5 md:mb-2">
-                            <span className="flex items-center gap-1 max-w-[120px] md:max-w-none truncate">
-                              <i className="ri-user-line flex-shrink-0"></i>
-                              <span className="truncate">{article.author_name || article.author_id}</span>
-                            </span>
-                            <span className="flex items-center gap-1">
-                              <i className="ri-heart-fill text-pink-500"></i>
-                              {formatNumber(article.likes_count)}
-                            </span>
-                            <span className="flex items-center gap-1">
-                              <i className="ri-bookmark-line"></i>
-                              {formatNumber(article.stocks_count)}
-                            </span>
-                            <span className="hidden sm:inline">{new Date(article.published_at).toLocaleDateString('ja-JP')}</span>
-                          </div>
-                          
-                          {article.tags && article.tags.length > 0 && (
-                            <div className="flex flex-wrap gap-1 md:gap-1.5">
-                              {/* モバイル: 最初の3つ、デスクトップ: 最初の5つ */}
-                              {article.tags.slice(0, 3).map((tag, idx) => (
-                                <span
-                                  key={idx}
-                                  className="px-1.5 md:px-2 py-0.5 bg-qiita-green/10 dark:bg-qiita-green/20 text-qiita-green dark:text-dark-green text-[10px] md:text-xs rounded"
-                                >
-                                  {tag}
-                                </span>
-                              ))}
-                              {article.tags.slice(3, 5).map((tag, idx) => (
-                                <span
-                                  key={idx + 3}
-                                  className="hidden md:inline-block px-2 py-0.5 bg-qiita-green/10 dark:bg-qiita-green/20 text-qiita-green dark:text-dark-green text-xs rounded"
-                                >
-                                  {tag}
-                                </span>
-                              ))}
-                              {article.tags.length > 3 && (
-                                <span className="md:hidden text-[10px] text-qiita-text dark:text-dark-text">
-                                  +{article.tags.length - 3}
-                                </span>
-                              )}
-                              {article.tags.length > 5 && (
-                                <span className="hidden md:inline text-xs text-qiita-text dark:text-dark-text">
-                                  +{article.tags.length - 5}
-                                </span>
-                              )}
-                            </div>
-                          )}
+                        <div className="flex items-center text-pink-500">
+                          <i className="ri-heart-3-fill mr-2"></i>
+                          {formatNumber(article.likes_count)} HP
                         </div>
-                        
-                        <div className="flex-shrink-0 pt-0.5 md:pt-1">
-                          <i className="ri-external-link-line text-qiita-text-light dark:text-dark-text-light group-hover-text-green text-sm md:text-base"></i>
+                        <div className="flex items-center">
+                          <i className="ri-time-line mr-2"></i>
+                          {formatPublicationDate(article.published_at)}
                         </div>
                       </div>
+                      
+                      <div className="absolute right-6 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity">
+                         <i className="ri-arrow-right-s-fill text-3xl text-green-500"></i>
+                      </div>
                     </a>
-                    );
-                  })}
-                </div>
+                  </div>
+                ))}
                 
-                {/* もっと見る / すべて表示ボタン */}
                 {book.qiita_articles.length > displayedArticlesCount && (
-                  <div className="mt-4 md:mt-6 flex gap-3 justify-center flex-wrap">
-                    <button
-                      onClick={() => handleShowMore(BOOK_DETAIL.SHOW_MORE_INCREMENT)}
-                      className="px-4 md:px-5 py-2.5 md:py-3 text-sm md:text-base bg-qiita-green dark:bg-dark-green text-white rounded-lg hover-opacity-90 font-semibold"
-                    >
-                      もっと見る（+{BOOK_DETAIL.SHOW_MORE_INCREMENT}件）
-                    </button>
-                    <button
-                      onClick={handleShowAll}
-                      className="px-4 md:px-5 py-2.5 md:py-3 text-sm md:text-base bg-qiita-surface dark:bg-dark-surface-light text-qiita-text-dark dark:text-white rounded-lg hover-primary font-semibold"
-                    >
-                      すべて表示（全{book.qiita_articles.length}件）
-                    </button>
-                  </div>
-                )}
-              </div>
-            )}
-
-            {/* YouTube動画セクション */}
-            {book.youtube_videos && book.youtube_videos.length > 0 && (
-              <div id="youtube-videos" className="mb-12 scroll-mt-24 animate-slide-up" style={{ animationDelay: '300ms' }}>
-                {/* セクションヘッダー */}
-                <div className="mb-4 md:mb-6">
-                  <div className="flex items-center gap-2 md:gap-3 mb-1.5 md:mb-2">
-                    <h2 className="text-base md:text-lg font-bold text-qiita-text-dark dark:text-white">
-                      関連動画
-                    </h2>
-                    <span className="text-xs md:text-sm font-bold text-red-500 dark:text-red-400 px-1.5 md:px-2 py-0.5 bg-red-500/10 dark:bg-red-500/20 rounded">
-                      {book.youtube_videos.length}件
-                    </span>
-                  </div>
-                  <p className="text-xs md:text-sm text-qiita-text dark:text-dark-text">
-                    この本について詳しく解説している動画
-                  </p>
-                </div>
-                
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-3">
-                  {book.youtube_videos.slice(0, displayedVideosCount).map((video, index) => {
-                    let style: React.CSSProperties = {};
-                    
-                    // キャッシュから復元時はアニメーションをスキップ
-                    if (!isFromCache) {
-                      if (newlyAddedVideosStart !== null && index >= newlyAddedVideosStart) {
-                        const relativeIndex = index - newlyAddedVideosStart;
-                        const delayMs = Math.min(relativeIndex, 8) * 100;
-                        style = {
-                          animation: `fadeInUp 0.5s ease-out ${delayMs}ms forwards`,
-                          opacity: 0
-                        };
-                      } else if (index < 8 && displayedVideosCount === 8) {
-                        const delayMs = index * 100;
-                        style = {
-                          animation: `fadeInUp 0.5s ease-out ${delayMs}ms forwards`,
-                          opacity: 0
-                        };
-                      }
-                    }
-
-                    return (
-                      <button
-                        key={video.video_id}
-                        onClick={() => setSelectedVideoId(video.video_id)}
-                        className="block rounded-lg bg-qiita-surface dark:bg-[#2f3232] overflow-hidden w-full text-left border border-qiita-border dark:border-dark-border hover-card"
-                        style={style}
-                      >
-                        {/* サムネイル */}
-                        <div className="relative aspect-video bg-gray-200 dark:bg-gray-800 overflow-hidden">
-                          {video.thumbnail_url && (
-                            <img
-                              src={video.thumbnail_url}
-                              alt={video.title}
-                              className="w-full h-full object-cover"
-                            />
-                          )}
-                          <div className="absolute inset-0 flex items-center justify-center">
-                            <div className="w-10 h-10 md:w-12 md:h-12 bg-red-600 rounded-full flex items-center justify-center shadow-lg">
-                              <i className="ri-play-fill text-white text-lg md:text-2xl ml-0.5"></i>
-                            </div>
-                          </div>
-                        </div>
-                        
-                        {/* 動画情報 */}
-                        <div className="p-2 md:p-3">
-                          <h3 className="text-xs md:text-sm font-bold text-qiita-text-dark dark:text-white mb-1.5 md:mb-2 line-clamp-2 leading-relaxed">
-                            {video.title}
-                          </h3>
-                          
-                          <div className="flex items-center gap-1.5 text-[10px] md:text-xs text-qiita-text dark:text-dark-text mb-1 md:mb-1.5">
-                            <div className="flex items-center gap-0.5 md:gap-1 truncate">
-                              <i className="ri-youtube-line text-red-500 flex-shrink-0"></i>
-                              <span className="truncate">{video.channel_name}</span>
-                            </div>
-                          </div>
-                          
-                          {/* 再生回数・いいね数 */}
-                          {(video.view_count > 0 || video.like_count > 0) && (
-                            <div className="flex items-center gap-2 text-[10px] md:text-xs text-qiita-text dark:text-dark-text">
-                              {video.view_count > 0 && (
-                                <div className="flex items-center gap-0.5 md:gap-1">
-                                  <i className="ri-play-circle-line"></i>
-                                  <span>{video.view_count.toLocaleString()}回</span>
-                                </div>
-                              )}
-                              {video.like_count > 0 && (
-                                <div className="flex items-center gap-0.5 md:gap-1">
-                                  <i className="ri-thumb-up-line"></i>
-                                  <span>{video.like_count.toLocaleString()}</span>
-                                </div>
-                              )}
-                            </div>
-                          )}
-                        </div>
-                      </button>
-                    );
-                  })}
-                </div>
-                
-                {/* もっと見る / すべて表示ボタン */}
-                {book.youtube_videos.length > displayedVideosCount && (
-                  <div className="mt-4 md:mt-6 flex gap-3 justify-center flex-wrap">
-                    <button
-                      onClick={() => handleShowMoreVideos(12)}
-                      className="px-4 md:px-5 py-2.5 md:py-3 text-sm md:text-base bg-red-500 dark:bg-red-600 text-white rounded-lg hover-opacity-90 font-semibold"
-                    >
-                      もっと見る（+12件）
-                    </button>
-                    <button
-                      onClick={handleShowAllVideos}
-                      className="px-4 md:px-5 py-2.5 md:py-3 text-sm md:text-base bg-qiita-surface dark:bg-dark-surface-light text-qiita-text-dark dark:text-white rounded-lg hover-primary font-semibold"
-                    >
-                      すべて表示（全{book.youtube_videos.length}件）
-                    </button>
-                  </div>
-                )}
-              </div>
-            )}
-
-            {/* Amazonで購入ボタン */}
-            {book.amazon_affiliate_url && (
-              <div className="mt-8 md:mt-12 flex justify-center">
-                <a
-                  href={book.amazon_affiliate_url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 md:gap-3 px-6 md:px-8 py-3 md:py-3.5 bg-[#FF9900] hover:bg-[#E88B00] text-white font-bold text-sm md:text-base rounded-lg transition-colors duration-200"
-                >
-                  <i className="ri-shopping-cart-line text-lg md:text-xl"></i>
-                  <span>Amazonで購入する</span>
-                  <i className="ri-external-link-line text-sm md:text-base"></i>
-                </a>
-              </div>
-            )}
-
-            {/* 動画再生モーダル */}
-            {selectedVideoId && (
-              <div
-                className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4 animate-fade-in"
-                onClick={() => setSelectedVideoId(null)}
-              >
-                <div
-                  className="relative w-full max-w-3xl aspect-video bg-black rounded-lg overflow-hidden shadow-2xl"
-                  onClick={(e) => e.stopPropagation()}
-                >
-                  {/* 閉じるボタン */}
                   <button
-                    onClick={() => setSelectedVideoId(null)}
-                    className="absolute top-2 right-2 md:top-4 md:right-4 w-10 h-10 bg-black/50 hover:bg-black/70 text-white rounded-full flex items-center justify-center z-10 transition-colors"
-                    aria-label="閉じる"
+                    onClick={handleShowMore}
+                    className="w-full py-3 mt-8 border-2 border-green-700 bg-black text-green-500 font-pixel text-xs shadow-[3px_3px_0_#166534] hover:bg-green-500 hover:text-black hover:shadow-none hover:translate-x-[3px] hover:translate-y-[3px] transition-all"
                   >
-                    <i className="ri-close-line text-2xl"></i>
+                    ▼ LOAD MORE DATA
                   </button>
-                  
-                  {/* YouTube埋め込み */}
-                  <iframe
-                    src={`https://www.youtube.com/embed/${selectedVideoId}?autoplay=1`}
-                    className="w-full h-full"
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                    allowFullScreen
-                  ></iframe>
-                </div>
+                )}
+              </div>
+            ) : (
+              <div className="border-2 border-gray-800 bg-black p-12 text-center shadow-[4px_4px_0_#1a1a1a]">
+                <p className="font-pixel text-gray-500 text-sm">NO ARTICLES FOUND.</p>
               </div>
             )}
+            
+            {/* Ad: Article List Bottom */}
+            <AdSenseDisplay adSlot="1178567873" />
+          </div>
+        </div>
       </main>
-      
-      {/* 構造化データ（JSON-LD） */}
-      {book && (
-        <>
-          <script
-            type="application/ld+json"
-            dangerouslySetInnerHTML={{
-              __html: JSON.stringify(generateBookStructuredData(book)),
-            }}
-          />
-          <script
-            type="application/ld+json"
-            dangerouslySetInnerHTML={{
-              __html: JSON.stringify(
-                generateBreadcrumbStructuredData([
-                  { name: 'ホーム', url: '/' },
-                  { name: book.title || '書籍詳細', url: `/books/${asin}` },
-                ])
-              ),
-            }}
-          />
-        </>
-      )}
       
       <Footer />
     </div>
   );
 }
-

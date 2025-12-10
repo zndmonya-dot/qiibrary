@@ -1,10 +1,9 @@
-from fastapi import FastAPI, Request
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from .api import rankings, books, admin, data_update, daily_tweet, youtube
+from .api import rankings, books
 from .scheduler import start_scheduler, stop_scheduler
 from .middleware.rate_limit import RateLimitMiddleware
 from .middleware.security import SecurityHeadersMiddleware
-from .middleware.admin_auth import verify_admin_access
 from .monitoring.sentry import init_sentry
 import os
 import logging
@@ -32,28 +31,18 @@ scheduler = None
 frontend_url = os.getenv("FRONTEND_URL", "http://localhost:3000")
 allowed_origins = [
     frontend_url,
-    # ローカル開発（HTTP）
+    # ローカル開発
     "http://localhost:3000",
     "http://localhost:3001",
-    "http://localhost:3002",
     "http://127.0.0.1:3000",
     "http://127.0.0.1:3001",
-    "http://127.0.0.1:3002",
-    # ローカル開発（HTTPS）
-    "https://localhost:3000",
-    "https://localhost:3001",
-    "https://localhost:3002",
-    "https://127.0.0.1:3000",
-    "https://127.0.0.1:3001",
-    "https://127.0.0.1:3002",
-    # Vercel本番環境
+    # 本番環境
     "https://qiibrary.com",
     "https://www.qiibrary.com",
-    # Vercel実際のURL
     "https://qiibrary.vercel.app",
 ]
 
-# Vercelのプレビュー環境も許可（*.vercel.app）
+# Vercelのプレビュー環境も許可
 vercel_preview_domain = os.getenv("VERCEL_PREVIEW_DOMAIN", "")
 if vercel_preview_domain:
     allowed_origins.append(vercel_preview_domain)
@@ -69,58 +58,21 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=allowed_origins,
     allow_credentials=True,
-    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
+    allow_methods=["GET", "OPTIONS"],
     allow_headers=["*"],
     expose_headers=["*"],
     max_age=3600,
 )
 
-# レート制限ミドルウェア（ボット攻撃対策）
+# レート制限ミドルウェア
 app.add_middleware(RateLimitMiddleware)
 
 # セキュリティヘッダーミドルウェア
 app.add_middleware(SecurityHeadersMiddleware)
 
-# 管理者API認証ミドルウェア
-@app.middleware("http")
-async def admin_auth_middleware(request: Request, call_next):
-    """管理者APIへのアクセスを認証でチェック    """
-    if request.url.path.startswith("/api/admin"):
-        await verify_admin_access(request)
-    response = await call_next(request)
-    return response
-
-
-@app.get("/api/admin/scheduler/status")
-async def get_scheduler_status(request: Request):
-    """スケジューラーの稼働状況を確認（管理者のみ）"""
-    await verify_admin_access(request)
-    
-    if not scheduler:
-        return {"status": "not_initialized"}
-    
-    jobs = []
-    for job in scheduler.get_jobs():
-        jobs.append({
-            "id": job.id,
-            "name": job.name,
-            "next_run_time": str(job.next_run_time) if job.next_run_time else None
-        })
-        
-    return {
-        "status": "running" if scheduler.running else "stopped",
-        "timezone": str(scheduler.timezone),
-        "jobs": jobs
-    }
-
-
-# ルーター登録
+# ルーター登録（公開APIのみ）
 app.include_router(rankings.router, prefix="/api/rankings", tags=["rankings"])
 app.include_router(books.router, prefix="/api/books", tags=["books"])
-app.include_router(admin.router, prefix="/api/admin", tags=["admin"])
-app.include_router(data_update.router, prefix="/api/admin", tags=["admin"])
-app.include_router(daily_tweet.router, prefix="/api/admin", tags=["admin"])
-app.include_router(youtube.router, prefix="/api/youtube", tags=["youtube"])
 
 
 @app.get("/")
@@ -139,9 +91,7 @@ async def health_check():
 
 @app.on_event("startup")
 async def startup_event():
-    """
-    アプリケーション起動時にスケジューラーを開始
-    """
+    """アプリケーション起動時にスケジューラーを開始"""
     global scheduler
     logger.info("アプリケーション起動中...")
     scheduler = start_scheduler()
@@ -150,11 +100,8 @@ async def startup_event():
 
 @app.on_event("shutdown")
 async def shutdown_event():
-    """
-    アプリケーション終了時にスケジューラーを停止
-    """
+    """アプリケーション終了時にスケジューラーを停止"""
     global scheduler
     logger.info("アプリケーション終了中...")
     stop_scheduler(scheduler)
     logger.info("アプリケーション終了完了")
-

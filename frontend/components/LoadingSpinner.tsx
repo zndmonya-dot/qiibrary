@@ -1,22 +1,26 @@
-interface LoadingSpinnerProps {
-  message?: string;
-  size?: 'sm' | 'md' | 'lg';
-}
+import React from 'react';
 
-export default function LoadingSpinner({ message = '読み込み中...', size = 'md' }: LoadingSpinnerProps) {
-  const sizeClasses = {
-    sm: 'h-8 w-8',
-    md: 'h-12 w-12',
-    lg: 'h-16 w-16',
-  };
-
+export default function LoadingSpinner() {
   return (
-    <div className="p-12">
-      <div className="flex flex-col justify-center items-center">
-        <div className={`animate-spin rounded-full ${sizeClasses[size]} border-t-2 border-b-2 border-qiita-green dark:border-dark-green mb-4`}></div>
-        <p className="text-qiita-text dark:text-dark-text text-sm font-medium animate-pulse">{message}</p>
+    <div className="flex flex-col items-center justify-center p-12 w-full">
+      <div className="relative mb-6">
+        {/* Outer Box */}
+        <div className="w-16 h-16 border-4 border-green-500 flex items-center justify-center animate-[spin_3s_linear_infinite]">
+          <div className="w-8 h-8 bg-green-500 animate-pulse"></div>
+        </div>
+        {/* Glitch Effect Layers */}
+        <div className="absolute top-0 left-0 w-16 h-16 border-4 border-red-500 opacity-30 animate-pulse" style={{ transform: 'translate(4px, 0)' }}></div>
+        <div className="absolute top-0 left-0 w-16 h-16 border-4 border-blue-500 opacity-30 animate-pulse" style={{ animationDelay: '0.1s', transform: 'translate(-4px, 0)' }}></div>
+      </div>
+      
+      <div className="font-pixel text-xl text-green-500 tracking-widest animate-pulse">
+        LOADING DATA...
+      </div>
+      
+      {/* Progress Bar */}
+      <div className="mt-4 w-64 h-6 border-2 border-green-500 p-1 bg-black shadow-[4px_4px_0_#39ff14]">
+        <div className="h-full bg-green-500 animate-loading-bar w-full origin-left"></div>
       </div>
     </div>
   );
 }
-

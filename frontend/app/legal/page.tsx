@@ -304,8 +304,8 @@ export default function LegalPage() {
           <div className="mt-8 pt-6 border-t border-qiita-border dark:border-dark-border text-sm text-qiita-text-light dark:text-dark-text-light">
             <div className="flex items-center justify-between">
               <div>
-                <div>制定日: 2024年10月20日</div>
-                <div>最終更新日: 2025年11月20日</div>
+                <div>制定日: 2025年10月20日</div>
+                <div>最終更新日: 2025年12月10日</div>
               </div>
               <Link href="/" className="text-qiita-green hover-underline flex items-center gap-1">
                 <i className="ri-home-line"></i>

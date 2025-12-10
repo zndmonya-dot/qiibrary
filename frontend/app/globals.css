@@ -2,320 +2,219 @@
 @tailwind components;
 @tailwind utilities;
 
-@import 'remixicon/fonts/remixicon.css';
+/* Retro Game Fonts */
+@import url('https://fonts.googleapis.com/css2?family=DotGothic16&family=Press+Start+2P&display=swap');
 
-/* フラッシュ防止: ルートレベルでカラースキームを設定 */
 :root {
-  color-scheme: light;
-}
-
-.dark {
-  color-scheme: dark;
-}
-
-/* 初期レンダリング時のちらつき防止 */
-html {
-  background-color: #f5f6f6;
-}
-
-html.dark {
-  background-color: #1d2020;
+  /* --retro-bg: #050505; Pure Black */
+  --retro-bg: #02040a; /* Deep Navy Black */
+  --retro-text: #e0e0e0;
+  --retro-primary: #39ff14; /* Neon Green */
+  --retro-secondary: #ff00ff; /* Neon Pink */
+  --retro-accent: #00ffff; /* Cyan */
+  --retro-warning: #ffff00; /* Yellow */
+  --retro-danger: #ff0000; /* Red */
+  --retro-dark: #1a1a1a;
+  --retro-border: #333;
 }
 
 body {
-  background-color: #f5f6f6;
-  color: #6a6a6a;
-  font-family: 'Roboto', 'Hiragino Kaku Gothic ProN', 'メイリオ', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  font-weight: 500;
-  /* transitionを削除してフラッシュを防止 */
+  background-color: transparent;
+  color: var(--retro-text);
+  font-family: 'DotGothic16', sans-serif;
+  overflow-x: hidden;
+  min-height: 100vh;
 }
 
-/* ダークモード */
-.dark body {
-  background-color: #1d2020;
-  color: #b8b8b8;
+/* CRT Scanline Effect - Very Subtle */
+body::before {
+  content: "";
+  display: block;
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  background: linear-gradient(
+    to bottom,
+    transparent 50%,
+    rgba(0, 0, 0, 0.03) 50%
+  );
+  background-size: 100% 4px;
+  z-index: 9999;
+  pointer-events: none;
+  opacity: 0.5;
 }
 
-/* Qiitaスタイルのスクロールバー */
+/* CRT Flicker */
+@keyframes flicker {
+  0% { opacity: 0.97; }
+  5% { opacity: 0.95; }
+  10% { opacity: 0.9; }
+  15% { opacity: 0.95; }
+  20% { opacity: 0.99; }
+  25% { opacity: 0.95; }
+  30% { opacity: 0.9; }
+  35% { opacity: 0.96; }
+  40% { opacity: 0.98; }
+  45% { opacity: 0.95; }
+  50% { opacity: 0.99; }
+  55% { opacity: 0.93; }
+  60% { opacity: 0.9; }
+  65% { opacity: 0.96; }
+  70% { opacity: 1; }
+  75% { opacity: 0.97; }
+  80% { opacity: 0.95; }
+  85% { opacity: 0.9; }
+  90% { opacity: 0.93; }
+  95% { opacity: 0.99; }
+  100% { opacity: 0.94; }
+}
+
+.crt-flicker {
+  animation: flicker 0.15s infinite;
+  pointer-events: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(18, 16, 16, 0.05);
+  z-index: 9998;
+}
+
+/* Retro Typography */
+.font-pixel {
+  font-family: 'Press Start 2P', cursive;
+}
+
+.text-retro-primary {
+  color: var(--retro-primary);
+  text-shadow: 0 0 5px var(--retro-primary);
+}
+
+.text-retro-secondary {
+  color: var(--retro-secondary);
+  text-shadow: 0 0 5px var(--retro-secondary);
+}
+
+.text-retro-accent {
+  color: var(--retro-accent);
+  text-shadow: 0 0 5px var(--retro-accent);
+}
+
+/* Retro Components */
+.retro-border {
+  border: 4px solid var(--retro-dark);
+  box-shadow: 
+    -4px -4px 0 var(--retro-border),
+    4px 4px 0 var(--retro-border);
+  position: relative;
+}
+
+.retro-border-primary {
+  border: 4px solid var(--retro-primary);
+  box-shadow: 0 0 10px var(--retro-primary), inset 0 0 10px var(--retro-primary);
+}
+
+.retro-border-secondary {
+  border: 2px solid var(--retro-secondary);
+  box-shadow: 0 0 5px var(--retro-secondary);
+}
+
+.retro-btn {
+  background: var(--retro-dark);
+  border: 2px solid var(--retro-primary);
+  color: var(--retro-primary);
+  padding: 10px 20px;
+  font-family: 'Press Start 2P', cursive;
+  font-size: 12px;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: 4px 4px 0 var(--retro-primary);
+}
+
+.retro-btn:hover {
+  background: var(--retro-primary);
+  color: #000;
+  box-shadow: 2px 2px 0 var(--retro-primary);
+  transform: translate(2px, 2px);
+}
+
+.retro-btn-secondary {
+  border-color: var(--retro-secondary);
+  color: var(--retro-secondary);
+  box-shadow: 4px 4px 0 var(--retro-secondary);
+}
+
+.retro-btn-secondary:hover {
+  background: var(--retro-secondary);
+  color: #000;
+  box-shadow: 2px 2px 0 var(--retro-secondary);
+}
+
+.retro-card {
+  background: #000;
+  border: 2px solid var(--retro-border);
+  padding: 1rem;
+  position: relative;
+}
+
+.retro-card::after {
+  content: "";
+  position: absolute;
+  top: 4px;
+  left: 4px;
+  right: 4px;
+  bottom: 4px;
+  border: 1px solid #222;
+  pointer-events: none;
+}
+
+/* Scrollbar */
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 12px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #edeeee;
-}
-
-.dark ::-webkit-scrollbar-track {
-  background: #2f3232;
+  background: #000;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #c0c0c0;
-  border-radius: 4px;
-  transition: background 0.2s ease;
+  background: var(--retro-dark);
+  border: 1px solid var(--retro-primary);
 }
 
-.dark ::-webkit-scrollbar-thumb {
-  background: #4a4d4d;
+::-webkit-scrollbar-thumb:hover {
+  background: var(--retro-primary);
 }
 
-/* スクロールバーのホバー：デスクトップのみ */
-@media (hover: hover) and (pointer: fine) {
-  ::-webkit-scrollbar-thumb:hover {
-    background: #357a00;
-  }
-
-  .dark ::-webkit-scrollbar-thumb:hover {
-    background: #4a9900;
-  }
+/* Utilities */
+.text-shadow-glow {
+  text-shadow: 0 0 8px currentColor;
 }
 
-/* ページトランジションの最適化 */
-html {
-  scroll-behavior: smooth;
+.animate-pulse-slow {
+  animation: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
 
-/* 滑らかなページ遷移 */
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-  to {
+@keyframes pulse {
+  0%, 100% {
     opacity: 1;
-    transform: translateY(0);
+  }
+  50% {
+    opacity: .5;
   }
 }
 
-@keyframes slideDown {
-  from {
-    opacity: 0;
-    transform: translateY(-10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+/* Loading Bar Animation */
+.animate-loading-bar {
+  animation: loading-bar 2s infinite ease-in-out;
 }
 
-@keyframes scaleIn {
-  from {
-    opacity: 0;
-    transform: scale(0.95);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1);
-  }
-}
-
-@keyframes fadeInUp {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.animate-fade-in {
-  animation: fadeIn 0.3s ease-out;
-}
-
-.animate-slide-down {
-  animation: slideDown 0.2s ease-out;
-}
-
-.animate-scale-in {
-  animation: scaleIn 0.2s ease-out;
-}
-
-.animate-fade-in-up {
-  animation: fadeInUp 0.5s ease-out;
-}
-
-/* アニメーション遅延（順次表示） */
-.animate-delay-50 {
-  animation-delay: 0.05s;
-  opacity: 0;
-  animation-fill-mode: forwards;
-}
-
-.animate-delay-100 {
-  animation-delay: 0.1s;
-  opacity: 0;
-  animation-fill-mode: forwards;
-}
-
-.animate-delay-150 {
-  animation-delay: 0.15s;
-  opacity: 0;
-  animation-fill-mode: forwards;
-}
-
-.animate-delay-200 {
-  animation-delay: 0.2s;
-  opacity: 0;
-  animation-fill-mode: forwards;
-}
-
-.animate-delay-250 {
-  animation-delay: 0.25s;
-  opacity: 0;
-  animation-fill-mode: forwards;
-}
-
-.animate-delay-300 {
-  animation-delay: 0.3s;
-  opacity: 0;
-  animation-fill-mode: forwards;
-}
-
-/* カスタムユーティリティ */
-@layer components {
-  /* プライマリボタン（Qiita緑） */
-  .btn-primary {
-    @apply bg-qiita-green text-white font-medium px-4 py-2 rounded 
-           transition-colors duration-150 ease-out;
-  }
-  
-  @media (hover: hover) and (pointer: fine) {
-    .btn-primary {
-      @apply hover:bg-qiita-green-dark;
-    }
-    
-    .btn-youtube {
-      @apply hover:bg-red-600;
-    }
-    
-    .btn-amazon {
-      @apply hover:bg-[#ff8800];
-    }
-  }
-  
-  /* YouTubeボタン（動画用） */
-  .btn-youtube {
-    @apply bg-youtube-red text-white font-semibold px-4 py-2 rounded 
-           transition-colors duration-150 ease-out inline-flex items-center gap-2;
-  }
-  
-  /* Amazonボタン */
-  .btn-amazon {
-    @apply bg-[#FF9900] text-white font-semibold px-4 py-2 rounded 
-           transition-colors duration-150 ease-out inline-flex items-center gap-2;
-  }
-  
-  /* カード */
-  .card-primary {
-    @apply bg-qiita-card dark:bg-dark-surface rounded-lg p-4 border border-qiita-border dark:border-dark-border
-           transition-all duration-150 ease-out;
-  }
-  
-  /* カードのホバー効果：デスクトップのみ */
-  @media (hover: hover) and (pointer: fine) {
-    .card-primary {
-      @apply hover:shadow-sm;
-    }
-    
-    .card-youtube {
-      @apply hover:shadow-sm;
-    }
-  }
-  
-  /* YouTubeカード（動画埋め込み用） */
-  .card-youtube {
-    @apply bg-qiita-surface-2 dark:bg-dark-surface rounded-lg p-4 border border-qiita-border dark:border-dark-border
-           transition-all duration-150 ease-out;
-  }
-  
-  /* セカンダリテキスト */
-  .text-secondary {
-    @apply text-qiita-text dark:text-dark-text;
-  }
-  
-  /* タブボタン */
-  .tab-button {
-    @apply px-6 py-3 font-medium transition-colors duration-150 ease-out
-           relative flex-1
-           text-qiita-text dark:text-dark-text;
-  }
-  
-  @media (hover: hover) and (pointer: fine) {
-    .tab-button {
-      @apply hover:text-qiita-text-dark dark:hover:text-white;
-    }
-  }
-  
-  .tab-button.active {
-    @apply text-qiita-text-dark dark:text-white;
-  }
-  
-  /* 共通ホバー効果（デスクトップのみ） */
-  @media (hover: hover) and (pointer: fine) {
-    .hover-primary {
-      @apply hover:bg-qiita-green/10 dark:hover:bg-qiita-green/20 
-             transition-all duration-200;
-    }
-    
-    .hover-link {
-      @apply hover:text-qiita-green dark:hover:text-dark-green 
-             transition-colors duration-200;
-    }
-    
-    .hover-scale {
-      @apply hover:opacity-80 transition-opacity duration-200;
-    }
-    
-    .hover-card {
-      @apply hover:bg-qiita-green/10 dark:hover:bg-qiita-green/20 
-             transition-all duration-200;
-    }
-
-    /* Footer links */
-    .hover-footer-link {
-      @apply hover:text-white transition-colors duration-150;
-    }
-
-    .hover-footer-icon {
-      @apply hover:bg-gray-600 transition-colors duration-150;
-    }
-
-    /* Book detail page */
-    .hover-text-green {
-      @apply hover:text-qiita-green dark:hover:text-dark-green transition-colors duration-200;
-    }
-
-    .hover-text-white {
-      @apply hover:text-white transition-colors duration-150;
-    }
-
-    /* Contact & other pages */
-    .hover-bg-green-dark {
-      @apply hover:bg-qiita-green-dark transition-all duration-200;
-    }
-
-    .hover-bg-surface {
-      @apply hover:bg-qiita-green/10 dark:hover:bg-qiita-green/20 transition-all duration-200;
-    }
-
-    .hover-underline {
-      @apply hover:underline;
-    }
-
-    .hover-opacity-90 {
-      @apply hover:opacity-90 transition-opacity;
-    }
-
-    .hover-opacity-80 {
-      @apply hover:opacity-80 transition-opacity duration-200;
-    }
-
-    /* Group hover for nested elements */
-    .group:hover .group-hover-text-green {
-      @apply text-qiita-green dark:text-dark-green transition-colors;
-    }
-  }
+@keyframes loading-bar {
+  0% { width: 0%; }
+  50% { width: 100%; }
+  100% { width: 0%; }
 }

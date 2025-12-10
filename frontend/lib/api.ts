@@ -1,6 +1,5 @@
-import axios from 'axios';
-import { API_TIMEOUT, DEFAULT_RANKING_LIMIT } from './constants';
-import { getYouTubeThumbnailUrl, getYouTubeVideoUrl, buildQueryParams } from './utils';
+import axios, { AxiosError, InternalAxiosRequestConfig } from 'axios';
+import { API_TIMEOUT } from './constants';
 
 // API設定
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
@@ -11,6 +10,38 @@ export const api = axios.create({
     'Content-Type': 'application/json',
   },
   timeout: API_TIMEOUT,
+});
+
+// リトライ用の型拡張
+interface RetryConfig extends InternalAxiosRequestConfig {
+  retryCount?: number;
+}
+
+// リトライ設定
+const MAX_RETRIES = 3;
+const RETRY_DELAY = 1000;
+
+api.interceptors.response.use(undefined, async (error: AxiosError) => {
+  const config = error.config as RetryConfig;
+  
+  // ネットワークエラー、タイムアウト、5xxエラーの場合にリトライ
+  const shouldRetry = 
+    !error.response || // ネットワークエラー
+    (error.response.status >= 500 && error.response.status < 600) || // サーバーエラー
+    error.code === 'ECONNABORTED'; // タイムアウト
+
+  if (!config || !shouldRetry || (config.retryCount || 0) >= MAX_RETRIES) {
+    return Promise.reject(error);
+  }
+  
+  config.retryCount = (config.retryCount || 0) + 1;
+  
+  // 指数バックオフ
+  const delay = RETRY_DELAY * Math.pow(2, config.retryCount - 1);
+  await new Promise(resolve => setTimeout(resolve, delay));
+  
+  console.log(`Retrying request... (${config.retryCount}/${MAX_RETRIES})`);
+  return api(config);
 });
 
 // ========================================
@@ -41,13 +72,12 @@ export interface Book {
 export interface BookStats {
   mention_count: number;
   article_count: number;
-  unique_user_count: number; // ユニークユーザー数
+  unique_user_count: number;
   total_likes: number;
   avg_likes: number;
   score: number;
   latest_mention_at: string | null;
-  is_new: boolean; // NEWバッジ表示フラグ（初登場から30日以内）
-  total_views?: number; // YouTube動画用（オプション）
+  is_new: boolean;
 }
 
 /**
@@ -78,31 +108,15 @@ export interface RankingItem {
  */
 export interface RankingResponse {
   rankings: RankingItem[];
-  total: number;           // 総件数（サーバーサイドページネーション用）
-  limit: number;           // 取得件数
-  offset: number;          // オフセット
+  total: number;
+  limit: number;
+  offset: number;
   period: {
     type?: 'daily' | 'monthly' | 'yearly';
     date?: string;
     year?: number;
     month?: number;
   };
-}
-
-/**
- * YouTube動画情報
- */
-export interface YouTubeVideo {
-  video_id: string;
-  title: string;
-  channel_name: string;
-  thumbnail_url: string | null;
-  video_url: string;
-  view_count: number;
-  like_count: number;
-  subscriber_count: number;
-  popularity_score: number;
-  published_at: string;
 }
 
 /**
@@ -123,11 +137,10 @@ export interface QiitaArticle {
 }
 
 /**
- * 書籍詳細情報（Qiita記事とYouTube動画を含む）
+ * 書籍詳細情報（Qiita記事を含む）
  */
 export interface BookDetail extends Book {
   qiita_articles: QiitaArticle[];
-  youtube_videos: YouTubeVideo[];
 }
 
 // ========================================
@@ -228,7 +241,6 @@ export const getRankings = {
 
 /**
  * 利用可能な年のリストを取得
- * @returns 年のリスト（降順）
  */
 export const getAvailableYears = async (): Promise<number[]> => {
   const response = await api.get('/api/rankings/years');
@@ -237,34 +249,13 @@ export const getAvailableYears = async (): Promise<number[]> => {
 
 /**
  * 書籍詳細を取得
- * @param asin 書籍のISBN/ASIN
- * @returns 書籍詳細情報
  */
 export const getBookDetail = async (asin: string): Promise<BookDetail> => {
   const response = await api.get(`/api/books/${asin}`);
   const data = response.data;
   
-  // youtube_linksをyoutube_videosに変換
-  const youtube_videos = (data.youtube_links || []).map((link: any) => {
-    const videoId = link.youtube_video_id || '';
-    return {
-      video_id: videoId,
-      title: link.title || '動画タイトル',
-      channel_name: link.channel_name || 'YouTube',
-      thumbnail_url: link.thumbnail_url || getYouTubeThumbnailUrl(videoId),
-      video_url: link.youtube_url || getYouTubeVideoUrl(videoId),
-      view_count: link.view_count || 0,
-      like_count: link.like_count || 0,
-      subscriber_count: link.subscriber_count || 0,
-      popularity_score: link.popularity_score || 0,
-      published_at: link.published_at || new Date().toISOString(),
-    };
-  });
-  
   return {
     ...data.book,
     qiita_articles: data.qiita_articles || [],
-    youtube_videos,
   };
 };
-

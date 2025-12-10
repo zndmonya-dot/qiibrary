@@ -69,11 +69,5 @@ class SecurityHeadersMiddleware(BaseHTTPMiddleware):
         # X-XSS-Protection (古いブラウザ向け)
         response.headers["X-XSS-Protection"] = "1; mode=block"
         
-        # Cache-Control - 機密データのキャッシュ防止
-        if request.url.path.startswith("/api/admin"):
-            response.headers["Cache-Control"] = "no-store, no-cache, must-revalidate, private"
-            response.headers["Pragma"] = "no-cache"
-            response.headers["Expires"] = "0"
-        
         return response
 

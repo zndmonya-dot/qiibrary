@@ -3,11 +3,9 @@
 import { memo } from 'react';
 import Link from 'next/link';
 import { Book, BookStats, TopArticle } from '@/lib/api';
-import { formatNumber, formatPublicationDate } from '@/lib/utils';
+import { formatNumber } from '@/lib/utils';
 import { analytics } from '@/lib/analytics';
 import BookImage from './BookImage';
-import { getRankStyle, getRankIcon } from '@/lib/rank-styles';
-import { BREAKPOINTS } from '@/lib/constants';
 
 interface BookCardProps {
   rank: number;
@@ -18,217 +16,135 @@ interface BookCardProps {
 }
 
 function BookCard({ rank, book, stats, topArticles, onNavigate }: BookCardProps) {
-  const rankStyle = getRankStyle(rank);
-  const rankIcon = getRankIcon(rank);
+  // ランクに応じたバッジの色
+  const getRankStyle = () => {
+    if (rank === 1) return 'bg-yellow-400 text-black border-yellow-200 shadow-[0_0_15px_rgba(250,204,21,0.5)]';
+    if (rank === 2) return 'bg-gray-300 text-black border-gray-100';
+    if (rank === 3) return 'bg-amber-600 text-white border-amber-400';
+    return 'bg-green-500 text-black border-white';
+  };
 
   return (
-    <div className="card-primary flex flex-col items-center md:flex-row md:items-center gap-4 md:gap-6 border border-qiita-border relative overflow-hidden">
-      {/* NEWバッジ（スマホ：右上、デスクトップ：左上） */}
-      {stats.is_new && (
-        <div className="absolute top-0 right-0 md:left-0 md:right-auto z-10">
-          <div className="relative">
-            {/* メインバッジ */}
-            <div className="px-3 md:px-4 py-1.5 md:py-1.5 bg-gradient-to-r from-red-500 to-orange-500 rounded-bl-lg md:rounded-bl-none md:rounded-br-lg shadow-lg animate-pulse">
-              <span className="text-sm md:text-sm font-black text-white tracking-wider drop-shadow-md">NEW!</span>
-            </div>
-            {/* グロー効果 */}
-            <div className="absolute inset-0 bg-gradient-to-r from-red-500/30 to-orange-500/30 blur-md rounded-bl-lg md:rounded-bl-none md:rounded-br-lg -z-10"></div>
-          </div>
-        </div>
-      )}
-      
-      {/* ランク表示 */}
-      <div className="flex-shrink-0 w-full md:w-14 flex items-center justify-center">
-        <div className="flex flex-col items-center">
-          {/* メダルアイコン：デスクトップのみ表示 */}
-          {rankIcon && (
-            <i className={`hidden md:inline ${rankIcon} text-2xl ${rankStyle}`}></i>
-          )}
-          <span className={`text-4xl md:text-3xl font-bold ${rankStyle}`}>
-            {rank}
-          </span>
-        </div>
+    <div className="bg-black border-2 border-gray-800 relative group hover:border-green-500 transition-all duration-300 shadow-[4px_4px_0_#1a1a1a] hover:shadow-[4px_4px_0_#166534]">
+      {/* Rank Badge */}
+      <div className={`absolute -top-4 left-4 font-pixel text-sm px-4 py-1.5 z-10 border-2 ${getRankStyle()}`}>
+        #{rank}
       </div>
-      
-      {/* 書籍画像と詳細ボタン */}
-      <div className="flex-shrink-0 flex flex-col gap-2 items-center md:items-start">
-        {book.amazon_affiliate_url ? (
-          <a
-            href={book.amazon_affiliate_url}
-            target="_blank"
-            rel="noopener noreferrer nofollow"
-            className="block hover-scale"
-            onClick={(e) => {
-              analytics.clickAmazonLink(book.isbn || '', book.title);
-              // スマホではアフィリエイトリンクを保持するため、同じタブで開く
-              if (window.innerWidth < BREAKPOINTS.MOBILE) {
-                e.preventDefault();
-                window.location.href = book.amazon_affiliate_url || '';
-              }
-            }}
-          >
-            <BookImage
-              src={book.thumbnail_url}
-              alt={book.title}
-              width={160}
-              height={240}
-              rank={rank}
-              className="w-[120px] h-[180px] md:w-[160px] md:h-[240px]"
-            />
-          </a>
-        ) : (
-          <BookImage
-            src={book.thumbnail_url}
-            alt={book.title}
-            width={160}
-            height={240}
-            rank={rank}
-            className="w-[120px] h-[180px] md:w-[160px] md:h-[240px]"
-          />
-        )}
-      </div>
-      
-      {/* 上部：タイトルと著者情報 */}
-      <div className="flex-1 min-w-0 w-full">
-        <div className="flex flex-col md:flex-row gap-3 md:gap-6 mb-3 md:mb-4">
-          {/* タイトル（左） */}
-          <div className="flex-1 min-w-0 text-center md:text-left">
+
+      <div className="flex flex-col md:flex-row gap-5 p-5 pt-6">
+        {/* Book Image */}
+        <div className="flex-shrink-0 w-28 md:w-36 mx-auto md:mx-0">
+          <div className="border-2 border-gray-700 bg-black p-1 group-hover:border-green-500/50 transition-colors aspect-[2/3]">
             {book.amazon_affiliate_url ? (
               <a
                 href={book.amazon_affiliate_url}
                 target="_blank"
                 rel="noopener noreferrer nofollow"
-                className="group inline-block"
-                onClick={(e) => {
-                  analytics.clickAmazonLink(book.isbn || '', book.title);
-                  // スマホではアフィリエイトリンクを保持するため、同じタブで開く
-                  if (window.innerWidth < BREAKPOINTS.MOBILE) {
-                    e.preventDefault();
-                    window.location.href = book.amazon_affiliate_url || '';
-                  }
-                }}
+                onClick={() => analytics.clickAmazonLink(book.isbn || '', book.title)}
+                className="block w-full h-full"
               >
-                <h3 className="text-lg md:text-lg font-bold line-clamp-2 leading-relaxed text-qiita-text-dark dark:text-white md:hover:text-qiita-green dark:md:hover:text-dark-green transition-colors duration-200">
-                  {book.title || `ISBN: ${book.isbn} の書籍`}
-                </h3>
+                <BookImage
+                  src={book.thumbnail_url}
+                  alt={book.title}
+                  width={128}
+                  height={192}
+                  rank={rank}
+                  className="w-full h-full object-cover hover:brightness-110 transition-all"
+                />
               </a>
             ) : (
-              <h3 className="text-lg md:text-lg font-bold line-clamp-2 leading-relaxed text-qiita-text-dark dark:text-white md:hover:text-qiita-green dark:md:hover:text-dark-green transition-colors duration-200 cursor-pointer">
-                {book.title || `ISBN: ${book.isbn} の書籍`}
-              </h3>
-            )}
-            
-            {!book.title && (
-              <div className="mt-2 px-2 py-1 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-700 rounded text-xs text-yellow-700 dark:text-yellow-300 inline-flex items-center gap-1">
-                <i className="ri-information-line text-xs"></i>
-                <span>書籍情報取得中</span>
-              </div>
-            )}
-          </div>
-          
-          {/* 統計情報（右） */}
-          <div className="flex items-center justify-center md:justify-start gap-4 md:gap-4 text-base md:text-sm flex-shrink-0">
-            {(stats.total_views ?? 0) > 0 ? (
-              // YouTube動画がある場合
-              <>
-                <div className="flex items-center gap-1.5 text-qiita-text dark:text-dark-text">
-                  <i className="ri-eye-line text-xl md:text-lg"></i>
-                  <span className="font-bold text-lg md:text-base">{formatNumber(stats.total_views ?? 0)}</span>
-                  <span className="text-sm md:text-xs">再生</span>
-                </div>
-                <div className="flex items-center gap-1.5 text-qiita-text dark:text-dark-text">
-                  <i className="ri-youtube-line text-xl md:text-lg"></i>
-                  <span className="font-bold text-lg md:text-base">{stats.mention_count}</span>
-                  <span className="text-sm md:text-xs">動画</span>
-                </div>
-              </>
-            ) : (
-              // Qiita記事の場合
-              <>
-                <Link
-                  href={`/books/${book.isbn}#qiita-articles`}
-                  prefetch={true}
-                  scroll={false}
-                  className="flex items-center gap-1.5 text-qiita-green dark:text-dark-green"
-                  onClick={onNavigate}
-                >
-                  <i className="ri-article-line text-xl md:text-lg"></i>
-                  <span className="font-bold text-lg md:text-base">{formatNumber(stats.mention_count)}</span>
-                  <span className="text-sm md:text-xs">記事</span>
-                </Link>
-                {stats.total_likes > 0 && (
-                  <Link
-                    href={`/books/${book.isbn}#qiita-articles`}
-                    prefetch={true}
-                    scroll={false}
-                    className="flex items-center gap-1.5 text-pink-600 dark:text-pink-400"
-                    onClick={onNavigate}
-                  >
-                    <i className="ri-heart-fill text-xl md:text-lg"></i>
-                    <span className="font-bold text-lg md:text-base">{formatNumber(stats.total_likes)}</span>
-                    <span className="text-sm md:text-xs text-qiita-text dark:text-dark-text">いいね</span>
-                  </Link>
-                )}
-              </>
+              <BookImage
+                src={book.thumbnail_url}
+                alt={book.title}
+                width={128}
+                height={192}
+                rank={rank}
+                className="w-full h-full object-cover"
+              />
             )}
           </div>
         </div>
-        
-        {/* トップ記事一覧（下部） */}
-        {topArticles && topArticles.length > 0 && (
-          <div>
-            <h4 className="text-sm md:text-xs font-bold text-qiita-text dark:text-dark-text mb-3 md:mb-3 flex items-center justify-center md:justify-start gap-1.5">
-              <i className="ri-article-line text-qiita-green dark:text-dark-green text-base md:text-sm"></i>
-              人気記事トップ{topArticles.length}
-            </h4>
-            <div className="space-y-2 md:space-y-2">
-              {topArticles.map((article, index) => (
-                <a
-                  key={article.id}
-                  href={article.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="block p-3 md:p-3 rounded-lg bg-qiita-surface/30 dark:bg-dark-surface-light/30 border border-qiita-border/30 dark:border-dark-border/30 md:hover:bg-qiita-green/10 dark:md:hover:bg-qiita-green/20 transition-all duration-200"
-                >
-                  <div className="flex items-start gap-3 md:gap-2.5">
-                    <span className="flex-shrink-0 w-7 h-7 md:w-6 md:h-6 flex items-center justify-center rounded-full bg-qiita-green/20 dark:bg-qiita-green/30 text-qiita-green dark:text-dark-green text-sm md:text-xs font-bold">
-                      {index + 1}
-                    </span>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-base md:text-sm font-semibold text-qiita-text-dark dark:text-white line-clamp-2 leading-relaxed mb-2 md:mb-1.5">
-                        {article.title}
-                      </p>
-                      <div className="flex items-center gap-1.5 md:gap-1 text-sm md:text-xs text-qiita-text dark:text-dark-text">
-                        <i className="ri-heart-fill text-pink-500 text-base md:text-sm"></i>
-                        <span>{formatNumber(article.likes_count)}</span>
-                      </div>
-                    </div>
-                    <i className="ri-external-link-line text-lg md:text-base text-qiita-text-light dark:text-dark-text-light flex-shrink-0"></i>
-                  </div>
-                </a>
-              ))}
-            </div>
-            <div className="mt-3 md:mt-3 flex justify-end">
-              <Link
-                href={`/books/${book.isbn}#qiita-articles`}
-                prefetch={true}
-                scroll={false}
-                className="inline-flex items-center gap-1.5 md:gap-1.5 text-base md:text-base text-qiita-green dark:text-dark-green font-medium py-2 px-3 md:py-0 md:px-0"
-                onClick={() => {
-                  onNavigate?.();
-                  analytics.clickBook(book.isbn || '', book.title, rank);
-                }}
-              >
-                <span>すべての記事を見る</span>
-                <i className="ri-arrow-right-line text-lg md:text-base"></i>
-              </Link>
-            </div>
+
+        {/* Book Info */}
+        <div className="flex-1 min-w-0 flex flex-col">
+          <Link href={`/books/${book.isbn}`} prefetch={true} onClick={onNavigate} className="block mb-2">
+            <h3 className="text-lg md:text-xl text-white leading-tight group-hover:text-green-400 transition-colors line-clamp-2 font-medium">
+              {book.title || `ISBN: ${book.isbn}`}
+            </h3>
+          </Link>
+          
+          <div className="text-xs text-gray-500 mb-4 flex flex-wrap gap-x-3 gap-y-1">
+            <span className="text-gray-400">{book.author || 'Unknown'}</span>
+            <span className="text-gray-600">|</span>
+            <span>{book.publisher || 'N/A'}</span>
           </div>
-        )}
+
+          {/* Stats */}
+          <div className="space-y-2 mb-4 flex-1">
+            <div className="flex items-center gap-3">
+              <span className="text-xs font-pixel text-cyan-400 w-20">MENTIONS</span>
+              <div className="flex-1 h-3 bg-gray-900 border border-gray-700 overflow-hidden">
+                <div 
+                  className="h-full bg-cyan-500"
+                  style={{ width: `${Math.min((stats.mention_count / 30) * 100, 100)}%` }}
+                />
+              </div>
+              <span className="text-xs font-pixel text-cyan-400 w-12 text-right">
+                {formatNumber(stats.mention_count)}
+              </span>
+            </div>
+            
+            {stats.total_likes > 0 && (
+              <div className="flex items-center gap-3">
+                <span className="text-xs font-pixel text-pink-400 w-20">LIKES</span>
+                <div className="flex-1 h-3 bg-gray-900 border border-gray-700 overflow-hidden">
+                  <div 
+                    className="h-full bg-pink-500"
+                    style={{ width: `${Math.min((stats.total_likes / 1000) * 100, 100)}%` }}
+                  />
+                </div>
+                <span className="text-xs font-pixel text-pink-400 w-12 text-right">
+                  {formatNumber(stats.total_likes)}
+                </span>
+              </div>
+            )}
+          </div>
+
+          {/* Top Articles */}
+          {topArticles && topArticles.length > 0 && (
+            <div className="bg-gray-900 p-2 border border-gray-700 mb-4">
+              <ul className="space-y-1">
+                {topArticles.slice(0, 2).map((article) => (
+                  <li key={article.id}>
+                    <a
+                      href={article.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center text-gray-500 hover:text-green-400 text-xs transition-colors"
+                    >
+                      <span className="mr-2 text-green-500">▸</span>
+                      <span className="truncate">{article.title}</span>
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+
+          <div className="flex justify-end mt-auto">
+            <Link 
+              href={`/books/${book.isbn}`} 
+              prefetch={true} 
+              onClick={onNavigate}
+              className="font-pixel text-[10px] text-green-500 hover:bg-green-500 hover:text-black px-3 py-1.5 border border-green-500 transition-all uppercase tracking-wider"
+            >
+              Details →
+            </Link>
+          </div>
+        </div>
       </div>
     </div>
   );
 }
 
 export default memo(BookCard);
-
