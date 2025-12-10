@@ -1,48 +1,29 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-  <defs>
-    <pattern id="scanlines" patternUnits="userSpaceOnUse" width="512" height="6">
-      <rect width="512" height="3" fill="rgba(0,0,0,0.15)"/>
-    </pattern>
-    <linearGradient id="greenGlow" x1="0%" y1="0%" x2="0%" y2="100%">
-      <stop offset="0%" style="stop-color:#5fff5f;stop-opacity:1" />
-      <stop offset="50%" style="stop-color:#39ff14;stop-opacity:1" />
-      <stop offset="100%" style="stop-color:#20c000;stop-opacity:1" />
-    </linearGradient>
-    <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
-      <feGaussianBlur stdDeviation="8" result="coloredBlur"/>
-      <feMerge>
-        <feMergeNode in="coloredBlur"/>
-        <feMergeNode in="SourceGraphic"/>
-      </feMerge>
-    </filter>
-    <filter id="innerShadow" x="-50%" y="-50%" width="200%" height="200%">
-      <feOffset dx="0" dy="4"/>
-      <feGaussianBlur stdDeviation="4" result="blur"/>
-      <feComposite in2="SourceAlpha" operator="arithmetic" k2="-1" k3="1"/>
-      <feMerge>
-        <feMergeNode/>
-        <feMergeNode in="SourceGraphic"/>
-      </feMerge>
-    </filter>
-  </defs>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" shape-rendering="crispEdges">
+  <!-- Background: Neon Green -->
+  <rect width="32" height="32" fill="#39ff14"/>
   
-  <!-- Background with rounded corners -->
-  <rect x="16" y="16" width="480" height="480" rx="80" ry="80" fill="url(#greenGlow)"/>
+  <!-- Border: Darker Green -->
+  <rect x="0" y="0" width="32" height="2" fill="#166534"/>
+  <rect x="0" y="30" width="32" height="2" fill="#166534"/>
+  <rect x="0" y="0" width="2" height="32" fill="#166534"/>
+  <rect x="30" y="0" width="2" height="32" fill="#166534"/>
+
+  <!-- Pixel Q: Bold Black -->
   
-  <!-- Scanline overlay -->
-  <rect x="16" y="16" width="480" height="480" rx="80" ry="80" fill="url(#scanlines)"/>
+  <!-- Top Bar -->
+  <rect x="8" y="6" width="16" height="4" fill="#000000"/>
   
-  <!-- Inner border highlight -->
-  <rect x="32" y="32" width="448" height="448" rx="64" ry="64" fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="2"/>
+  <!-- Bottom Bar (Left part) -->
+  <rect x="8" y="22" width="12" height="4" fill="#000000"/>
   
-  <!-- Q letter with glow effect - centered -->
-  <g filter="url(#innerShadow)">
-    <!-- Q circle part -->
-    <circle cx="256" cy="240" r="120" fill="none" stroke="#000" stroke-width="48"/>
-    <!-- Q tail -->
-    <line x1="320" y1="320" x2="400" y2="420" stroke="#000" stroke-width="48" stroke-linecap="round"/>
-  </g>
+  <!-- Left Bar -->
+  <rect x="6" y="8" width="4" height="16" fill="#000000"/>
   
-  <!-- Subtle highlight on Q -->
-  <circle cx="256" cy="240" r="120" fill="none" stroke="rgba(255,255,255,0.15)" stroke-width="8" stroke-dasharray="80 300" stroke-dashoffset="-60"/>
+  <!-- Right Bar -->
+  <rect x="22" y="8" width="4" height="16" fill="#000000"/>
+  
+  <!-- Tail -->
+  <rect x="18" y="20" width="4" height="4" fill="#000000"/>
+  <rect x="20" y="22" width="4" height="4" fill="#000000"/>
+  <rect x="22" y="24" width="4" height="4" fill="#000000"/>
 </svg>
