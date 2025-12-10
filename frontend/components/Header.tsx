@@ -48,12 +48,32 @@ export default function Header() {
       }`}>
         <div className="container mx-auto px-4 flex items-center justify-between">
           <Link href="/" prefetch={true} onClick={handleLogoClick} className="flex items-center space-x-3 group">
-            <div className="w-10 h-10 bg-green-500 flex items-center justify-center rounded-sm shadow-[0_0_10px_#39ff14]">
-              <span className="font-pixel text-2xl text-black font-bold">Q</span>
+            {/* Q Icon - SVG */}
+            <div className="w-10 h-10 relative">
+              <svg viewBox="0 0 32 32" className="w-full h-full" style={{ imageRendering: 'pixelated' }}>
+                <rect width="32" height="32" fill="#39ff14"/>
+                <rect x="0" y="0" width="32" height="2" fill="#166534"/>
+                <rect x="0" y="30" width="32" height="2" fill="#166534"/>
+                <rect x="0" y="0" width="2" height="32" fill="#166534"/>
+                <rect x="30" y="0" width="2" height="32" fill="#166534"/>
+                <rect x="8" y="6" width="16" height="4" fill="#000"/>
+                <rect x="8" y="22" width="12" height="4" fill="#000"/>
+                <rect x="6" y="8" width="4" height="16" fill="#000"/>
+                <rect x="22" y="8" width="4" height="16" fill="#000"/>
+                <rect x="18" y="20" width="4" height="4" fill="#000"/>
+                <rect x="20" y="22" width="4" height="4" fill="#000"/>
+                <rect x="22" y="24" width="4" height="4" fill="#000"/>
+              </svg>
+              <div className="absolute inset-0 rounded-sm shadow-[0_0_15px_#39ff14] opacity-50 group-hover:opacity-100 transition-opacity"></div>
             </div>
-            <h1 className="text-xl md:text-2xl font-pixel text-white tracking-widest group-hover:text-green-400 transition-colors">
-              Qiibrary
-            </h1>
+            {/* Logo Text */}
+            <div className="flex flex-col">
+              <h1 className="text-xl md:text-2xl font-pixel tracking-wide">
+                <span className="text-green-400 group-hover:text-green-300 transition-colors">Qii</span>
+                <span className="text-white group-hover:text-green-400 transition-colors">brary</span>
+              </h1>
+              <span className="text-[8px] font-mono text-gray-500 tracking-widest hidden md:block">TECH BOOK DATABASE</span>
+            </div>
           </Link>
           
           {/* Desktop Navigation */}
