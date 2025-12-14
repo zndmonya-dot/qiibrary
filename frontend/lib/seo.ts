@@ -14,15 +14,6 @@ export function generateBookStructuredData(bookDetail: BookDetail) {
   const qiitaArticles = bookDetail.qiita_articles || [];
   const totalLikes = qiitaArticles.reduce((sum: number, article: any) => sum + (article.likes_count || 0), 0);
   const mentionCount = qiitaArticles.length;
-  
-  // 集約評価の計算（Qiita記事のいいね数とメンション数から）
-  const aggregateRating = totalLikes > 0 ? {
-    '@type': 'AggregateRating',
-    'ratingValue': Math.min(5, Math.max(1, Math.log10(totalLikes + 1) * 1.5 + 3)).toFixed(1),
-    'reviewCount': mentionCount,
-    'bestRating': '5',
-    'worstRating': '1',
-  } : undefined;
 
   // トップ記事を取得（いいね数順、上位3件）
   const topArticles = [...qiitaArticles]
@@ -47,7 +38,6 @@ export function generateBookStructuredData(bookDetail: BookDetail) {
     'description': bookDetail.description || `${bookDetail.title}についてQiitaで言及された技術書。${mentionCount}件の記事で紹介されています。`,
     'datePublished': bookDetail.publication_date,
     'inLanguage': 'ja',
-    'aggregateRating': aggregateRating,
     'offers': bookDetail.amazon_affiliate_url ? {
       '@type': 'Offer',
       'url': bookDetail.amazon_affiliate_url,
@@ -57,17 +47,8 @@ export function generateBookStructuredData(bookDetail: BookDetail) {
         'name': 'Amazon.co.jp',
       },
     } : undefined,
-    'review': topArticles.map((article: any) => ({
-      '@type': 'Review',
-      'author': {
-        '@type': 'Person',
-        'name': article.author_id,
-      },
-      'datePublished': article.published_at,
-      'name': article.title,
-      'reviewBody': article.title,
-      'url': article.url,
-    })),
+    // Note: いいね数から推定した「評価」や、Qiita記事タイトルを「レビュー」として扱うのは
+    // 検索エンジンのガイドライン上リスクが高いため出力しない。
   };
 
   // undefinedのフィールドを削除
@@ -136,5 +117,26 @@ export function generateRankingStructuredData(books: { book: Book; rank: number 
       },
     })),
   };
+}
+
+/**
+ * canonical URL をクライアント側で確実に設定する
+ *
+ * Note:
+ * Next.jsのmetadataで出すのが理想だが、`use client` なページでも
+ * canonical を安定させるためにDOM側で補助する。
+ */
+export function ensureCanonicalUrl(canonicalUrl: string) {
+  if (typeof document === 'undefined') return;
+  if (!canonicalUrl) return;
+
+  const normalized = canonicalUrl.replace(/\/+$/, '') || canonicalUrl;
+  let link = document.querySelector('link[rel="canonical"]') as HTMLLinkElement | null;
+  if (!link) {
+    link = document.createElement('link');
+    link.rel = 'canonical';
+    document.head.appendChild(link);
+  }
+  link.href = normalized;
 }
 

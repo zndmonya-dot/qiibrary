@@ -11,7 +11,7 @@ import { AdSenseDisplay, AdSenseInFeed } from '@/components/AdSense';
 import { getRankings, getAvailableYears, RankingResponse } from '@/lib/api';
 import { analytics } from '@/lib/analytics';
 import { ITEMS_PER_PAGE, SEARCH } from '@/lib/constants';
-import { generateWebSiteStructuredData } from '@/lib/seo';
+import { ensureCanonicalUrl, generateRankingStructuredData, generateWebSiteStructuredData } from '@/lib/seo';
 import { getErrorMessage, logError } from '@/lib/error-handler';
 import { PeriodType } from '@/types/common';
 
@@ -29,6 +29,12 @@ const getPeriodLabel = (p: PeriodType, year: number | null) => {
 export default function Home() {
   const router = useRouter();
   const searchParams = useSearchParams();
+
+  // canonical は常にトップ（クエリで重複URLを作らない）
+  useEffect(() => {
+    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://qiibrary.com';
+    ensureCanonicalUrl(`${siteUrl}/`);
+  }, []);
   
   const [period, setPeriod] = useState<PeriodType>((searchParams.get('period') as PeriodType) || 'yearly');
   const [selectedYear, setSelectedYear] = useState<number | null>(
@@ -181,6 +187,23 @@ export default function Home() {
           __html: JSON.stringify(generateWebSiteStructuredData()),
         }}
       />
+
+      {!error && rankings && paginatedRankings.length > 0 && (
+        <Script
+          id="structured-data-ranking"
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(
+              generateRankingStructuredData(
+                paginatedRankings.slice(0, 50).map((item) => ({
+                  book: item.book,
+                  rank: item.rank,
+                }))
+              )
+            ),
+          }}
+        />
+      )}
       
       {/* Scanline Effect */}
       <div className="crt-flicker"></div>
