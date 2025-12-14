@@ -127,8 +127,8 @@ export default function BookDetailPage() {
 
                   <div className="grid grid-cols-2 gap-3 mb-6">
                     <div className="bg-gray-900 border-2 border-cyan-600 p-3 text-center shadow-[3px_3px_0_#0e7490]">
-                      <div className="text-[10px] text-cyan-400 font-pixel mb-1">MENTIONS</div>
-                      <div className="text-2xl font-pixel text-cyan-300">{formatNumber(book.total_mentions)}</div>
+                      <div className="text-[10px] text-cyan-400 font-pixel mb-1">QIITA BLOGS</div>
+                      <div className="text-2xl font-pixel text-cyan-300">{formatNumber(book.qiita_articles.length)}</div>
                     </div>
                     <div className="bg-gray-900 border-2 border-pink-600 p-3 text-center shadow-[3px_3px_0_#86198f]">
                       <div className="text-[10px] text-pink-400 font-pixel mb-1">LIKES</div>

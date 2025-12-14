@@ -82,15 +82,15 @@ function BookCard({ rank, book, stats, topArticles, onNavigate }: BookCardProps)
           {/* Stats */}
           <div className="space-y-2 mb-4 flex-1">
             <div className="flex items-center gap-3">
-              <span className="text-xs font-pixel text-cyan-400 w-20">MENTIONS</span>
+              <span className="text-xs font-pixel text-cyan-400 w-20">QIITA BLOGS</span>
               <div className="flex-1 h-3 bg-gray-900 border border-gray-700 overflow-hidden">
                 <div 
                   className="h-full bg-cyan-500"
-                  style={{ width: `${Math.min((stats.mention_count / 30) * 100, 100)}%` }}
+                  style={{ width: `${Math.min(((stats.article_count || 0) / 30) * 100, 100)}%` }}
                 />
               </div>
               <span className="text-xs font-pixel text-cyan-400 w-12 text-right">
-                {formatNumber(stats.mention_count)}
+                {formatNumber(stats.article_count || 0)}
               </span>
             </div>
             
