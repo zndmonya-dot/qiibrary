@@ -134,7 +134,7 @@ export default function HeroSection() {
 
         <div className="grid grid-cols-3 gap-3 md:gap-6 max-w-3xl mx-auto mb-10">
           <StatBox label="Books" value={stats.totalBooks} color="green" />
-          <StatBox label="QIITA ARTICLES" value={stats.totalArticles} color="cyan" />
+          <StatBox label="QIITA BLOGS" value={stats.totalArticles} color="cyan" />
           <StatBox label="Likes" value={stats.totalLikes} color="pink" />
         </div>
 

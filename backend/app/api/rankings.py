@@ -12,7 +12,7 @@ from ..database import get_db
 from ..services.ranking_service import RankingService
 from ..services.cache_service import get_cache_service
 from ..models.qiita_article import QiitaArticle
-from ..models.book import Book
+from ..models.book import Book, BookQiitaMention
 
 router = APIRouter()
 
@@ -25,20 +25,38 @@ async def get_site_stats(
     サイト全体の統計（ブログ総数など）を取得
 
     Returns:
-        total_articles: Qiita記事総数
-        total_books: 書籍総数
-        total_likes: Qiita記事の総いいね数
+        total_articles: ブログ総数（= 書籍に紐づくQiita記事の総数）
+        total_books: 書籍総数（= 言及のある書籍数）
+        total_likes: 上記Qiita記事の総いいね数
     """
     try:
         cache = get_cache_service()
-        cache_key = cache.generate_key("site_stats")
+        # 集計定義を変えたのでキャッシュキーも更新
+        cache_key = cache.generate_key("site_stats_v2")
         cached = cache.get(cache_key)
         if cached is not None:
             return cached
 
-        total_articles = int(db.query(func.count(QiitaArticle.id)).scalar() or 0)
-        total_books = int(db.query(func.count(Book.id)).scalar() or 0)
-        total_likes = int(db.query(func.coalesce(func.sum(QiitaArticle.likes_count), 0)).scalar() or 0)
+        # ブログ総数: 書籍に紐づく記事数（重複排除）
+        total_articles = int(
+            db.query(func.count(func.distinct(BookQiitaMention.article_id))).scalar() or 0
+        )
+
+        # 書籍総数: 言及のある書籍数（重複排除）
+        total_books = int(
+            db.query(func.count(func.distinct(BookQiitaMention.book_id))).scalar() or 0
+        )
+
+        # いいね総数: 上記「言及のある記事」だけを対象に合算
+        mentioned_articles = (
+            db.query(QiitaArticle.id.label("id"), QiitaArticle.likes_count.label("likes_count"))
+            .join(BookQiitaMention, BookQiitaMention.article_id == QiitaArticle.id)
+            .distinct(QiitaArticle.id)
+            .subquery()
+        )
+        total_likes = int(
+            db.query(func.coalesce(func.sum(mentioned_articles.c.likes_count), 0)).scalar() or 0
+        )
 
         result = {
             "total_articles": total_articles,
