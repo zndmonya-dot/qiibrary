@@ -16,7 +16,7 @@ backend_dir = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(backend_dir))
 
 from scripts.collect_books_from_qiita import run_data_collection
-from app.database import SessionLocal
+from app.database import db_session
 from app.services.ranking_service import RankingService
 from app.models.book import Book
 
@@ -73,63 +73,63 @@ def daily_tweet_generation():
     毎日実行されるツイート文生成タスク
     24時間ランキング1位のツイート文をログに出力
     """
-    db = SessionLocal()
     try:
         logger.info("=" * 80)
         logger.info("ツイート文生成開始")
         logger.info(f"実行時刻: {datetime.now(JST)}")
         logger.info("=" * 80)
-        
-        # 24時間ランキングを取得
-        ranking_service = RankingService(db)
-        rankings_result = ranking_service.get_ranking_fast(days=1, limit=1)
-        
-        # 返り値は{"rankings": [...], "total": ...}形式
-        rankings_data = rankings_result.get('rankings', [])
-        
-        if not rankings_data or len(rankings_data) == 0:
-            logger.warning("24時間以内のランキングデータがありません")
-            return
-        
-        # 1位を取得
-        top_item = rankings_data[0]
-        book_id = top_item['book']['id']
-        
-        # 書籍の累計データを取得
-        book = db.query(Book).filter(Book.id == book_id).first()
-        if not book:
-            logger.error("書籍データが見つかりません")
-            return
-        
-        # 累計いいね数を計算
-        from app.models.qiita_article import QiitaArticle
-        from app.models.book import BookQiitaMention
-        from sqlalchemy import func
-        
-        total_likes = db.query(
-            func.sum(QiitaArticle.likes_count)
-        ).join(
-            BookQiitaMention,
-            QiitaArticle.id == BookQiitaMention.article_id
-        ).filter(
-            BookQiitaMention.book_id == book.id
-        ).scalar() or 0
-        
-        article_count = db.query(
-            func.count(func.distinct(QiitaArticle.id))
-        ).join(
-            BookQiitaMention,
-            QiitaArticle.id == BookQiitaMention.article_id
-        ).filter(
-            BookQiitaMention.book_id == book.id
-        ).scalar() or 0
-        
-        # ツイート文を生成
-        likes_display = format_number(total_likes)
-        asin = book.isbn.replace('-', '') if book.isbn else ''
-        book_url = f"https://qiibrary.com/books/{asin}" if asin else "https://qiibrary.com"
-        
-        tweet = f"""【Qiita技術書ランキング 本日の1位】
+
+        with db_session() as db:
+            # 24時間ランキングを取得
+            ranking_service = RankingService(db)
+            rankings_result = ranking_service.get_ranking_fast(days=1, limit=1)
+
+            # 返り値は{"rankings": [...], "total": ...}形式
+            rankings_data = rankings_result.get('rankings', [])
+
+            if not rankings_data or len(rankings_data) == 0:
+                logger.warning("24時間以内のランキングデータがありません")
+                return
+
+            # 1位を取得
+            top_item = rankings_data[0]
+            book_id = top_item['book']['id']
+
+            # 書籍の累計データを取得
+            book = db.query(Book).filter(Book.id == book_id).first()
+            if not book:
+                logger.error("書籍データが見つかりません")
+                return
+
+            # 累計いいね数を計算
+            from app.models.qiita_article import QiitaArticle
+            from app.models.book import BookQiitaMention
+            from sqlalchemy import func
+
+            total_likes = db.query(
+                func.sum(QiitaArticle.likes_count)
+            ).join(
+                BookQiitaMention,
+                QiitaArticle.id == BookQiitaMention.article_id
+            ).filter(
+                BookQiitaMention.book_id == book.id
+            ).scalar() or 0
+
+            article_count = db.query(
+                func.count(func.distinct(QiitaArticle.id))
+            ).join(
+                BookQiitaMention,
+                QiitaArticle.id == BookQiitaMention.article_id
+            ).filter(
+                BookQiitaMention.book_id == book.id
+            ).scalar() or 0
+
+            # ツイート文を生成
+            likes_display = format_number(total_likes)
+            asin = book.isbn.replace('-', '') if book.isbn else ''
+            book_url = f"https://qiibrary.com/books/{asin}" if asin else "https://qiibrary.com"
+
+            tweet = f"""【Qiita技術書ランキング 本日の1位】
 
 {book.title}
 
@@ -142,22 +142,20 @@ Qiitaで話題の技術書をランキング化
 購入: {book.amazon_affiliate_url}
 
 #技術書 #Qiita #Qiibrary"""
-        
-        # ログに出力
-        logger.info("=" * 80)
-        logger.info("本日のツイート文:")
-        logger.info("=" * 80)
-        logger.info(tweet)
-        logger.info("=" * 80)
-        logger.info(f"文字数: {len(tweet)} / 280")
-        logger.info("=" * 80)
-        logger.info("ツイート文生成完了")
-        logger.info("=" * 80)
+
+            # ログに出力
+            logger.info("=" * 80)
+            logger.info("本日のツイート文:")
+            logger.info("=" * 80)
+            logger.info(tweet)
+            logger.info("=" * 80)
+            logger.info(f"文字数: {len(tweet)} / 280")
+            logger.info("=" * 80)
+            logger.info("ツイート文生成完了")
+            logger.info("=" * 80)
         
     except Exception as e:
         logger.error(f"ツイート文生成エラー: {e}", exc_info=True)
-    finally:
-        db.close()
 
 
 def start_scheduler():

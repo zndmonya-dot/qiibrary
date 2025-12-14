@@ -23,9 +23,16 @@ class BookBase(BaseModel):
 class BookStats(BaseModel):
     """書籍統計情報"""
     mention_count: int = 0
+    # ブログ総数（全期間のQiita記事数）
     article_count: int = 0
+    # 期間/タグ等で絞った記事数（ランキング計算用）
+    article_count_period: Optional[int] = None
+    unique_user_count: int = 0
     total_likes: int = 0
+    avg_likes: float = 0.0
+    score: float = 0.0
     latest_mention_at: Optional[datetime] = None
+    is_new: bool = False
 
 
 class Book(BookBase):

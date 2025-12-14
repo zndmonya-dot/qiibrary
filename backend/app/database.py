@@ -1,6 +1,8 @@
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm import sessionmaker, Session
+from contextlib import contextmanager
+from typing import Iterator
 from .config import settings
 
 # データベース接続プールの最適化設定
@@ -36,6 +38,20 @@ Base = declarative_base()
 
 def get_db():
     """データベースセッションの依存性注入"""
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
+
+
+@contextmanager
+def db_session() -> Iterator[Session]:
+    """
+    DBセッションを `with` で安全に扱うためのコンテキストマネージャ。
+
+    FastAPIのDepends用は `get_db()` を使い、バッチ/スケジューラー等はこれを使う。
+    """
     db = SessionLocal()
     try:
         yield db

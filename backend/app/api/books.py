@@ -4,24 +4,15 @@
 
 from fastapi import APIRouter, HTTPException, Depends
 from sqlalchemy.orm import Session
-from typing import List, Optional
+from typing import List, Optional, cast
 
-from ..database import SessionLocal
+from ..database import get_db
 from ..models.book import Book, BookQiitaMention, BookYouTubeLink
 from ..models.qiita_article import QiitaArticle
 from ..services.openbd_service import get_openbd_service
 from ..services.cache_service import get_cache_service
 
 router = APIRouter()
-
-
-# データベース依存性
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
 
 
 @router.get("/{isbn}", response_model=dict)
@@ -41,7 +32,7 @@ async def get_book_detail(
     try:
         # キャッシュから取得を試みる
         cache = get_cache_service()
-        cache_key = cache._generate_key("book_detail", isbn=isbn)
+        cache_key = cache.generate_key("book_detail", isbn=isbn)
         cached_result = cache.get(cache_key)
         if cached_result is not None:
             return cached_result
@@ -77,7 +68,8 @@ async def get_book_detail(
         
         # 動的にAmazonアフィリエイトURLを生成
         openbd_service = get_openbd_service()
-        amazon_affiliate_url = openbd_service.generate_amazon_affiliate_url(book.isbn)
+        isbn_value = cast(Optional[str], getattr(book, "isbn", None)) or ""
+        amazon_affiliate_url = openbd_service.generate_amazon_affiliate_url(isbn_value)
         
         # レスポンス形式に変換
         book_dict = book.to_dict()

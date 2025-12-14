@@ -71,13 +71,30 @@ export interface Book {
  */
 export interface BookStats {
   mention_count: number;
+  /**
+   * ブログ総数（全期間のQiita記事数）
+   */
   article_count: number;
+  /**
+   * 期間/タグ等で絞った記事数（ランキング計算用）
+   */
+  article_count_period?: number;
   unique_user_count: number;
   total_likes: number;
   avg_likes: number;
   score: number;
   latest_mention_at: string | null;
   is_new: boolean;
+}
+
+/**
+ * サイト全体の統計
+ */
+export interface SiteStatsResponse {
+  total_articles: number;
+  total_books: number;
+  total_likes: number;
+  updated_at: string;
 }
 
 /**
@@ -245,6 +262,14 @@ export const getRankings = {
 export const getAvailableYears = async (): Promise<number[]> => {
   const response = await api.get('/api/rankings/years');
   return response.data.years || [];
+};
+
+/**
+ * サイト全体の統計を取得
+ */
+export const getSiteStats = async (): Promise<SiteStatsResponse> => {
+  const response = await api.get('/api/rankings/stats');
+  return response.data;
 };
 
 /**

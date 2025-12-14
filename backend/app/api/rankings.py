@@ -6,20 +6,57 @@ from fastapi import APIRouter, HTTPException, Query, Depends
 from sqlalchemy.orm import Session
 from typing import List, Optional
 from datetime import date
+from sqlalchemy import func
 
-from ..database import SessionLocal
+from ..database import get_db
 from ..services.ranking_service import RankingService
+from ..services.cache_service import get_cache_service
+from ..models.qiita_article import QiitaArticle
+from ..models.book import Book
 
 router = APIRouter()
 
 
-# データベース依存性
-def get_db():
-    db = SessionLocal()
+@router.get("/stats", response_model=dict)
+async def get_site_stats(
+    db: Session = Depends(get_db),
+):
+    """
+    サイト全体の統計（ブログ総数など）を取得
+
+    Returns:
+        total_articles: Qiita記事総数
+        total_books: 書籍総数
+        total_likes: Qiita記事の総いいね数
+    """
     try:
-        yield db
-    finally:
-        db.close()
+        cache = get_cache_service()
+        cache_key = cache.generate_key("site_stats")
+        cached = cache.get(cache_key)
+        if cached is not None:
+            return cached
+
+        total_articles = int(db.query(func.count(QiitaArticle.id)).scalar() or 0)
+        total_books = int(db.query(func.count(Book.id)).scalar() or 0)
+        total_likes = int(db.query(func.coalesce(func.sum(QiitaArticle.likes_count), 0)).scalar() or 0)
+
+        result = {
+            "total_articles": total_articles,
+            "total_books": total_books,
+            "total_likes": total_likes,
+            "updated_at": date.today().isoformat(),
+        }
+
+        # 更新頻度が低いので長めにキャッシュ
+        cache.set(cache_key, result, ttl_seconds=1800)
+        return result
+
+    except Exception as e:
+        import traceback
+
+        error_msg = f"Stats error: {repr(e)}"
+        traceback.print_exc()
+        raise HTTPException(status_code=500, detail=error_msg)
 
 
 @router.get("/", response_model=dict)

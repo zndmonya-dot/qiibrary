@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { formatNumber } from '@/lib/utils';
 import Link from 'next/link';
+import { getSiteStats } from '@/lib/api';
 
 interface StatBoxProps {
   label: string;
@@ -82,11 +83,31 @@ const StatBox: React.FC<StatBoxProps> = ({ label, value, color }) => {
 };
 
 export default function HeroSection() {
-  const stats = {
+  const [stats, setStats] = useState({
     totalArticles: 15200,
     totalLikes: 540200,
     totalBooks: 17446,
-  };
+  });
+
+  useEffect(() => {
+    let isMounted = true;
+    (async () => {
+      try {
+        const data = await getSiteStats();
+        if (!isMounted) return;
+        setStats({
+          totalArticles: data.total_articles ?? 0,
+          totalLikes: data.total_likes ?? 0,
+          totalBooks: data.total_books ?? 0,
+        });
+      } catch {
+        // フォールバック（固定値）のまま
+      }
+    })();
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   return (
     <section className="relative pt-28 pb-12 overflow-hidden bg-black border-b-4 border-green-500">
@@ -113,7 +134,7 @@ export default function HeroSection() {
 
         <div className="grid grid-cols-3 gap-3 md:gap-6 max-w-3xl mx-auto mb-10">
           <StatBox label="Books" value={stats.totalBooks} color="green" />
-          <StatBox label="Articles" value={stats.totalArticles} color="cyan" />
+          <StatBox label="QIITA ARTICLES" value={stats.totalArticles} color="cyan" />
           <StatBox label="Likes" value={stats.totalLikes} color="pink" />
         </div>
 

@@ -65,6 +65,15 @@ class CacheService:
         params = json.dumps(kwargs, sort_keys=True, default=str)
         hash_value = hashlib.md5(params.encode()).hexdigest()[:16]
         return f"{prefix}:{hash_value}"
+
+    def generate_key(self, prefix: str, **kwargs) -> str:
+        """
+        キャッシュキーを生成（公開API）
+
+        Note:
+            既存実装との互換性のため `_generate_key()` も残す。
+        """
+        return self._generate_key(prefix, **kwargs)
     
     def get(self, key: str) -> Optional[Any]:
         """
@@ -228,7 +237,7 @@ def cached(
             else:
                 cache_params = kwargs
             
-            cache_key = cache._generate_key(prefix, **cache_params)
+            cache_key = cache.generate_key(prefix, **cache_params)
             
             # キャッシュから取得
             cached_value = cache.get(cache_key)

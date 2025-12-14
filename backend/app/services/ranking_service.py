@@ -5,9 +5,9 @@
 import logging
 import math
 from typing import List, Dict, Optional
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, date
 from sqlalchemy.orm import Session
-from sqlalchemy import func, text
+from sqlalchemy import func, text, or_
 
 from ..models.book import Book, BookQiitaMention
 from ..models.qiita_article import QiitaArticle
@@ -24,6 +24,85 @@ class RankingService:
         self.db = db
         self.openbd_service = get_openbd_service()
         self.cache = get_cache_service()
+
+    def _build_date_and_tag_condition(
+        self,
+        *,
+        tags: Optional[List[str]],
+        days: Optional[int],
+        year: Optional[int],
+        month: Optional[int],
+    ) -> tuple[str, dict]:
+        """
+        SQL（text）用の期間/タグ条件を組み立てる（必ずバインド変数を使う）。
+
+        Returns:
+            (sql_fragment, params)
+            sql_fragment は先頭に 'AND ...' を含むか、条件がなければ空文字。
+        """
+        conditions: list[str] = []
+        params: dict = {}
+
+        # 期間（qa.published_at）
+        if days is not None:
+            # 過去N日（"今" からN日前の日時以降）
+            conditions.append("qa.published_at >= :period_start")
+            params["period_start"] = datetime.now() - timedelta(days=days)
+        elif year is not None and month is not None:
+            # 指定月（開始含む、次月開始未満）
+            import calendar
+
+            last_day = calendar.monthrange(year, month)[1]
+            period_start = date(year, month, 1)
+            period_end = date(year, month, last_day) + timedelta(days=1)
+            conditions.append("qa.published_at >= :period_start")
+            conditions.append("qa.published_at < :period_end")
+            params["period_start"] = period_start
+            params["period_end"] = period_end
+        elif year is not None:
+            # 指定年（開始含む、翌年開始未満）
+            period_start = date(year, 1, 1)
+            period_end = date(year + 1, 1, 1)
+            conditions.append("qa.published_at >= :period_start")
+            conditions.append("qa.published_at < :period_end")
+            params["period_start"] = period_start
+            params["period_end"] = period_end
+
+        # タグ（qa.tags）
+        if tags:
+            tag_checks: list[str] = []
+            for i, tag in enumerate(tags):
+                param_name = f"tag_{i}"
+                tag_checks.append(f"qa.tags ? :{param_name}")
+                params[param_name] = tag
+            conditions.append(f"({' OR '.join(tag_checks)})")
+
+        if not conditions:
+            return "", {}
+
+        return "AND " + "\nAND ".join(conditions), params
+
+    def _build_search_condition(self, search: Optional[str]) -> tuple[str, dict]:
+        """
+        SQL（text）用の検索条件を組み立てる（必ずバインド変数を使う）。
+        """
+        if not search:
+            return "", {}
+
+        search_term = search.strip()
+        if not search_term:
+            return "", {}
+
+        # 過度に長い検索は抑制（LIKEの負荷とキャッシュキー肥大化を防ぐ）
+        search_term = search_term[:100]
+        params = {"search_like": f"%{search_term}%"}
+        condition = """AND (
+            LOWER(b.title) LIKE LOWER(:search_like) OR
+            LOWER(b.author) LIKE LOWER(:search_like) OR
+            LOWER(b.publisher) LIKE LOWER(:search_like) OR
+            LOWER(b.isbn) LIKE LOWER(:search_like)
+        )"""
+        return condition, params
     
     def get_ranking_fast(
         self,
@@ -57,9 +136,6 @@ class RankingService:
         - 検索あり: キャッシュしない（リアルタイム検索）
         - ページネーションあり: 5分間キャッシュ
         """
-        # 検索結果も短時間キャッシュ（同じ検索の重複を防ぐ）
-        use_cache = True  # 常にキャッシュを使用
-        
         # キャッシュキーを生成（検索キーワードも含める）
         cache_key_params = {
             "tags": tuple(sorted(tags)) if tags else None,
@@ -70,7 +146,7 @@ class RankingService:
             "offset": offset,
             "search": search,  # 検索キーワードもキャッシュキーに含める
         }
-        cache_key = self.cache._generate_key("ranking_fast", **cache_key_params)
+        cache_key = self.cache.generate_key("ranking_fast", **cache_key_params)
             
         # キャッシュから取得を試みる
         cached_result = self.cache.get(cache_key)
@@ -79,47 +155,25 @@ class RankingService:
             return cached_result
         
         logger.info(f"🔍 ランキングキャッシュミス、DBクエリ実行: {cache_key[:50]}...")
-        # 期間条件を構築
-        date_condition = ""
-        if days is not None:
-            start_date = (datetime.now() - timedelta(days=days)).strftime('%Y-%m-%d')
-            date_condition = f"AND qa.published_at >= '{start_date}'"
-        elif year is not None and month is not None:
-            import calendar
-            last_day = calendar.monthrange(year, month)[1]
-            date_condition = f"AND qa.published_at >= '{year}-{month:02d}-01' AND qa.published_at <= '{year}-{month:02d}-{last_day}'"
-        elif year is not None:
-            date_condition = f"AND qa.published_at >= '{year}-01-01' AND qa.published_at <= '{year}-12-31'"
-        
-        # タグ条件を構築
-        tag_condition = ""
-        if tags:
-            tag_checks = " OR ".join([f"qa.tags ? '{tag}'" for tag in tags])
-            tag_condition = f"AND ({tag_checks})"
-        
-        # 検索条件を構築（SQLインジェクション対策強化）
-        search_condition = ""
-        search_params = {}
-        if search:
-            # 危険な文字を除去
-            search_term = search.replace("'", "").replace(";", "").replace("--", "").replace("/*", "").replace("*/", "")
-            # 長さ制限（100文字まで）
-            search_term = search_term[:100] if len(search_term) > 100 else search_term
-            
-            if search_term:  # 空文字列でない場合のみ
-                search_condition = f"""AND (
-                    LOWER(b.title) LIKE LOWER('%{search_term}%') OR
-                    LOWER(b.author) LIKE LOWER('%{search_term}%') OR
-                    LOWER(b.publisher) LIKE LOWER('%{search_term}%') OR
-                    LOWER(b.isbn) LIKE LOWER('%{search_term}%')
-                )"""
-        
-        # ページネーション句
+
+        # 条件（バインド変数で組み立て）
+        date_tag_condition, date_tag_params = self._build_date_and_tag_condition(
+            tags=tags,
+            days=days,
+            year=year,
+            month=month,
+        )
+        search_condition, search_params = self._build_search_condition(search)
+
+        # ページネーション（バインド変数）
         pagination_clause = ""
+        pagination_params: dict = {}
         if limit is not None:
-            pagination_clause = f"LIMIT {limit}"
+            pagination_clause = "LIMIT :limit"
+            pagination_params["limit"] = int(limit)
             if offset is not None:
-                pagination_clause += f" OFFSET {offset}"
+                pagination_clause += " OFFSET :offset"
+                pagination_params["offset"] = int(offset)
         
         # 総件数取得用SQL（検索条件とフィルタを適用）
         count_sql = text(f"""
@@ -128,12 +182,14 @@ class RankingService:
             JOIN book_qiita_mentions bqm ON b.id = bqm.book_id
             JOIN qiita_articles qa ON bqm.article_id = qa.id
             WHERE b.total_mentions > 0
-            {date_condition}
-            {tag_condition}
+            {date_tag_condition}
             {search_condition}
         """)
         
-        count_result = self.db.execute(count_sql).fetchone()
+        count_result = self.db.execute(
+            count_sql,
+            {**date_tag_params, **search_params},
+        ).fetchone()
         total_count = int(count_result.total) if count_result else 0
         
         # 直接SQL（1回のクエリでランキングデータ取得）
@@ -153,8 +209,7 @@ class RankingService:
                 JOIN book_qiita_mentions bqm ON b.id = bqm.book_id
                 JOIN qiita_articles qa ON bqm.article_id = qa.id
                 WHERE b.total_mentions > 0
-                {date_condition}
-                {tag_condition}
+                {date_tag_condition}
                 {search_condition}
                 GROUP BY b.id, b.isbn, b.title, b.author, b.publisher, b.publication_date,
                          b.description, b.thumbnail_url, b.amazon_url, b.amazon_affiliate_url,
@@ -169,10 +224,29 @@ class RankingService:
             {pagination_clause}
         """)
         
-        results = self.db.execute(sql).fetchall()
+        results = self.db.execute(
+            sql,
+            {**date_tag_params, **search_params, **pagination_params},
+        ).fetchall()
         
         # 取得した書籍IDのリストを作成
         book_ids = [row.id for row in results]
+
+        # 「ブログ総数（全期間の記事数）」を返したいケース向けに、
+        # 表示用の全期間記事数をページ内の書籍IDだけ一括取得する
+        article_count_total_map: dict[int, int] = {}
+        if book_ids:
+            totals_sql = text("""
+                SELECT
+                    book_id,
+                    COUNT(DISTINCT article_id) AS article_count_total
+                FROM book_qiita_mentions
+                WHERE book_id = ANY(:book_ids)
+                GROUP BY book_id
+            """)
+            totals = self.db.execute(totals_sql, {"book_ids": book_ids}).fetchall()
+            for row_ in totals:
+                article_count_total_map[int(row_.book_id)] = int(row_.article_count_total or 0)
         
         # トップ記事を一括取得（2回目のクエリ）
         top_articles_map: dict[int, list[dict]] = {}
@@ -194,14 +268,16 @@ class RankingService:
                     FROM book_qiita_mentions bqm
                     JOIN qiita_articles qa ON bqm.article_id = qa.id
                     WHERE bqm.book_id = ANY(:book_ids)
-                    {date_condition}
-                    {tag_condition}
+                    {date_tag_condition}
                 )
                 SELECT * FROM ranked_articles WHERE rn <= 3
                 ORDER BY book_id, rn
             """)
             
-            articles_results = self.db.execute(articles_sql, {"book_ids": book_ids}).fetchall()
+            articles_results = self.db.execute(
+                articles_sql,
+                {"book_ids": book_ids, **date_tag_params},
+            ).fetchall()
             
             # book_id別にトップ記事を整理
             for article in articles_results:
@@ -224,10 +300,13 @@ class RankingService:
         now = datetime.now()
         for rank, row in enumerate(results, start=1):
             mention_count = int(row.mention_count) if row.mention_count else 0
-            article_count = int(row.article_count) if row.article_count else 0
+            # 期間/タグ等で絞った記事数（スコア計算用）
+            article_count_period = int(row.article_count) if row.article_count else 0
+            # 全期間の記事数（表示用）
+            article_count_total = article_count_total_map.get(row.id, article_count_period)
             unique_user_count = int(row.unique_user_count) if row.unique_user_count else 0
             total_likes = int(row.total_likes) if row.total_likes else 0
-            avg_likes = total_likes / article_count if article_count > 0 else 0
+            avg_likes = total_likes / article_count_period if article_count_period > 0 else 0
             
             # スコア（SQLで計算済み）
             score = float(row.calculated_score) if hasattr(row, 'calculated_score') else unique_user_count * (1 + math.log(avg_likes + 1))
@@ -264,7 +343,10 @@ class RankingService:
                 },
                 "stats": {
                     "mention_count": mention_count,
-                    "article_count": article_count,
+                    # UI上の「ARTICLES」はブログ総数（全期間）を期待するケースがあるため、全期間を返す
+                    "article_count": article_count_total,
+                    # 必要なら期間内件数も参照できるように残す（後方互換：追加フィールド）
+                    "article_count_period": article_count_period,
                     "unique_user_count": unique_user_count,
                     "total_likes": total_likes,
                     "avg_likes": round(avg_likes, 2),
@@ -374,7 +456,7 @@ class RankingService:
             if len(tag_conditions) == 1:
                 query = query.filter(tag_conditions[0])
             else:
-                query = query.filter(func.or_(*tag_conditions))
+                query = query.filter(or_(*tag_conditions))
         
         # 期間フィルタ（Qiita記事のpublished_at基準）
         if days is not None:
@@ -592,7 +674,7 @@ class RankingService:
             if len(tag_conditions) == 1:
                 query = query.filter(tag_conditions[0])
             else:
-                query = query.filter(func.or_(*tag_conditions))
+                query = query.filter(or_(*tag_conditions))
         
         # 期間フィルタ
         if days is not None:
